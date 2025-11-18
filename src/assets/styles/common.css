@@ -1,0 +1,207 @@
+/* src/assets/styles/common.css */
+
+/* ----- Reset / base ----- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  background-color: #f5f6fa;
+  color: #222;
+}
+
+/* ----- Layout ----- */
+.app-layout {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+.app-main {
+  display: flex;
+  min-height: 0;
+}
+
+.app-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+/* ----- Header ----- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #1f2933;
+  color: #fff;
+}
+
+.app-logo {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.app-header__user {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* ----- Sidebar ----- */
+.side-nav {
+  width: 220px;
+  background-color: #111827;
+  color: #e5e7eb;
+  padding: 1rem 0;
+  flex-shrink: 0;
+  min-height: calc(100vh - 96px); /* header + footer approx */
+}
+
+.side-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.side-nav__link {
+  display: block;
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.95rem;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.side-nav__link:hover {
+  background-color: #1f2937;
+}
+
+.side-nav__link--active {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+/* ----- Footer ----- */
+.app-footer {
+  padding: 0.5rem 1.5rem;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* ----- Common utility classes ----- */
+.page-title {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.09);
+}
+
+/* ----- Sidebar group (dropdown) ----- */
+.side-nav__group {
+  margin-top: 0.75rem;
+}
+
+/* header block similar to your screenshot */
+.side-nav__group-header {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  outline: none;
+}
+
+.side-nav__group-header:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.side-nav__group-header:hover {
+  background-color: #1f2937;
+}
+
+.side-nav__group-icon {
+  margin-right: 0.5rem;
+}
+
+.side-nav__group-label {
+  flex: 1;
+  text-align: left;
+}
+
+.side-nav__group-chevron {
+  transition: transform 0.15s ease;
+}
+
+.side-nav__group-chevron--open {
+  transform: rotate(180deg);
+}
+
+/* sub menu list */
+.side-nav__sub-list {
+  list-style: none;
+  margin: 0.25rem 0 0.25rem 0;
+  padding: 0;
+}
+
+/* children (General, Icons, Timeline style) */
+.side-nav__sub-link {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 1.75rem;
+  text-decoration: none;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.side-nav__sub-link:hover {
+  opacity: 1;
+}
+
+/* circle bullet on the left */
+.side-nav__sub-bullet {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #9ca3af;
+  margin-right: 0.5rem;
+}
+
+/* active child item (filled circle + bold text) */
+.side-nav__sub-link--active {
+  opacity: 1;
+  font-weight: 500;
+}
+
+.side-nav__sub-link--active .side-nav__sub-bullet {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
