@@ -1,9 +1,7 @@
-<!-- src/components/layout/SideNav.vue -->
 <template>
   <aside class="side-nav">
     <nav>
       <ul class="side-nav__list">
-        <!-- Simple links -->
         <li>
           <RouterLink to="/" class="side-nav__link" active-class="side-nav__link--active">
             Home
@@ -67,7 +65,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
 
-  const openGroupId = ref<string | null>('forms') // default: Forms open; set null if you want all closed
+  const openGroupId = ref<string | null>('forms') 
 
   function toggleGroup(id: string) {
     openGroupId.value = openGroupId.value === id ? null : id

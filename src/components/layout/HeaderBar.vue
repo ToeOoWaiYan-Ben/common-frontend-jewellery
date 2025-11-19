@@ -1,4 +1,3 @@
-<!-- src/components/layout/HeaderBar.vue -->
 <template>
   <header class="app-header">
     <div class="app-header__left">
