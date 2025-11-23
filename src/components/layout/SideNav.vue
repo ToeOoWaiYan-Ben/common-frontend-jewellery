@@ -9,18 +9,8 @@
       </div>
     </div>
 
-    <!-- User panel -->
-    <div class="side-nav__user-panel">
-      <div class="side-nav__user-avatar">A</div>
-      <div class="side-nav__user-info">
-        <span class="side-nav__user-name">Alexander</span>
-        <span class="side-nav__user-status">Online</span>
-      </div>
-    </div>
-
     <!-- Menu -->
     <div class="side-nav__menu">
-      <p class="side-nav__section-label">MAIN NAVIGATION</p>
 
       <ul class="side-nav__list">
         <li class="side-nav__item">
