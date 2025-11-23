@@ -1,80 +1,113 @@
-<!-- src/components/layout/SideNav.vue -->
 <template>
   <aside class="side-nav">
-    <div class="side-nav__scroll">
-      <!-- small brand block in sidebar -->
-      <div class="side-nav__brand">
-        <div class="side-nav__brand-mark">MT</div>
-        <div>
-          <div class="side-nav__brand-name">Myint Thar Oo Jewellery Shop</div>
-          <div class="side-nav__brand-meta">Control panel</div>
-        </div>
+    <!-- Brand/top area -->
+    <div class="side-nav__brand">
+      <div class="side-nav__brand-logo">MA</div>
+      <div class="side-nav__brand-text">
+        <p class="side-nav__brand-title">My Admin</p>
+        <p class="side-nav__brand-subtitle">Dashboard</p>
       </div>
+    </div>
 
-      <nav>
-        <p class="side-nav__section-label">Main</p>
-        <ul class="side-nav__list">
-          <li>
-            <RouterLink to="/" class="side-nav__link" active-class="side-nav__link--active">
-              <span class="side-nav__link-icon"></span>
-              <span class="side-nav__link-label">Dashboard</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/users" class="side-nav__link" active-class="side-nav__link--active">
-              <span class="side-nav__link-icon"></span>
-              <span class="side-nav__link-label">Users</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/orders" class="side-nav__link" active-class="side-nav__link--active">
-              <span class="side-nav__link-icon"></span>
-              <span class="side-nav__link-label">Orders</span>
-            </RouterLink>
-          </li>
-          <li>
-            <RouterLink to="/products" class="side-nav__link" active-class="side-nav__link--active">
-              <span class="side-nav__link-icon"></span>
-              <span class="side-nav__link-label">Products</span>
-            </RouterLink>
-          </li>
+    <!-- User panel -->
+    <div class="side-nav__user-panel">
+      <div class="side-nav__user-avatar">A</div>
+      <div class="side-nav__user-info">
+        <span class="side-nav__user-name">Alexander</span>
+        <span class="side-nav__user-status">Online</span>
+      </div>
+    </div>
 
-          <li class="side-nav__group">
-            <button type="button" class="side-nav__group-header" @click="toggleGroup('forms')">
+    <!-- Menu -->
+    <div class="side-nav__menu">
+      <p class="side-nav__section-label">MAIN NAVIGATION</p>
+
+      <ul class="side-nav__list">
+        <li class="side-nav__item">
+          <RouterLink
+            to="/"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span class="side-nav__link-icon">📊</span>
+            <span class="side-nav__link-label">Dashboard</span>
+          </RouterLink>
+        </li>
+
+        <li class="side-nav__item">
+          <RouterLink
+            to="/users"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span class="side-nav__link-icon">👥</span>
+            <span class="side-nav__link-label">Users</span>
+          </RouterLink>
+        </li>
+
+        <li class="side-nav__item">
+          <RouterLink
+            to="/orders"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span class="side-nav__link-icon">🧾</span>
+            <span class="side-nav__link-label">Orders</span>
+          </RouterLink>
+        </li>
+
+        <li class="side-nav__item">
+          <RouterLink
+            to="/products"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span class="side-nav__link-icon">📦</span>
+            <span class="side-nav__link-label">Products</span>
+          </RouterLink>
+        </li>
+
+        <!-- Forms group -->
+        <li class="side-nav__item">
+          <button
+            type="button"
+            class="side-nav__group-header"
+            @click="toggleGroup('forms')"
+          >
+            <div class="side-nav__group-header-inner">
+              <span class="side-nav__link-icon">✎</span>
               <span class="side-nav__group-label">Forms</span>
               <span
                 class="side-nav__group-chevron"
                 :class="{ 'side-nav__group-chevron--open': isGroupOpen('forms') }"
               >
-                ▾
+                ›
               </span>
-            </button>
+            </div>
+          </button>
 
-            <ul v-if="isGroupOpen('forms')" class="side-nav__sub-list">
-              <li>
-                <RouterLink
-                  to="/register-form"
-                  class="side-nav__sub-link"
-                  active-class="side-nav__sub-link--active"
-                >
-                  <span class="side-nav__sub-bullet"></span>
-                  <span>Register Form</span>
-                </RouterLink>
-              </li>
-              <li>
-                <RouterLink
-                  to="/another-form"
-                  class="side-nav__sub-link"
-                  active-class="side-nav__sub-link--active"
-                >
-                  <span class="side-nav__sub-bullet"></span>
-                  <span>Another Form</span>
-                </RouterLink>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
+          <ul v-if="isGroupOpen('forms')" class="side-nav__sub-list">
+            <li>
+              <RouterLink
+                to="/register-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Register Form
+              </RouterLink>
+            </li>
+            <li>
+              <RouterLink
+                to="/another-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Another Form
+              </RouterLink>
+            </li>
+          </ul>
+        </li>
+      </ul>
     </div>
   </aside>
 </template>

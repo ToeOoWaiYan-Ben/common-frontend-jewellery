@@ -1,16 +1,22 @@
 <template>
   <header class="app-header">
     <div class="app-header__left">
-      <div class="app-logo-mark">AD</div>
-      <div class="app-logo-text">
-        <h1 class="app-logo">AdminDashboard</h1>
-        <p class="app-header__subtitle">Management dashboard</p>
-      </div>
+      <button class="app-header__toggle" type="button" aria-label="Toggle sidebar">
+        ☰
+      </button>
+
+      <a href="#" class="app-header__brand">My Admin</a>
     </div>
 
-    <!-- center part removed -->
+    <nav class="app-header__nav">
+      <a href="#" class="app-header__nav-link">Home</a>
+      <a href="#" class="app-header__nav-link">Contact</a>
+    </nav>
 
     <div class="app-header__right">
+      <button class="app-header__icon-btn" type="button" aria-label="Search">
+        🔍
+      </button>
       <button class="app-header__icon-btn" type="button" aria-label="Notifications">
         🔔
       </button>
