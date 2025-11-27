@@ -24,40 +24,57 @@
       </div>
     </div>
 
-    <!-- Table -->
+    <!-- Card / table / states -->
     <div class="card">
-      <table class="table users-table" v-if="filteredUsers.length">
-        <thead>
-          <tr>
-            <th style="width: 60px;">#</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th style="width: 140px;">Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in filteredUsers" :key="user.id">
-            <td>{{ user.id }}</td>
-            <td>{{ user.name }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-              <span class="role-pill" :class="`role-pill--${user.role.toLowerCase()}`">
-                {{ user.role }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div v-else class="users-empty">
-        No users found for “<span class="users-empty__term">{{ searchTerm }}</span>”.
+      <!-- Loading -->
+      <div v-if="isLoading" class="users-empty">
+        Loading users…
       </div>
+
+      <!-- Error -->
+      <div v-else-if="errorMessage" class="users-empty users-empty--error">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Data -->
+      <template v-else>
+        <table class="table users-table" v-if="filteredUsers.length">
+          <thead>
+            <tr>
+              <th style="width: 60px;">#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th style="width: 140px;">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in filteredUsers" :key="user.id">
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span
+                  class="role-pill"
+                  :class="`role-pill--${user.role.toLowerCase()}`"
+                >
+                  {{ user.role }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div v-else class="users-empty">
+          No users found for
+          “<span class="users-empty__term">{{ searchTerm }}</span>”.
+        </div>
+      </template>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 interface User {
   id: number
@@ -66,16 +83,42 @@ interface User {
   role: string
 }
 
-const users = ref<User[]>([
-  { id: 1, name: 'Aye Chan', email: 'aye@example.com', role: 'Admin' },
-  { id: 2, name: 'Min Thu', email: 'min@example.com', role: 'Editor' },
-  { id: 3, name: 'Su Su', email: 'su@example.com', role: 'Viewer' },
-  { id: 4, name: 'Ko Ko', email: 'koko@example.com', role: 'Editor' },
-  { id: 5, name: 'Hnin Hnin', email: 'hnin@example.com', role: 'Viewer' },
-])
-
+// --- State ---
+const users = ref<User[]>([])
 const searchTerm = ref('')
 
+const isLoading = ref(false)
+const errorMessage = ref<string | null>(null)
+
+// --- Fetch users from API ---
+const loadUsers = async () => {
+  isLoading.value = true
+  errorMessage.value = null
+
+  try {
+    const res = await fetch('http://localhost:8080/api/customers')
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch users (${res.status})`)
+    }
+
+    const data = (await res.json()) as User[]
+
+    // You can map/transform here if backend field names are different
+    users.value = data
+  } catch (err: any) {
+    errorMessage.value = err?.message ?? 'Something went wrong while loading users.'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Load on mount
+onMounted(() => {
+  loadUsers()
+})
+
+// --- Filters & meta ---
 const filteredUsers = computed(() => {
   const term = searchTerm.value.trim().toLowerCase()
   if (!term) return users.value
@@ -193,6 +236,10 @@ const filteredCount = computed(() => filteredUsers.value.length)
   padding: 1.25rem 0.5rem;
   font-size: 0.9rem;
   color: #6b7280;
+}
+
+.users-empty--error {
+  color: #b91c1c;
 }
 
 .users-empty__term {
