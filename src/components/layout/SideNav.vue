@@ -57,6 +57,17 @@
           </RouterLink>
         </li>
 
+      <li class="side-nav__item">
+        <RouterLink
+        to="/categories"
+        class="side-nav__link"
+        active-class="side-nav__link--active"
+      >
+        <span class="side-nav__link-icon">💍</span>
+        <span class="side-nav__link-label">Categories</span>
+        </RouterLink>
+      </li>
+
         <!-- Forms group -->
         <li class="side-nav__item">
           <button

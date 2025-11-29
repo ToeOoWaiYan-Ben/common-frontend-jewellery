@@ -1,0 +1,134 @@
+/* Page Title */
+.page-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  /* Header meta text */
+  .users-meta {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  /* ---------------- SEARCH BAR ---------------- */
+  
+  .users-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    padding: 8px 12px;
+    border-radius: 6px;
+    width: 280px;
+  }
+  
+  .users-search__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+  }
+  
+  .users-search__icon {
+    opacity: 0.6;
+  }
+  
+  /* ---------------- TABLE ---------------- */
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th {
+    text-align: left;
+    background: #f7f7f7;
+    font-weight: 600;
+    padding: 12px 10px;
+  }
+  
+  .table td {
+    padding: 10px;
+    border-top: 1px solid #efefef;
+    font-size: 14px;
+  }
+  
+  /* Hover row effect */
+  .table tbody tr:hover {
+    background: #fafafa;
+  }
+  
+  /* ---------------- EMPTY STATES ---------------- */
+  
+  .users-empty {
+    text-align: center;
+    padding: 30px 10px;
+    color: #888;
+    font-size: 15px;
+  }
+  
+  .users-empty--error {
+    color: #d9534f;
+    font-weight: 600;
+  }
+  
+  /* Highlight search word */
+  .users-empty__term {
+    font-weight: bold;
+    color: #111;
+  }
+  
+  /* ---------------- CARD WRAPPER ---------------- */
+  
+  .card {
+    margin-top: 18px;
+    background: #fff;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  
+  /* Header wrapper */
+  .users-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  /* Simple clean category list display */
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+  }
+  
+  .category-item {
+    background: #fff;
+    padding: 14px 16px;
+    border-radius: 6px;
+    border: 1px solid #e6e6e6;
+    transition: 0.25s;
+  }
+  
+  .category-item:hover {
+    background: #fafafa;
+    border-color: #d0d0d0;
+  }
+  
+  /* Name */
+  .category-name {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  /* Short description below name */
+  .category-desc {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
+  }
