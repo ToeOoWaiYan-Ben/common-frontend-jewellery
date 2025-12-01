@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 
-import { useUsersStore } from '@/stores/useUsersStore'
+import { useUsersStore } from '../stores/useUsersStore'
 import { storeToRefs } from 'pinia'
 
 import { computed,onMounted, ref } from 'vue'

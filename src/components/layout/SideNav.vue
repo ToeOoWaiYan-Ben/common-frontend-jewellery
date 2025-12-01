@@ -11,7 +11,6 @@
 
     <!-- Menu -->
     <div class="side-nav__menu">
-
       <ul class="side-nav__list">
         <li class="side-nav__item">
           <RouterLink
@@ -93,6 +92,16 @@
                 active-class="side-nav__sub-link--active"
               >
                 Another Form
+              </RouterLink>
+            </li>
+            <!-- NEW: Category Form -->
+            <li>
+              <RouterLink
+                to="/category-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Category Form
               </RouterLink>
             </li>
           </ul>

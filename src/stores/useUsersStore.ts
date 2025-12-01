@@ -1,6 +1,6 @@
 // src/stores/useUsersStore.ts
 import { defineStore } from 'pinia'
-import type { UserDto } from '@/dtos/UserDto'
+import type { UserDto } from '../dtos/UserDto'
 
 interface UsersState {
   items: UserDto[]

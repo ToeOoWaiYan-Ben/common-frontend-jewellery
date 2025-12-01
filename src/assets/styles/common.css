@@ -435,7 +435,7 @@ body {
   padding: 1rem 1.2rem;
 }
 
-/* tables (for Users, Orders etc.) */
+/* tables (for Users, Orders, Categories etc.) */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -454,6 +454,193 @@ body {
   font-weight: 600;
 }
 
+/* ---------- Buttons ---------- */
+
+.btn-primary,
+.btn-secondary {
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.btn-secondary {
+  background-color: #ffffff;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+
+/* ---------- Users / Categories header + search ---------- */
+
+.users-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.users-header__actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.users-meta {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.users-meta strong {
+  color: #111827;
+}
+
+/* search area inside card */
+.users-search {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 260px;
+  position: relative;
+}
+
+.users-search__icon {
+  position: absolute;
+  left: 0.55rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.users-search__input {
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  padding: 0.4rem 0.75rem 0.4rem 1.8rem;
+  font-size: 0.85rem;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.users-search__input::placeholder {
+  color: #9ca3af;
+}
+
+/* empty states */
+.users-empty {
+  text-align: center;
+  padding: 1rem 0.5rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.users-empty--error {
+  color: #b91c1c;
+}
+
+.users-empty__term {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* role pills for Users table */
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+/* adjust colors based on your roles */
+.role-pill--admin {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.role-pill--customer {
+  background-color: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
+.role-pill--staff {
+  background-color: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+/* ---------- Category form (inline on Categories page) ---------- */
+
+.category-form {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.category-form__title {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.category-form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.category-form__label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.category-form__input {
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.category-form__input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px #bfdbfe;
+}
+
+.category-form__textarea {
+  resize: vertical;
+}
+
+.category-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
 /* ---------- Responsive tweaks ---------- */
 
 @media (max-width: 900px) {
@@ -469,5 +656,15 @@ body {
 
   .app-header {
     padding-inline: 0.9rem;
+  }
+
+  .users-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .users-header__actions {
+    align-self: stretch;
+    justify-content: flex-start;
   }
 }
