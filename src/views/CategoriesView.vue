@@ -1,4 +1,3 @@
-<!-- src/views/CategoriesView.vue -->
 <template>
   <section>
     <!-- Header + create button -->
@@ -16,22 +15,30 @@
 
       <div class="users-header__actions">
         <button class="btn-primary" type="button" @click="onClickNew">
-          {{ showForm && !isEditing ? 'Close Form' : 'Create New Category' }}
+          {{
+            showForm && !isEditing
+              ? 'Close Form'
+              : isEditing
+                ? 'Editing...'
+                : 'Create New Category'
+          }}
         </button>
       </div>
     </div>
 
     <!-- Card -->
-    <div class="card">
+    <div class="card" ref="cardRef">
       <!-- Inline form (Create + Update) -->
       <div v-if="showForm" class="category-form">
         <h3 class="category-form__title">
           {{ isEditing ? 'Edit Category' : 'New Category' }}
         </h3>
 
-        <p v-if="formError" class="users-empty users-empty--error">
-          {{ formError }}
-        </p>
+        <!-- error -->
+        <div v-if="formError" class="alert alert--error">
+          <span class="alert__icon">⚠</span>
+          <span>{{ formError }}</span>
+        </div>
 
         <div class="category-form__row">
           <label class="category-form__label" for="name">Name *</label>
@@ -79,6 +86,16 @@
           </button>
 
           <button
+            v-if="isEditing"
+            class="btn-secondary"
+            type="button"
+            @click="closeEdit"
+            :disabled="isSubmitting"
+          >
+            Close
+          </button>
+
+          <button
             class="btn-primary"
             type="button"
             @click="handleSubmitForm"
@@ -95,17 +112,18 @@
         </div>
       </div>
 
+      <!-- Backend error -->
+      <div v-if="errorMessage" class="alert alert--error">
+        <span class="alert__icon">⚠</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+
       <!-- Loading -->
-      <div v-if="isLoading" class="users-empty">
+      <div v-else-if="isLoading" class="users-empty">
         Loading categories…
       </div>
 
-      <!-- Error -->
-      <div v-else-if="errorMessage" class="users-empty users-empty--error">
-        {{ errorMessage }}
-      </div>
-
-      <!-- Search + table -->
+      <!-- Search + pagination + table -->
       <template v-else>
         <!-- Search bar -->
         <div class="users-search">
@@ -118,8 +136,48 @@
           />
         </div>
 
+        <!-- Top pagination controls -->
+        <div class="table-pagination" v-if="filteredCount > 0">
+          <div class="table-pagination__info">
+            Page {{ currentPage }} of {{ totalPages }}
+            <span v-if="filteredCount">
+              • {{ filteredCount }} result<span v-if="filteredCount > 1">s</span>
+            </span>
+          </div>
+          <div class="table-pagination__buttons">
+            <button
+              class="btn-page"
+              type="button"
+              :disabled="currentPage === 1"
+              @click="goToPage(currentPage - 1)"
+            >
+              ‹ Prev
+            </button>
+
+            <button
+              v-for="page in pagesToShow"
+              :key="page"
+              class="btn-page"
+              :class="{ 'btn-page--active': page === currentPage }"
+              type="button"
+              @click="goToPage(page)"
+            >
+              {{ page }}
+            </button>
+
+            <button
+              class="btn-page"
+              type="button"
+              :disabled="currentPage === totalPages"
+              @click="goToPage(currentPage + 1)"
+            >
+              Next ›
+            </button>
+          </div>
+        </div>
+
         <!-- Table -->
-        <table class="table users-table" v-if="filteredCategories.length">
+        <table class="table users-table" v-if="paginatedCategories.length">
           <thead>
             <tr>
               <th style="width: 60px;">#</th>
@@ -130,7 +188,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="category in filteredCategories" :key="category.id">
+            <tr
+              v-for="category in paginatedCategories"
+              :key="category.id"
+              :class="{ 'row--editing': category.id === editingId }"
+            >
               <td>{{ category.id }}</td>
               <td>{{ category.name }}</td>
               <td>{{ category.code }}</td>
@@ -146,8 +208,7 @@
                   </button>
                   <button
                     type="button"
-                    class="btn-secondary"
-                    style="color: #b91c1c; border-color: #fecaca; background-color: #fef2f2;"
+                    class="btn-secondary btn-secondary--danger"
                     @click="onClickDelete(category.id)"
                   >
                     Delete
@@ -168,7 +229,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '../stores/useCategoriesStore'
 import type { CategoryDto } from '../dtos/CategoryDto'
@@ -202,7 +263,68 @@ const filteredCategories = computed(() => {
 const totalCategories = computed(() => categories.value.length)
 const filteredCount = computed(() => filteredCategories.value.length)
 
-// ---- inline form state ----
+/* -------- Pagination -------- */
+const pageSize = ref(20)
+const currentPage = ref(1)
+
+const totalPages = computed(() =>
+  filteredCount.value === 0
+    ? 1
+    : Math.max(1, Math.ceil(filteredCount.value / pageSize.value))
+)
+
+const pagesToShow = computed(() => {
+  const total = totalPages.value
+  const current = currentPage.value
+  const maxButtons = 5
+
+  // If total pages <= maxButtons, just show all
+  if (total <= maxButtons) {
+    return Array.from({ length: total }, (_, i) => i + 1)
+  }
+
+  let start = current - Math.floor(maxButtons / 2) // try to center current page
+  let end = current + Math.floor(maxButtons / 2)
+
+  // Clamp to valid range
+  if (start < 1) {
+    start = 1
+    end = maxButtons
+  } else if (end > total) {
+    end = total
+    start = total - maxButtons + 1
+  }
+
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+})
+
+
+watch(filteredCategories, () => {
+  currentPage.value = 1
+})
+
+const paginatedCategories = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredCategories.value.slice(start, end)
+})
+
+const goToPage = (page: number) => {
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+}
+
+/* -------- Scroll helper -------- */
+const cardRef = ref<HTMLElement | null>(null)
+
+const scrollToTop = async () => {
+  await nextTick()
+  if (cardRef.value) {
+    cardRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+/* -------- Form state (create + update) -------- */
 const showForm = ref(false)
 const isEditing = ref(false)
 const editingId = ref<number | null>(null)
@@ -222,8 +344,13 @@ const resetForm = () => {
   editingId.value = null
 }
 
+const closeEdit = () => {
+  resetForm()
+  showForm.value = false
+}
+
 const onClickNew = () => {
-  // open in Create mode
+  // open in create mode
   resetForm()
   isEditing.value = false
   showForm.value = !showForm.value
@@ -238,6 +365,9 @@ const onClickEdit = (category: CategoryDto) => {
   formCode.value = category.code
   formDescription.value = category.description ?? ''
   formError.value = null
+
+  // scroll to top when clicking Edit
+  scrollToTop()
 }
 
 const handleSubmitForm = async () => {
@@ -257,6 +387,9 @@ const handleSubmitForm = async () => {
         code: formCode.value.trim(),
         description: formDescription.value.trim() || undefined
       })
+
+      // scroll to top after successful update
+      await scrollToTop()
     } else {
       // CREATE
       await categoriesStore.createCategory({

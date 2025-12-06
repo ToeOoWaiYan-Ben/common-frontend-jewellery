@@ -115,7 +115,7 @@ body {
   background-color: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* important: has colon */
   font-size: 0.9rem;
   cursor: pointer;
   color: #6b7280;
@@ -484,6 +484,13 @@ body {
   color: #374151;
 }
 
+/* danger variant for delete */
+.btn-secondary--danger {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background-color: #fef2f2;
+}
+
 /* ---------- Users / Categories header + search ---------- */
 
 .users-header {
@@ -570,7 +577,6 @@ body {
   border: 1px solid transparent;
 }
 
-/* adjust colors based on your roles */
 .role-pill--admin {
   background-color: #eff6ff;
   border-color: #bfdbfe;
@@ -639,6 +645,109 @@ body {
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: 0.25rem;
+}
+
+/* ---------- Alerts (for nicer error messages) ---------- */
+
+.alert {
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid transparent;
+}
+
+.alert__icon {
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.alert--error {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+/* ---------- Table pagination ---------- */
+
+.table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.table-pagination__info {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* make numbers in "Page X of Y" slightly blue */
+.table-pagination__info strong {
+  color: #2563eb;
+}
+
+.table-pagination__buttons {
+  display: flex;
+  gap: 0.3rem;
+}
+
+/* base page button */
+.btn-page {
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.06s ease-out;
+}
+
+.btn-page:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* hover state */
+.btn-page:hover:not(:disabled) {
+  background-color: #f3f4ff;
+  border-color: #c7d2fe;
+}
+
+/* active page highlight */
+.btn-page--active {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px #bfdbfe;
+  transform: translateY(-1px);
+}
+
+/* if you ever use ellipsis in pagination */
+.pagination-ellipsis {
+  padding: 0 0.35rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+/* ---------- Highlight row being edited ---------- */
+
+.row--editing {
+  background-color: #dcfce7;           /* bright green background */
+  box-shadow: inset 4px 0 0 #22c55e;   /* green bar on the left */
+  transition: background-color 0.3s ease;
 }
 
 /* ---------- Responsive tweaks ---------- */

@@ -38,7 +38,6 @@ export const useCategoriesStore = defineStore('categories', {
       }
     },
 
-    // CREATE
     async createCategory(payload: {
       name: string
       code: string
@@ -70,7 +69,6 @@ export const useCategoriesStore = defineStore('categories', {
       }
     },
 
-    // UPDATE
     async updateCategory(
       id: number,
       payload: { name: string; code: string; description?: string }
@@ -92,7 +90,6 @@ export const useCategoriesStore = defineStore('categories', {
 
         const updated = (await res.json()) as CategoryDto
 
-        // update item in local list
         const idx = this.items.findIndex((c) => c.id === id)
         if (idx !== -1) {
           this.items[idx] = updated
