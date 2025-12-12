@@ -66,7 +66,9 @@
   background-color: rgba(15, 23, 42, 0.12);
   color: inherit;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
 }
 
 .stat-card__action:hover {

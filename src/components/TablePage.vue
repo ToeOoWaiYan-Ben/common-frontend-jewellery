@@ -34,9 +34,7 @@
       </div>
 
       <!-- Loading -->
-      <div v-else-if="isLoading" class="users-empty">
-        Loading {{ title.toLowerCase() }}…
-      </div>
+      <div v-else-if="isLoading" class="users-empty">Loading {{ title.toLowerCase() }}…</div>
 
       <!-- Search + table + pagination -->
       <template v-else>
@@ -47,9 +45,7 @@
         <div class="table-pagination" v-if="filteredCount > 0">
           <div class="table-pagination__info">
             Page {{ currentPage }} of {{ totalPages }}
-            <span>
-              • {{ filteredCount }} result<span v-if="filteredCount > 1">s</span>
-            </span>
+            <span> • {{ filteredCount }} result<span v-if="filteredCount > 1">s</span> </span>
           </div>
           <div class="table-pagination__buttons">
             <button
@@ -102,130 +98,128 @@
         </table>
 
         <!-- Empty -->
-        <div v-else class="users-empty">
-          No {{ title.toLowerCase() }} found.
-        </div>
+        <div v-else class="users-empty">No {{ title.toLowerCase() }} found.</div>
       </template>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, toRef } from 'vue'
+  import { computed, toRef } from 'vue'
 
-const props = defineProps<{
-  title: string
-  total: number
-  filteredCount: number
-  items: any[]
-  pageSize: number
-  currentPage: number
-  idKey?: string
-  isLoading: boolean
-  errorMessage: string | null
-  showForm: boolean
-  primaryButtonLabel: string
-  editingId?: number | null   // ⭐ NEW: which row is being edited
-}>()
+  const props = defineProps<{
+    title: string
+    total: number
+    filteredCount: number
+    items: any[]
+    pageSize: number
+    currentPage: number
+    idKey?: string
+    isLoading: boolean
+    errorMessage: string | null
+    showForm: boolean
+    primaryButtonLabel: string
+    editingId?: number | null // ⭐ NEW: which row is being edited
+  }>()
 
-const emit = defineEmits<{
-  (e: 'changePage', page: number): void
-  (e: 'clickNew'): void
-}>()
+  const emit = defineEmits<{
+    (e: 'changePage', page: number): void
+    (e: 'clickNew'): void
+  }>()
 
-const idKey = props.idKey ?? 'id'
+  const idKey = props.idKey ?? 'id'
 
-// make editingId usable in template (auto-unwrapped)
-const editingId = toRef(props, 'editingId')
+  // make editingId usable in template (auto-unwrapped)
+  const editingId = toRef(props, 'editingId')
 
-const totalPages = computed(() =>
-  props.filteredCount === 0 ? 1 : Math.ceil(props.filteredCount / props.pageSize)
-)
+  const totalPages = computed(() =>
+    props.filteredCount === 0 ? 1 : Math.ceil(props.filteredCount / props.pageSize)
+  )
 
-const pagesToShow = computed(() => {
-  const total = totalPages.value
-  const current = props.currentPage
-  const maxButtons = 5
+  const pagesToShow = computed(() => {
+    const total = totalPages.value
+    const current = props.currentPage
+    const maxButtons = 5
 
-  if (total <= maxButtons) {
-    return Array.from({ length: total }, (_, i) => i + 1)
+    if (total <= maxButtons) {
+      return Array.from({ length: total }, (_, i) => i + 1)
+    }
+
+    let start = current - Math.floor(maxButtons / 2)
+    let end = current + Math.floor(maxButtons / 2)
+
+    if (start < 1) {
+      start = 1
+      end = maxButtons
+    } else if (end > total) {
+      end = total
+      start = total - maxButtons + 1
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+  })
+
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages.value) return
+    emit('changePage', page)
   }
-
-  let start = current - Math.floor(maxButtons / 2)
-  let end = current + Math.floor(maxButtons / 2)
-
-  if (start < 1) {
-    start = 1
-    end = maxButtons
-  } else if (end > total) {
-    end = total
-    start = total - maxButtons + 1
-  }
-
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i)
-})
-
-const goToPage = (page: number) => {
-  if (page < 1 || page > totalPages.value) return
-  emit('changePage', page)
-}
 </script>
 
 <style scoped>
-.table-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-}
+  .table-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  }
 
-.table-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
+  .table-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
 
-.table-card__table {
-  width: 100%;
-  border-collapse: collapse;
-}
+  .table-card__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
-.table-card__table th,
-.table-card__table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid #e2e8f0;
-}
+  .table-card__table th,
+  .table-card__table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+  }
 
-.table-card__table tr:hover td {
-  background: #f8fafc;
-}
+  .table-card__table tr:hover td {
+    background: #f8fafc;
+  }
 
-.table-pagination {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 16px;
-}
+  .table-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+  }
 
-.btn-page {
-  padding: 6px 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-}
+  .btn-page {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+  }
 
-.btn-page--active {
-  background: #1d4ed8;
-  color: white;
-  border-color: #1d4ed8;
-}
+  .btn-page--active {
+    background: #1d4ed8;
+    color: white;
+    border-color: #1d4ed8;
+  }
 
-/* ⭐ highlight the row being edited */
-.row--editing td {
-  background-color: #e6ffed; /* light green */
-  transition: background-color 0.2s ease;
-}
+  /* ⭐ highlight the row being edited */
+  .row--editing td {
+    background-color: #e6ffed; /* light green */
+    transition: background-color 0.2s ease;
+  }
 </style>

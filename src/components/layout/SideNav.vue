@@ -13,44 +13,28 @@
     <div class="side-nav__menu">
       <ul class="side-nav__list">
         <li class="side-nav__item">
-          <RouterLink
-            to="/"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
+          <RouterLink to="/" class="side-nav__link" active-class="side-nav__link--active">
             <span class="side-nav__link-icon">📊</span>
             <span class="side-nav__link-label">Dashboard</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink
-            to="/users"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
+          <RouterLink to="/users" class="side-nav__link" active-class="side-nav__link--active">
             <span class="side-nav__link-icon">👥</span>
             <span class="side-nav__link-label">Users</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink
-            to="/orders"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
+          <RouterLink to="/orders" class="side-nav__link" active-class="side-nav__link--active">
             <span class="side-nav__link-icon">🧾</span>
             <span class="side-nav__link-label">Orders</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink
-            to="/products"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
+          <RouterLink to="/products" class="side-nav__link" active-class="side-nav__link--active">
             <span class="side-nav__link-icon">📦</span>
             <span class="side-nav__link-label">Products</span>
           </RouterLink>
@@ -58,11 +42,7 @@
 
         <!-- Forms group -->
         <li class="side-nav__item">
-          <button
-            type="button"
-            class="side-nav__group-header"
-            @click="toggleGroup('forms')"
-          >
+          <button type="button" class="side-nav__group-header" @click="toggleGroup('forms')">
             <div class="side-nav__group-header-inner">
               <span class="side-nav__link-icon">✎</span>
               <span class="side-nav__group-label">Forms</span>
@@ -112,15 +92,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+  import { ref } from 'vue'
 
-const openGroupId = ref<string | null>('forms')
+  const openGroupId = ref<string | null>('forms')
 
-function toggleGroup(id: string) {
-  openGroupId.value = openGroupId.value === id ? null : id
-}
+  function toggleGroup(id: string) {
+    openGroupId.value = openGroupId.value === id ? null : id
+  }
 
-function isGroupOpen(id: string) {
-  return openGroupId.value === id
-}
+  function isGroupOpen(id: string) {
+    return openGroupId.value === id
+  }
 </script>

@@ -12,11 +12,11 @@ export const useCategoriesStore = defineStore('categories', {
   state: (): CategoriesState => ({
     items: [],
     loading: false,
-    error: null
+    error: null,
   }),
 
   getters: {
-    totalCategories: (state) => state.items.length
+    totalCategories: (state) => state.items.length,
   },
 
   actions: {
@@ -31,27 +31,22 @@ export const useCategoriesStore = defineStore('categories', {
 
         this.items = (await res.json()) as CategoryDto[]
       } catch (e: any) {
-        this.error =
-          e?.message ?? 'Something went wrong while loading categories.'
+        this.error = e?.message ?? 'Something went wrong while loading categories.'
       } finally {
         this.loading = false
       }
     },
 
-    async createCategory(payload: {
-      name: string
-      code: string
-      description?: string
-    }) {
+    async createCategory(payload: { name: string; code: string; description?: string }) {
       this.loading = true
       this.error = null
       try {
         const res = await fetch('http://localhost:8080/api/categories', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         })
 
         if (!res.ok) {
@@ -61,8 +56,7 @@ export const useCategoriesStore = defineStore('categories', {
         const created = (await res.json()) as CategoryDto
         this.items.push(created)
       } catch (e: any) {
-        this.error =
-          e?.message ?? 'Something went wrong while creating category.'
+        this.error = e?.message ?? 'Something went wrong while creating category.'
         throw e
       } finally {
         this.loading = false
@@ -79,9 +73,9 @@ export const useCategoriesStore = defineStore('categories', {
         const res = await fetch(`http://localhost:8080/api/categories/${id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         })
 
         if (!res.ok) {
@@ -95,8 +89,7 @@ export const useCategoriesStore = defineStore('categories', {
           this.items[idx] = updated
         }
       } catch (e: any) {
-        this.error =
-          e?.message ?? 'Something went wrong while updating category.'
+        this.error = e?.message ?? 'Something went wrong while updating category.'
         throw e
       } finally {
         this.loading = false
@@ -109,7 +102,7 @@ export const useCategoriesStore = defineStore('categories', {
       this.error = null
       try {
         const res = await fetch(`http://localhost:8080/api/categories/${id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
         })
 
         if (!res.ok) {
@@ -118,12 +111,11 @@ export const useCategoriesStore = defineStore('categories', {
 
         this.items = this.items.filter((c) => c.id !== id)
       } catch (e: any) {
-        this.error =
-          e?.message ?? 'Something went wrong while deleting category.'
+        this.error = e?.message ?? 'Something went wrong while deleting category.'
         throw e
       } finally {
         this.loading = false
       }
-    }
-  }
+    },
+  },
 })

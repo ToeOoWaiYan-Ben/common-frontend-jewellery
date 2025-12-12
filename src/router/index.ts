@@ -14,7 +14,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/products', name: 'products', component: ProductsView },
   { path: '/register-form', name: 'register-form', component: RegisterFormView },
   { path: '/categories', name: 'categories', component: CategoriesView },
-  { path: '/category-form', redirect: '/categories' }
+  { path: '/category-form', redirect: '/categories' },
 ]
 
 const router = createRouter({
