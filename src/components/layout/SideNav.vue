@@ -1,37 +1,78 @@
 <template>
   <aside class="side-nav">
-    <nav>
+    <!-- Brand/top area -->
+    <div class="side-nav__brand">
+      <div class="side-nav__brand-logo">MA</div>
+      <div class="side-nav__brand-text">
+        <p class="side-nav__brand-title">My Admin</p>
+        <p class="side-nav__brand-subtitle">Dashboard</p>
+      </div>
+    </div>
+
+    <!-- Menu -->
+    <div class="side-nav__menu">
       <ul class="side-nav__list">
-        <li>
-          <RouterLink to="/" class="side-nav__link" active-class="side-nav__link--active">
-            Home
+        <li class="side-nav__item">
+          <RouterLink
+            to="/"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span class="side-nav__link-icon">📊</span>
+            <span class="side-nav__link-label">Dashboard</span>
           </RouterLink>
         </li>
-        <li>
-          <RouterLink to="/users" class="side-nav__link" active-class="side-nav__link--active">
-            Users
+
+        <li class="side-nav__item">
+          <RouterLink
+            to="/users"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span class="side-nav__link-icon">👥</span>
+            <span class="side-nav__link-label">Users</span>
           </RouterLink>
         </li>
-        <li>
-          <RouterLink to="/orders" class="side-nav__link" active-class="side-nav__link--active">
-            Orders
+
+        <li class="side-nav__item">
+          <RouterLink
+            to="/orders"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span class="side-nav__link-icon">🧾</span>
+            <span class="side-nav__link-label">Orders</span>
           </RouterLink>
         </li>
-        <li>
-          <RouterLink to="/products" class="side-nav__link" active-class="side-nav__link--active">
-            Products
+
+        <li class="side-nav__item">
+          <RouterLink
+            to="/products"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span class="side-nav__link-icon">📦</span>
+            <span class="side-nav__link-label">Products</span>
           </RouterLink>
         </li>
-        <li class="side-nav__group">
-          <button type="button" class="side-nav__group-header" @click="toggleGroup('forms')">
-            <!-- <span class="side-nav__group-icon">🌲</span> -->
-            <span class="side-nav__group-label">Forms</span>
-            <span
-              class="side-nav__group-chevron"
-              :class="{ 'side-nav__group-chevron--open': isGroupOpen('forms') }"
-            >
-              ▾
-            </span>
+
+        <!-- Forms group -->
+        <li class="side-nav__item">
+          <button
+            type="button"
+            class="side-nav__group-header"
+            @click="toggleGroup('forms')"
+          >
+            <div class="side-nav__group-header-inner">
+              <span class="side-nav__link-icon">✎</span>
+              <span class="side-nav__group-label">Forms</span>
+              <span
+                class="side-nav__group-chevron"
+                :class="{ 'side-nav__group-chevron--open': isGroupOpen('forms') }"
+              >
+                ›
+              </span>
+            </div>
           </button>
 
           <ul v-if="isGroupOpen('forms')" class="side-nav__sub-list">
@@ -41,8 +82,7 @@
                 class="side-nav__sub-link"
                 active-class="side-nav__sub-link--active"
               >
-                <span class="side-nav__sub-bullet"></span>
-                <span>Register Form</span>
+                Register Form
               </RouterLink>
             </li>
             <li>
@@ -51,27 +91,36 @@
                 class="side-nav__sub-link"
                 active-class="side-nav__sub-link--active"
               >
-                <span class="side-nav__sub-bullet"></span>
-                <span>Another Form</span>
+                Another Form
+              </RouterLink>
+            </li>
+            <!-- NEW: Category Form -->
+            <li>
+              <RouterLink
+                to="/category-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Category Form
               </RouterLink>
             </li>
           </ul>
         </li>
       </ul>
-    </nav>
+    </div>
   </aside>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+import { ref } from 'vue'
 
-  const openGroupId = ref<string | null>('forms') 
+const openGroupId = ref<string | null>('forms')
 
-  function toggleGroup(id: string) {
-    openGroupId.value = openGroupId.value === id ? null : id
-  }
+function toggleGroup(id: string) {
+  openGroupId.value = openGroupId.value === id ? null : id
+}
 
-  function isGroupOpen(id: string) {
-    return openGroupId.value === id
-  }
+function isGroupOpen(id: string) {
+  return openGroupId.value === id
+}
 </script>
