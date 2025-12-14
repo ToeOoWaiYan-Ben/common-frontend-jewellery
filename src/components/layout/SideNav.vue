@@ -85,6 +85,7 @@
                 Register Form
               </RouterLink>
             </li>
+
             <li>
               <RouterLink
                 to="/another-form"
@@ -94,7 +95,7 @@
                 Another Form
               </RouterLink>
             </li>
-            <!-- NEW: Category Form -->
+
             <li>
               <RouterLink
                 to="/category-form"
@@ -102,6 +103,17 @@
                 active-class="side-nav__sub-link--active"
               >
                 Category Form
+              </RouterLink>
+            </li>
+
+            <!-- ✅ NEW: Craft Form -->
+            <li>
+              <RouterLink
+                to="/craft-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Craft Form
               </RouterLink>
             </li>
           </ul>
