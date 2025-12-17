@@ -131,6 +131,7 @@
   </script>
   
   <style scoped src="@/styles/admin/admin-table.css"></style>
+
   <style scoped>
   /* ✅ Light green editing row */
   .row--editing td {
