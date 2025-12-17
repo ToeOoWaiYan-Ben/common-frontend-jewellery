@@ -205,7 +205,7 @@
   <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue'
   import { storeToRefs } from 'pinia'
-  import TablePage from '../components/TablePage.vue'
+  import TablePage from '../components/admin/TablePage.vue'
   import type { CustomerDto } from '../dtos/CustomerDto'
   import { useCustomersStore } from '../stores/useCustomersStore'
   
