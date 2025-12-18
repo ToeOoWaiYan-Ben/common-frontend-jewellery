@@ -13,44 +13,28 @@
     <div class="side-nav__menu">
       <ul class="side-nav__list">
         <li class="side-nav__item">
-          <RouterLink
-            to="/"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
+          <RouterLink to="/" class="side-nav__link" active-class="side-nav__link--active">
             <span class="side-nav__link-icon">📊</span>
             <span class="side-nav__link-label">Dashboard</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink
-            to="/users"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
+          <RouterLink to="/users" class="side-nav__link" active-class="side-nav__link--active">
             <span class="side-nav__link-icon">👥</span>
             <span class="side-nav__link-label">Users</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink
-            to="/orders"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
+          <RouterLink to="/orders" class="side-nav__link" active-class="side-nav__link--active">
             <span class="side-nav__link-icon">🧾</span>
             <span class="side-nav__link-label">Orders</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink
-            to="/products"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
+          <RouterLink to="/products" class="side-nav__link" active-class="side-nav__link--active">
             <span class="side-nav__link-icon">📦</span>
             <span class="side-nav__link-label">Products</span>
           </RouterLink>
@@ -85,6 +69,7 @@
                 Register Form
               </RouterLink>
             </li>
+
             <li>
               <RouterLink
                 to="/another-form"
@@ -94,7 +79,8 @@
                 Another Form
               </RouterLink>
             </li>
-            <!-- NEW: Category Form -->
+
+            <!-- Category Form -->
             <li>
               <RouterLink
                 to="/category-form"
@@ -102,6 +88,17 @@
                 active-class="side-nav__sub-link--active"
               >
                 Category Form
+              </RouterLink>
+            </li>
+
+            <!-- ✅ NEW: Craft Form -->
+            <li>
+              <RouterLink
+                to="/craft-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Craft Form
               </RouterLink>
             </li>
           </ul>

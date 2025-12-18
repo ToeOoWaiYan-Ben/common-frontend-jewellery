@@ -7,6 +7,8 @@ import RegisterFormView from '../views/RegisterFormView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
 import CustomersView from '../views/CustomersView.vue'
 import CustomerFormView from '../views/CustomerFormView.vue'
+import CraftsView from '../views/CraftsView.vue'
+
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: HomeView },
@@ -21,7 +23,11 @@ const routes: RouteRecordRaw[] = [
 
   /* -------- Customers -------- */
   { path: '/customers', name: 'customers', component: CustomersView },
-  { path: '/customers/new', name: 'customer-new', component: CustomerFormView }
+  { path: '/customers/new', name: 'customer-new', component: CustomerFormView },
+
+  /* -------- Crafts -------- */
+{ path: '/crafts', name: 'crafts', component: CraftsView },
+{ path: '/craft-form', redirect: '/crafts' },
 ]
 
 const router = createRouter({
