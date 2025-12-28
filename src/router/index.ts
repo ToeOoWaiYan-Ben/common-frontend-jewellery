@@ -10,7 +10,6 @@ import CraftsView from '../views/CraftsView.vue'
 import GemsPackagesView from '../views/GemPackagesView.vue'
 import GemTypeFormView from '../views/GemTypeFormView.vue'
 
-
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: HomeView },
   { path: '/users', name: 'users', component: UsersView },
@@ -23,7 +22,6 @@ const routes: RouteRecordRaw[] = [
   { path: '/craft-form', redirect: '/crafts' },
   { path: '/gems-packages', name: 'gems-packages', component: GemsPackagesView },
   { path: '/gem-type-form', name: 'gem-type-form', component: GemTypeFormView },
-
 ]
 
 const router = createRouter({

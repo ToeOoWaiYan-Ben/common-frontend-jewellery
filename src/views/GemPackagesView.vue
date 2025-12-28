@@ -14,7 +14,6 @@
       </div>
     </div>
 
-    <!-- ✅ TABLE LIST (default) -->
     <div class="gp-card gp-card--table">
       <div class="gp-card-head">
         <div>
@@ -23,7 +22,11 @@
         </div>
 
         <div class="gp-search">
-          <input v-model.trim="q" class="gp-input gp-input--search" placeholder="Search name / gem type..." />
+          <input
+            v-model.trim="q"
+            class="gp-input gp-input--search"
+            placeholder="Search name / gem type..."
+          />
         </div>
       </div>
 
@@ -32,7 +35,13 @@
         <span>{{ store.error }}</span>
       </div>
 
-      <AdminTable title="" :columns="columns" :rows="filteredRows" :pageSize="8" :editingId="editId">
+      <AdminTable
+        title=""
+        :columns="columns"
+        :rows="filteredRows"
+        :pageSize="8"
+        :editingId="editId"
+      >
         <template #cell-originalPrice="{ value }">
           {{ formatMoney(value as number | null | undefined) }}
         </template>
@@ -46,14 +55,15 @@
       </AdminTable>
     </div>
 
-    <!-- ✅ FORM (only shows after clicking Add/Edit) -->
     <div v-if="showForm" class="gp-grid gp-grid--below">
       <!-- Form card -->
       <div class="gp-card">
         <div class="gp-card-head">
           <div>
             <h3 class="gp-card-title">{{ isEdit ? 'Edit package' : 'Add package' }}</h3>
-            <p class="gp-card-caption">{{ isEdit ? `Editing #${editId}` : 'Create a new package' }}</p>
+            <p class="gp-card-caption">
+              {{ isEdit ? `Editing #${editId}` : 'Create a new package' }}
+            </p>
           </div>
 
           <button class="gp-btn" @click="closeForm" :disabled="store.loading">✕ Close</button>
@@ -111,7 +121,11 @@
               </option>
             </select>
 
-            <small v-if="gemTypesStore.items.length === 0" class="gp-muted" style="display:block; margin-top:6px;">
+            <small
+              v-if="gemTypesStore.items.length === 0"
+              class="gp-muted"
+              style="display: block; margin-top: 6px"
+            >
               No gem types found. Please register gem types first.
             </small>
           </div>
@@ -128,21 +142,19 @@
 
           <div class="gp-field">
             <label class="gp-label">Cutting</label>
-<select v-model="form.cutting" class="gp-input">
-  <option value="">Select cutting</option>
-  <option value="Round">Round</option>
-  <option value="Princess">Princess</option>
-  <option value="Cushion">Cushion</option>
-  <option value="Emerald">Emerald</option>
-  <option value="Oval">Oval</option>
-  <option value="Pear">Pear</option>
-  <option value="Marquise">Marquise</option>
-  <option value="Heart">Heart</option>
-  <option value="Radiant">Radiant</option>
-  <option value="Asscher">Asscher</option>
-</select>
-
-            
+            <select v-model="form.cutting" class="gp-input">
+              <option value="">Select cutting</option>
+              <option value="Round">Round</option>
+              <option value="Princess">Princess</option>
+              <option value="Cushion">Cushion</option>
+              <option value="Emerald">Emerald</option>
+              <option value="Oval">Oval</option>
+              <option value="Pear">Pear</option>
+              <option value="Marquise">Marquise</option>
+              <option value="Heart">Heart</option>
+              <option value="Radiant">Radiant</option>
+              <option value="Asscher">Asscher</option>
+            </select>
           </div>
 
           <div class="gp-field">
@@ -186,12 +198,19 @@
 
           <div class="gp-field gp-field--full">
             <label class="gp-label">Description</label>
-            <textarea v-model.trim="form.description" class="gp-textarea" rows="3" placeholder="Short note..." />
+            <textarea
+              v-model.trim="form.description"
+              class="gp-textarea"
+              rows="3"
+              placeholder="Short note..."
+            />
           </div>
         </div>
 
         <div class="gp-actions">
-          <button class="gp-btn" type="button" @click="resetForm" :disabled="store.loading">Reset</button>
+          <button class="gp-btn" type="button" @click="resetForm" :disabled="store.loading">
+            Reset
+          </button>
 
           <button
             class="gp-btn gp-btn--primary"
@@ -247,158 +266,157 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
-import AdminTable, { type TableColumn } from '../components/admin/AdminTable.vue'
-import { useGemsPackagesStore } from '../stores/gemsPackages'
-import type { GemsPackageDto } from '../dtos/GemsPackageDto'
-import { useGemTypesStore } from '../stores/gemTypes'
+  import { computed, onMounted, reactive, ref } from 'vue'
+  import AdminTable, { type TableColumn } from '../components/admin/AdminTable.vue'
+  import { useGemsPackagesStore } from '../stores/gemsPackages'
+  import type { GemsPackageDto } from '../dtos/GemsPackageDto'
+  import { useGemTypesStore } from '../stores/gemTypes'
 
-const store = useGemsPackagesStore()
-const gemTypesStore = useGemTypesStore()
+  const store = useGemsPackagesStore()
+  const gemTypesStore = useGemTypesStore()
 
-const q = ref('')
-const showForm = ref(false)
-const editId = ref<number | null>(null)
+  const q = ref('')
+  const showForm = ref(false)
+  const editId = ref<number | null>(null)
 
-const blank = (): Omit<GemsPackageDto, 'id'> => ({
-  name: '',
-  packageNumber: null,
-  gemsSize: null,
-  gemsWeight: null,
-  color: null,
-  cutting: null,
-  description: null,
-  originalPrice: null,
-  buyDate: null,
-  gemTypeId: null,
-  certificateId: null,
-  sellerId: null,
-  sellerName: null
-})
-
-const form = reactive<Omit<GemsPackageDto, 'id'>>(blank())
-const snapshot = ref(JSON.stringify(form))
-
-const isEdit = computed(() => editId.value != null)
-const dirty = computed(() => JSON.stringify(form) !== snapshot.value)
-
-const columns: TableColumn[] = [
-  { key: 'id', label: 'ID', width: '70px' },
-  { key: 'name', label: 'Name', width: '220px' },
-
-  // ✅ FIX: API returns gemTypeName, not gemType
-  { key: 'gemTypeName', label: 'Gem Type', width: '140px' },
-
-  { key: 'packageNumber', label: 'Package No.' },
-  { key: 'gemsSize', label: 'Gems Size' },
-  { key: 'gemsWeight', label: 'Gems Weight' },
-  { key: 'color', label: 'Color' },
-  { key: 'cutting', label: 'Cutting' },
-  { key: 'originalPrice', label: 'Price', align: 'right' },
-  { key: 'buyDate', label: 'Buy Date', width: '120px' },
-  { key: 'sellerName', label: 'Seller', width: '160px' },
-  { key: 'actions', label: 'Actions', width: '160px', align: 'center' }
-]
-
-const filteredRows = computed(() => {
-  const text = q.value.toLowerCase()
-  if (!text) return store.items
-  return store.items.filter((x) => {
-    const a = (x.name ?? '').toLowerCase()
-    const b = (x.gemTypeName ?? '').toLowerCase()
-    return a.includes(text) || b.includes(text)
-  })
-})
-
-/** ✅ Step 3.4: show selected gem type name in preview */
-const selectedGemTypeName = computed(() => {
-  if (!form.gemTypeId) return '-'
-  return gemTypesStore.items.find((x) => x.id === form.gemTypeId)?.name ?? '-'
-})
-
-onMounted(async () => {
-  await store.loadAll()
-  await gemTypesStore.loadAll()
-})
-
-// currency formatting
-function formatMoney(v?: number | null) {
-  if (v == null || Number.isNaN(v)) return '-'
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
-}
-
-// ✅ prevents NaN -> null silently
-function toNumOrNull(v: string): number | null {
-  const t = v.trim()
-  if (!t) return null
-  const n = Number(t)
-  return Number.isFinite(n) ? n : null
-}
-function toIntOrNull(v: string): number | null {
-  const t = v.trim()
-  if (!t) return null
-  const n = Number.parseInt(t, 10)
-  return Number.isFinite(n) ? n : null
-}
-
-function openCreate() {
-  showForm.value = true
-  editId.value = null
-  Object.assign(form, blank())
-  snapshot.value = JSON.stringify(form)
-}
-
-function openEdit(row: GemsPackageDto) {
-  showForm.value = true
-  editId.value = row.id
-
-  // keep gemTypeId from API
-  Object.assign(form, {
-    ...row,
-    gemTypeId: row.gemTypeId ?? null
+  const blank = (): Omit<GemsPackageDto, 'id'> => ({
+    name: '',
+    packageNumber: null,
+    gemsSize: null,
+    gemsWeight: null,
+    color: null,
+    cutting: null,
+    description: null,
+    originalPrice: null,
+    buyDate: null,
+    gemTypeId: null,
+    certificateId: null,
+    sellerId: null,
+    sellerName: null,
   })
 
-  ;(form as any).id = undefined
-  snapshot.value = JSON.stringify(form)
-}
+  const form = reactive<Omit<GemsPackageDto, 'id'>>(blank())
+  const snapshot = ref(JSON.stringify(form))
 
-function closeForm() {
-  showForm.value = false
-  editId.value = null
-}
+  const isEdit = computed(() => editId.value != null)
+  const dirty = computed(() => JSON.stringify(form) !== snapshot.value)
 
-function resetForm() {
-  if (isEdit.value) {
-    const row = store.items.find((x) => x.id === editId.value)
-    if (row) {
-      Object.assign(form, { ...row, gemTypeId: row.gemTypeId ?? null })
-      ;(form as any).id = undefined
-      snapshot.value = JSON.stringify(form)
+  const columns: TableColumn[] = [
+    { key: 'id', label: 'ID', width: '70px' },
+    { key: 'name', label: 'Name', width: '220px' },
+
+    // ✅ FIX: API returns gemTypeName, not gemType
+    { key: 'gemTypeName', label: 'Gem Type', width: '140px' },
+
+    { key: 'packageNumber', label: 'Package No.' },
+    { key: 'gemsSize', label: 'Gems Size' },
+    { key: 'gemsWeight', label: 'Gems Weight' },
+    { key: 'color', label: 'Color' },
+    { key: 'cutting', label: 'Cutting' },
+    { key: 'originalPrice', label: 'Price', align: 'right' },
+    { key: 'buyDate', label: 'Buy Date', width: '120px' },
+    { key: 'sellerName', label: 'Seller', width: '160px' },
+    { key: 'actions', label: 'Actions', width: '160px', align: 'center' },
+  ]
+
+  const filteredRows = computed(() => {
+    const text = q.value.toLowerCase()
+    if (!text) return store.items
+    return store.items.filter((x) => {
+      const a = (x.name ?? '').toLowerCase()
+      const b = (x.gemTypeName ?? '').toLowerCase()
+      return a.includes(text) || b.includes(text)
+    })
+  })
+
+  /** ✅ Step 3.4: show selected gem type name in preview */
+  const selectedGemTypeName = computed(() => {
+    if (!form.gemTypeId) return '-'
+    return gemTypesStore.items.find((x) => x.id === form.gemTypeId)?.name ?? '-'
+  })
+
+  onMounted(async () => {
+    await store.loadAll()
+    await gemTypesStore.loadAll()
+  })
+
+  // currency formatting
+  function formatMoney(v?: number | null) {
+    if (v == null || Number.isNaN(v)) return '-'
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
+  }
+
+  // ✅ prevents NaN -> null silently
+  function toNumOrNull(v: string): number | null {
+    const t = v.trim()
+    if (!t) return null
+    const n = Number(t)
+    return Number.isFinite(n) ? n : null
+  }
+  function toIntOrNull(v: string): number | null {
+    const t = v.trim()
+    if (!t) return null
+    const n = Number.parseInt(t, 10)
+    return Number.isFinite(n) ? n : null
+  }
+
+  function openCreate() {
+    showForm.value = true
+    editId.value = null
+    Object.assign(form, blank())
+    snapshot.value = JSON.stringify(form)
+  }
+
+  function openEdit(row: GemsPackageDto) {
+    showForm.value = true
+    editId.value = row.id
+
+    // keep gemTypeId from API
+    Object.assign(form, {
+      ...row,
+      gemTypeId: row.gemTypeId ?? null,
+    })
+    ;(form as any).id = undefined
+    snapshot.value = JSON.stringify(form)
+  }
+
+  function closeForm() {
+    showForm.value = false
+    editId.value = null
+  }
+
+  function resetForm() {
+    if (isEdit.value) {
+      const row = store.items.find((x) => x.id === editId.value)
+      if (row) {
+        Object.assign(form, { ...row, gemTypeId: row.gemTypeId ?? null })
+        ;(form as any).id = undefined
+        snapshot.value = JSON.stringify(form)
+      }
+      return
     }
-    return
-  }
-  Object.assign(form, blank())
-  snapshot.value = JSON.stringify(form)
-}
-
-async function save() {
-  if (!form.name.trim()) return
-
-  if (isEdit.value) {
-    await store.update(editId.value!, { ...form })
-  } else {
-    await store.create({ ...form })
+    Object.assign(form, blank())
+    snapshot.value = JSON.stringify(form)
   }
 
-  await store.loadAll()
-  closeForm()
-}
+  async function save() {
+    if (!form.name.trim()) return
 
-async function onDelete(row: GemsPackageDto) {
-  if (!confirm(`Delete "${row.name}"?`)) return
-  await store.remove(row.id)
-  await store.loadAll()
-}
+    if (isEdit.value) {
+      await store.update(editId.value!, { ...form })
+    } else {
+      await store.create({ ...form })
+    }
+
+    await store.loadAll()
+    closeForm()
+  }
+
+  async function onDelete(row: GemsPackageDto) {
+    if (!confirm(`Delete "${row.name}"?`)) return
+    await store.remove(row.id)
+    await store.loadAll()
+  }
 </script>
 
 <style scoped src="@/styles/admin/gems-package-page.css"></style>

@@ -1,116 +1,117 @@
 /* src/styles/admin/admin-table.css */
 
 .admin-table-panel {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 16px;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
-  }
-  
-  .panel-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  
-  .panel-title {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: #0f172a;
-  }
-  
-  .panel-caption {
-    font-size: 13px;
-    color: #64748b;
-  }
-  
-  /* Table wrapper allows horizontal scroll on small screens */
-  .table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-  }
-  
-  .admin-table {
-    width: 100%;
-    min-width: 900px; /* keeps columns aligned */
-    border-collapse: collapse;
-    background: #fff;
-  }
-  
-  .admin-table thead th {
-    position: sticky;
-    top: 0;
-    background: #f8fafc;
-    color: #0f172a;
-    font-weight: 700;
-    font-size: 13px;
-    text-transform: none;
-    letter-spacing: 0.2px;
-    padding: 12px 14px;
-    border-bottom: 1px solid #e2e8f0;
-    white-space: nowrap;
-  }
-  
-  .admin-table tbody td {
-    padding: 12px 14px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #0f172a;
-    font-size: 14px;
-    vertical-align: middle;
-  }
-  
-  .admin-table tbody tr:hover td {
-    background: #f8fafc;
-  }
-  
-  /* Empty state row */
-  .admin-table tbody tr td[colspan] {
-    text-align: center;
-    color: #64748b;
-    padding: 22px 14px;
-  }
-  
-  /* Pagination */
-  .pagination {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    align-items: center;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
-  
-  .pagination-btn {
-    border: 1px solid #cbd5e1;
-    background: #ffffff;
-    color: #0f172a;
-    padding: 8px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 13px;
-    line-height: 1;
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-  
-  .pagination-btn:hover {
-    background: #f1f5f9;
-    border-color: #94a3b8;
-  }
-  
-  .pagination-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  .pagination-btn--active {
-    background: #1d4ed8;
-    border-color: #1d4ed8;
-    color: #ffffff;
-  }
-  
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.panel-caption {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Table wrapper allows horizontal scroll on small screens */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 900px; /* keeps columns aligned */
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.admin-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0.2px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0f172a;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:hover td {
+  background: #f8fafc;
+}
+
+/* Empty state row */
+.admin-table tbody tr td[colspan] {
+  text-align: center;
+  color: #64748b;
+  padding: 22px 14px;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.pagination-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-btn--active {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}

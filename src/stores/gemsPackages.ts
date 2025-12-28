@@ -68,52 +68,52 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
       }
     },
 
-async update(id: number, payload: Omit<GemsPackageDto, 'id'>) {
-  this.loading = true
-  this.error = null
-  try {
-    const body = {
-      ...payload,
-      name: payload.name?.trim(),
-      color: payload.color?.trim(),
-      cutting: payload.cutting?.trim(),
-      description: payload.description?.trim(),
-      gemTypeId: payload.gemTypeId, // ✅ IMPORTANT
-      sellerName: payload.sellerName?.trim(),
-    }
+    async update(id: number, payload: Omit<GemsPackageDto, 'id'>) {
+      this.loading = true
+      this.error = null
+      try {
+        const body = {
+          ...payload,
+          name: payload.name?.trim(),
+          color: payload.color?.trim(),
+          cutting: payload.cutting?.trim(),
+          description: payload.description?.trim(),
+          gemTypeId: payload.gemTypeId, // ✅ IMPORTANT
+          sellerName: payload.sellerName?.trim(),
+        }
 
-    console.log('DEBUG UPDATE body=', body)
+        console.log('DEBUG UPDATE body=', body)
 
-    const res = await fetch(`${BASE_URL}/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
+        const res = await fetch(`${BASE_URL}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
 
-    if (!res.ok) {
-      const msg = await res.text().catch(() => '')
-      throw new Error(`Failed to update (${res.status}) ${msg}`)
-    }
+        if (!res.ok) {
+          const msg = await res.text().catch(() => '')
+          throw new Error(`Failed to update (${res.status}) ${msg}`)
+        }
 
-    const idx = this.items.findIndex((x) => x.id === id)
-    if (idx === -1) {
-      await this.loadAll()
-      return
-    }
+        const idx = this.items.findIndex((x) => x.id === id)
+        if (idx === -1) {
+          await this.loadAll()
+          return
+        }
 
-    const contentType = res.headers.get('content-type') || ''
-    if (res.status === 204 || !contentType.includes('application/json')) {
-      this.items[idx] = { id, ...body } as any
-    } else {
-      this.items[idx] = (await res.json()) as GemsPackageDto
-    }
-  } catch (e: any) {
-    this.error = e?.message ?? 'Failed to update.'
-    throw e
-  } finally {
-    this.loading = false
-  }
-},
+        const contentType = res.headers.get('content-type') || ''
+        if (res.status === 204 || !contentType.includes('application/json')) {
+          this.items[idx] = { id, ...body } as any
+        } else {
+          this.items[idx] = (await res.json()) as GemsPackageDto
+        }
+      } catch (e: any) {
+        this.error = e?.message ?? 'Failed to update.'
+        throw e
+      } finally {
+        this.loading = false
+      }
+    },
 
     async remove(id: number) {
       this.loading = true

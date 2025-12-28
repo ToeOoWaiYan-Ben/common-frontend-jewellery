@@ -17,7 +17,7 @@ export const useGemTypesStore = defineStore('gemTypes', {
   state: (): State => ({
     items: [],
     loading: false,
-    error: null
+    error: null,
   }),
 
   actions: {
@@ -42,7 +42,7 @@ export const useGemTypesStore = defineStore('gemTypes', {
         const res = await fetch(BASE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name })
+          body: JSON.stringify({ name }),
         })
         if (!res.ok) {
           const msg = await res.text().catch(() => '')
@@ -62,7 +62,7 @@ export const useGemTypesStore = defineStore('gemTypes', {
         const res = await fetch(`${BASE_URL}/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name })
+          body: JSON.stringify({ name }),
         })
         if (!res.ok) {
           const msg = await res.text().catch(() => '')
@@ -89,6 +89,6 @@ export const useGemTypesStore = defineStore('gemTypes', {
       } finally {
         this.loading = false
       }
-    }
-  }
+    },
+  },
 })

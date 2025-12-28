@@ -745,8 +745,8 @@ body {
 /* ---------- Highlight row being edited ---------- */
 
 .row--editing {
-  background-color: #dcfce7;           /* bright green background */
-  box-shadow: inset 4px 0 0 #22c55e;   /* green bar on the left */
+  background-color: #dcfce7; /* bright green background */
+  box-shadow: inset 4px 0 0 #22c55e; /* green bar on the left */
   transition: background-color 0.3s ease;
 }
 
@@ -784,7 +784,7 @@ body {
 
 .side-nav {
   width: 260px;
-  background: #f5f8ff;              /* ✅ sidebar background */
+  background: #f5f8ff; /* ✅ sidebar background */
   color: #0f172a;
   flex-shrink: 0;
   min-height: calc(100vh - 52px);
@@ -867,7 +867,9 @@ body {
   text-decoration: none;
   font-size: 0.92rem;
   border: 1px solid transparent;
-  transition: background-color 0.15s ease, border-color 0.15s ease,
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
     transform 0.05s ease;
 }
 
@@ -901,7 +903,9 @@ body {
   border: 1px solid transparent;
   cursor: pointer;
   font-size: 0.92rem;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .side-nav__group-header:hover {
@@ -927,7 +931,9 @@ body {
   font-size: 0.86rem;
   color: #475569;
   text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .side-nav__sub-link:hover {
@@ -1046,4 +1052,3 @@ body {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
 }
-

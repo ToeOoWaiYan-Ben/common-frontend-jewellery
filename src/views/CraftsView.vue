@@ -40,24 +40,12 @@
 
         <div class="category-form__row">
           <label class="category-form__label" for="nrc">NRC *</label>
-          <input
-            id="nrc"
-            v-model="formNrc"
-            class="category-form__input"
-            type="text"
-            required
-          />
+          <input id="nrc" v-model="formNrc" class="category-form__input" type="text" required />
         </div>
 
         <div class="category-form__row">
           <label class="category-form__label" for="phone">Phone *</label>
-          <input
-            id="phone"
-            v-model="formPhone"
-            class="category-form__input"
-            type="text"
-            required
-          />
+          <input id="phone" v-model="formPhone" class="category-form__input" type="text" required />
         </div>
 
         <div class="category-form__row">
@@ -72,12 +60,7 @@
         </div>
 
         <div class="category-form__actions">
-          <button
-            class="btn-secondary"
-            type="button"
-            @click="resetForm"
-            :disabled="isSubmitting"
-          >
+          <button class="btn-secondary" type="button" @click="resetForm" :disabled="isSubmitting">
             Reset
           </button>
 
@@ -121,12 +104,12 @@
 
     <!-- COLUMNS -->
     <template #columns>
-      <th style="width: 60px;">#</th>
+      <th style="width: 60px">#</th>
       <th>Shop Name</th>
       <th>NRC</th>
       <th>Phone</th>
       <th>Address</th>
-      <th style="width: 190px;">Actions</th>
+      <th style="width: 190px">Actions</th>
     </template>
 
     <!-- ROWS -->
@@ -137,10 +120,8 @@
       <td>{{ item.phone }}</td>
       <td>{{ item.address }}</td>
       <td>
-        <div style="display:flex; gap:0.25rem;">
-          <button class="btn-secondary" type="button" @click="onClickEdit(item)">
-            Edit
-          </button>
+        <div style="display: flex; gap: 0.25rem">
+          <button class="btn-secondary" type="button" @click="onClickEdit(item)">Edit</button>
           <button
             class="btn-secondary btn-secondary--danger"
             type="button"
@@ -155,162 +136,163 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
-import TablePage from '../components/TablePage.vue'
-import { useCraftsStore } from '../stores/useCraftsStore'
-import type { CraftDto } from '../dtos/CraftDto'
+  import { computed, onMounted, ref, watch } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import TablePage from '../components/TablePage.vue'
+  import { useCraftsStore } from '../stores/useCraftsStore'
+  import type { CraftDto } from '../dtos/CraftDto'
 
-const craftsStore = useCraftsStore()
-const { items: crafts, loading, error } = storeToRefs(craftsStore)
+  const craftsStore = useCraftsStore()
+  const { items: crafts, loading, error } = storeToRefs(craftsStore)
 
-const searchTerm = ref('')
+  const searchTerm = ref('')
 
-onMounted(() => {
-  craftsStore.loadCrafts()
-})
+  onMounted(() => {
+    craftsStore.loadCrafts()
+  })
 
-const isLoading = computed(() => loading.value)
-const errorMessage = computed(() => error.value)
+  const isLoading = computed(() => loading.value)
+  const errorMessage = computed(() => error.value)
 
-// filter
-const filteredCrafts = computed(() => {
-  const term = searchTerm.value.trim().toLowerCase()
-  if (!term) return crafts.value
+  // filter
+  const filteredCrafts = computed(() => {
+    const term = searchTerm.value.trim().toLowerCase()
+    if (!term) return crafts.value
 
-  return crafts.value.filter((c) =>
-    c.shopName.toLowerCase().includes(term) ||
-    c.nrc.toLowerCase().includes(term) ||
-    c.phone.toLowerCase().includes(term) ||
-    c.address.toLowerCase().includes(term)
-  )
-})
+    return crafts.value.filter(
+      (c) =>
+        c.shopName.toLowerCase().includes(term) ||
+        c.nrc.toLowerCase().includes(term) ||
+        c.phone.toLowerCase().includes(term) ||
+        c.address.toLowerCase().includes(term)
+    )
+  })
 
-const totalCrafts = computed(() => crafts.value.length)
-const filteredCount = computed(() => filteredCrafts.value.length)
+  const totalCrafts = computed(() => crafts.value.length)
+  const filteredCount = computed(() => filteredCrafts.value.length)
 
-// pagination
-const pageSize = ref(20)
-const currentPage = ref(1)
+  // pagination
+  const pageSize = ref(20)
+  const currentPage = ref(1)
 
-watch(filteredCrafts, () => {
-  currentPage.value = 1
-})
+  watch(filteredCrafts, () => {
+    currentPage.value = 1
+  })
 
-const paginatedCrafts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return filteredCrafts.value.slice(start, start + pageSize.value)
-})
+  const paginatedCrafts = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    return filteredCrafts.value.slice(start, start + pageSize.value)
+  })
 
-const goToPage = (page: number) => {
-  currentPage.value = page
-}
-
-// form states
-const showForm = ref(false)
-const isEditing = ref(false)
-const editingId = ref<number | null>(null)
-
-// ✅ rename for clarity (input uses shopName but your ref variable name can be anything)
-const formShopName = ref('')
-const formNrc = ref('')
-const formPhone = ref('')
-const formAddress = ref('')
-
-const isSubmitting = ref(false)
-const formError = ref<string | null>(null)
-
-const resetForm = () => {
-  formShopName.value = ''
-  formNrc.value = ''
-  formPhone.value = ''
-  formAddress.value = ''
-  formError.value = null
-  isEditing.value = false
-  editingId.value = null
-}
-
-const onClickNew = () => {
-  if (showForm.value) {
-    resetForm()
-    showForm.value = false
-    return
+  const goToPage = (page: number) => {
+    currentPage.value = page
   }
 
-  resetForm()
-  showForm.value = true
-}
+  // form states
+  const showForm = ref(false)
+  const isEditing = ref(false)
+  const editingId = ref<number | null>(null)
 
-const onClickEdit = (craft: CraftDto) => {
-  showForm.value = true
-  isEditing.value = true
-  editingId.value = craft.id
+  // ✅ rename for clarity (input uses shopName but your ref variable name can be anything)
+  const formShopName = ref('')
+  const formNrc = ref('')
+  const formPhone = ref('')
+  const formAddress = ref('')
 
-  // ✅ use shopName
-  formShopName.value = craft.shopName
-  formNrc.value = craft.nrc
-  formPhone.value = craft.phone
-  formAddress.value = craft.address
+  const isSubmitting = ref(false)
+  const formError = ref<string | null>(null)
 
-  formError.value = null
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-const closeEdit = () => {
-  resetForm()
-  showForm.value = false
-}
-
-const handleSubmitForm = async () => {
-  formError.value = null
-
-  if (
-    !formShopName.value.trim() ||
-    !formNrc.value.trim() ||
-    !formPhone.value.trim() ||
-    !formAddress.value.trim()
-  ) {
-    formError.value = 'All fields are required.'
-    return
+  const resetForm = () => {
+    formShopName.value = ''
+    formNrc.value = ''
+    formPhone.value = ''
+    formAddress.value = ''
+    formError.value = null
+    isEditing.value = false
+    editingId.value = null
   }
 
-  // ✅ IMPORTANT: send shopName (backend expects this)
-  const payload = {
-    shopName: formShopName.value.trim(),
-    nrc: formNrc.value.trim(),
-    phone: formPhone.value.trim(),
-    address: formAddress.value.trim()
-  }
-
-  isSubmitting.value = true
-  try {
-    if (isEditing.value && editingId.value != null) {
-      await craftsStore.updateCraft(editingId.value, payload)
-    } else {
-      await craftsStore.createCraft(payload)
-    }
-
-    resetForm()
-    showForm.value = false
-  } catch (e: any) {
-    formError.value = e?.message ?? 'Failed to save craft.'
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-const onClickDelete = async (id: number) => {
-  const ok = window.confirm('Are you sure you want to delete this craft?')
-  if (!ok) return
-
-  try {
-    await craftsStore.deleteCraft(id)
-    if (isEditing.value && editingId.value === id) {
+  const onClickNew = () => {
+    if (showForm.value) {
       resetForm()
       showForm.value = false
+      return
     }
-  } catch (e: any) {
-    alert(e?.message ?? 'Failed to delete craft.')
+
+    resetForm()
+    showForm.value = true
   }
-}
+
+  const onClickEdit = (craft: CraftDto) => {
+    showForm.value = true
+    isEditing.value = true
+    editingId.value = craft.id
+
+    // ✅ use shopName
+    formShopName.value = craft.shopName
+    formNrc.value = craft.nrc
+    formPhone.value = craft.phone
+    formAddress.value = craft.address
+
+    formError.value = null
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const closeEdit = () => {
+    resetForm()
+    showForm.value = false
+  }
+
+  const handleSubmitForm = async () => {
+    formError.value = null
+
+    if (
+      !formShopName.value.trim() ||
+      !formNrc.value.trim() ||
+      !formPhone.value.trim() ||
+      !formAddress.value.trim()
+    ) {
+      formError.value = 'All fields are required.'
+      return
+    }
+
+    // ✅ IMPORTANT: send shopName (backend expects this)
+    const payload = {
+      shopName: formShopName.value.trim(),
+      nrc: formNrc.value.trim(),
+      phone: formPhone.value.trim(),
+      address: formAddress.value.trim(),
+    }
+
+    isSubmitting.value = true
+    try {
+      if (isEditing.value && editingId.value != null) {
+        await craftsStore.updateCraft(editingId.value, payload)
+      } else {
+        await craftsStore.createCraft(payload)
+      }
+
+      resetForm()
+      showForm.value = false
+    } catch (e: any) {
+      formError.value = e?.message ?? 'Failed to save craft.'
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  const onClickDelete = async (id: number) => {
+    const ok = window.confirm('Are you sure you want to delete this craft?')
+    if (!ok) return
+
+    try {
+      await craftsStore.deleteCraft(id)
+      if (isEditing.value && editingId.value === id) {
+        resetForm()
+        showForm.value = false
+      }
+    } catch (e: any) {
+      alert(e?.message ?? 'Failed to delete craft.')
+    }
+  }
 </script>

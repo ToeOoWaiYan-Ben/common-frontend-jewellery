@@ -33,9 +33,13 @@
             <span>Products</span>
           </RouterLink>
         </li>
-<RouterLink to="/gems-packages" class="side-nav__link" active-class="side-nav__link--active">
-  <span>Gems Packages</span>
-</RouterLink>
+        <RouterLink
+          to="/gems-packages"
+          class="side-nav__link"
+          active-class="side-nav__link--active"
+        >
+          <span>Gems Packages</span>
+        </RouterLink>
 
         <li class="side-nav__item">
           <button type="button" class="side-nav__group-header" @click="toggleGroup('forms')">
@@ -47,31 +51,50 @@
 
           <ul v-if="isGroupOpen('forms')" class="side-nav__sub-list">
             <li>
-              <RouterLink to="/register-form" class="side-nav__sub-link" active-class="side-nav__sub-link--active">
+              <RouterLink
+                to="/register-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
                 Register Form
               </RouterLink>
             </li>
             <li>
-              <RouterLink to="/another-form" class="side-nav__sub-link" active-class="side-nav__sub-link--active">
+              <RouterLink
+                to="/another-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
                 Another Form
               </RouterLink>
             </li>
             <li>
-              <RouterLink to="/category-form" class="side-nav__sub-link" active-class="side-nav__sub-link--active">
+              <RouterLink
+                to="/category-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
                 Category Form
               </RouterLink>
             </li>
             <li>
-              <RouterLink to="/craft-form" class="side-nav__sub-link" active-class="side-nav__sub-link--active">
+              <RouterLink
+                to="/craft-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
                 Craft Form
               </RouterLink>
             </li>
             <li>
-  <RouterLink to="/gem-type-form" class="side-nav__sub-link" active-class="side-nav__sub-link--active">
-    Gems Type Register Form
-  </RouterLink>
-</li>
-
+              <RouterLink
+                to="/gem-type-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Gems Type Register Form
+              </RouterLink>
+            </li>
           </ul>
         </li>
       </ul>
@@ -80,14 +103,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+  import { ref } from 'vue'
 
-const openGroupId = ref<string | null>('forms')
+  const openGroupId = ref<string | null>('forms')
 
-function toggleGroup(id: string) {
-  openGroupId.value = openGroupId.value === id ? null : id
-}
-function isGroupOpen(id: string) {
-  return openGroupId.value === id
-}
+  function toggleGroup(id: string) {
+    openGroupId.value = openGroupId.value === id ? null : id
+  }
+  function isGroupOpen(id: string) {
+    return openGroupId.value === id
+  }
 </script>

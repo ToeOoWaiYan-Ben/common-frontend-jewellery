@@ -27,9 +27,7 @@
     <!-- Card / table / states -->
     <div class="card">
       <!-- Loading -->
-      <div v-if="isLoading" class="users-empty">
-        Loading users…
-      </div>
+      <div v-if="isLoading" class="users-empty">Loading users…</div>
 
       <!-- Error -->
       <div v-else-if="errorMessage" class="users-empty users-empty--error">
@@ -41,10 +39,10 @@
         <table class="table users-table" v-if="filteredUsers.length">
           <thead>
             <tr>
-              <th style="width: 60px;">#</th>
+              <th style="width: 60px">#</th>
               <th>Name</th>
               <th>Email</th>
-              <th style="width: 140px;">Role</th>
+              <th style="width: 140px">Role</th>
             </tr>
           </thead>
           <tbody>
@@ -53,10 +51,7 @@
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
               <td>
-                <span
-                  class="role-pill"
-                  :class="`role-pill--${user.role.toLowerCase()}`"
-                >
+                <span class="role-pill" :class="`role-pill--${user.role.toLowerCase()}`">
                   {{ user.role }}
                 </span>
               </td>
@@ -65,8 +60,8 @@
         </table>
 
         <div v-else class="users-empty">
-          No users found for
-          “<span class="users-empty__term">{{ searchTerm }}</span>”.
+          No users found for “<span class="users-empty__term">{{ searchTerm }}</span
+          >”.
         </div>
       </template>
     </div>
@@ -74,40 +69,37 @@
 </template>
 
 <script setup lang="ts">
+  import { useUsersStore } from '../stores/useUsersStore'
+  import { storeToRefs } from 'pinia'
 
-import { useUsersStore } from '../stores/useUsersStore'
-import { storeToRefs } from 'pinia'
+  import { computed, onMounted, ref } from 'vue'
+  const searchTerm = ref('')
 
-import { computed,onMounted, ref } from 'vue'
-const searchTerm = ref('')
+  const isLoading = ref(false)
+  const errorMessage = ref<string | null>(null)
 
-const isLoading = ref(false)
-const errorMessage = ref<string | null>(null)
-
-const usersStore = useUsersStore()
-const { items: users, loading, error } = storeToRefs(usersStore)
-onMounted(() => {
-  usersStore.loadUsers()
-  console.log("onMounted Call !!!")
-})
-
-
-
-// --- Filters & meta ---
-const filteredUsers = computed(() => {
-  const term = searchTerm.value.trim().toLowerCase()
-  if (!term) return users.value
-
-  return users.value.filter((u) => {
-    return (
-      u.name.toLowerCase().includes(term) ||
-      u.email.toLowerCase().includes(term) ||
-      u.role.toLowerCase().includes(term)
-    )
+  const usersStore = useUsersStore()
+  const { items: users, loading, error } = storeToRefs(usersStore)
+  onMounted(() => {
+    usersStore.loadUsers()
+    console.log('onMounted Call !!!')
   })
-})
 
-const totalUsers = computed(() => users.value.length)
-const filteredCount = computed(() => filteredUsers.value.length)
+  // --- Filters & meta ---
+  const filteredUsers = computed(() => {
+    const term = searchTerm.value.trim().toLowerCase()
+    if (!term) return users.value
+
+    return users.value.filter((u) => {
+      return (
+        u.name.toLowerCase().includes(term) ||
+        u.email.toLowerCase().includes(term) ||
+        u.role.toLowerCase().includes(term)
+      )
+    })
+  })
+
+  const totalUsers = computed(() => users.value.length)
+  const filteredCount = computed(() => filteredUsers.value.length)
 </script>
 <style scoped src="/public/styles/admin/user.css"></style>

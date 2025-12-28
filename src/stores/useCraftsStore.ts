@@ -28,7 +28,7 @@ function mapToCraftDto(x: CraftApi): CraftDto {
     shopName: (x.shopName ?? x.shop_name ?? x.shop_Name ?? '') as string,
     nrc: (x.nrc ?? '') as string,
     phone: (x.phone ?? '') as string,
-    address: (x.address ?? '') as string
+    address: (x.address ?? '') as string,
   }
 }
 
@@ -36,11 +36,11 @@ export const useCraftsStore = defineStore('crafts', {
   state: (): CraftsState => ({
     items: [],
     loading: false,
-    error: null
+    error: null,
   }),
 
   getters: {
-    totalCrafts: (state) => state.items.length
+    totalCrafts: (state) => state.items.length,
   },
 
   actions: {
@@ -60,39 +60,37 @@ export const useCraftsStore = defineStore('crafts', {
       }
     },
 
-async createCraft(payload: Omit<CraftDto, 'id'>) {
-  this.loading = true
-  this.error = null
-  try {
-    const body = {
-      shopName: payload.shopName?.trim(),
-      nrc: payload.nrc?.trim(),
-      phone: payload.phone?.trim(),
-      address: payload.address?.trim()
-    }
+    async createCraft(payload: Omit<CraftDto, 'id'>) {
+      this.loading = true
+      this.error = null
+      try {
+        const body = {
+          shopName: payload.shopName?.trim(),
+          nrc: payload.nrc?.trim(),
+          phone: payload.phone?.trim(),
+          address: payload.address?.trim(),
+        }
 
-    const res = await fetch(BASE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    })
+        const res = await fetch(BASE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
 
-    if (!res.ok) {
-      const msg = await res.text().catch(() => '')
-      throw new Error(`Failed to create craft (${res.status}) ${msg}`)
-    }
+        if (!res.ok) {
+          const msg = await res.text().catch(() => '')
+          throw new Error(`Failed to create craft (${res.status}) ${msg}`)
+        }
 
-    const created = (await res.json()) as CraftDto
-    this.items.push(created)
-  } catch (e: any) {
-    this.error = e?.message ?? 'Something went wrong while creating craft.'
-    throw e
-  } finally {
-    this.loading = false
-  }
-}
-,
-
+        const created = (await res.json()) as CraftDto
+        this.items.push(created)
+      } catch (e: any) {
+        this.error = e?.message ?? 'Something went wrong while creating craft.'
+        throw e
+      } finally {
+        this.loading = false
+      }
+    },
     async updateCraft(id: number, payload: Omit<CraftDto, 'id'>) {
       this.loading = true
       this.error = null
@@ -104,8 +102,8 @@ async createCraft(payload: Omit<CraftDto, 'id'>) {
             shopName: payload.shopName,
             nrc: payload.nrc,
             phone: payload.phone,
-            address: payload.address
-          })
+            address: payload.address,
+          }),
         })
 
         if (!res.ok) {
@@ -155,6 +153,6 @@ async createCraft(payload: Omit<CraftDto, 'id'>) {
       } finally {
         this.loading = false
       }
-    }
-  }
+    },
+  },
 })

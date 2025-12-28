@@ -12,11 +12,11 @@ export const useUsersStore = defineStore('users', {
   state: (): UsersState => ({
     items: [],
     loading: false,
-    error: null
+    error: null,
   }),
 
   getters: {
-    totalUsers: (state) => state.items.length
+    totalUsers: (state) => state.items.length,
   },
 
   actions: {
@@ -27,13 +27,12 @@ export const useUsersStore = defineStore('users', {
         const res = await fetch('http://localhost:8080/api/customers')
         if (!res.ok) throw new Error(`Failed to fetch users (${res.status})`)
 
-       this.items= (await res.json()) as UserDto[]
-
+        this.items = (await res.json()) as UserDto[]
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading users.'
       } finally {
         this.loading = false
       }
-    }
-  }
+    },
+  },
 })

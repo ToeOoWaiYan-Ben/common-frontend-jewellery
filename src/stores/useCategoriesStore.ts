@@ -12,11 +12,11 @@ export const useCategoriesStore = defineStore('categories', {
   state: (): CategoriesState => ({
     items: [],
     loading: false,
-    error: null
+    error: null,
   }),
 
   getters: {
-    totalCategories: (state) => state.items.length
+    totalCategories: (state) => state.items.length,
   },
 
   actions: {
@@ -35,33 +35,31 @@ export const useCategoriesStore = defineStore('categories', {
       }
     },
 
-async createCategory(payload: { name: string; code: string; description?: string }) {
-  this.loading = true
-  this.error = null
-  try {
-    const res = await fetch('http://localhost:8080/api/categories', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
+    async createCategory(payload: { name: string; code: string; description?: string }) {
+      this.loading = true
+      this.error = null
+      try {
+        const res = await fetch('http://localhost:8080/api/categories', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
 
-    const raw = await res.text() // <-- read error message too
+        const raw = await res.text() // <-- read error message too
 
-    if (!res.ok) {
-      throw new Error(raw || `Failed to create category (${res.status})`)
-    }
+        if (!res.ok) {
+          throw new Error(raw || `Failed to create category (${res.status})`)
+        }
 
-    const created = JSON.parse(raw) as CategoryDto
-    this.items.push(created)
-  } catch (e: any) {
-    this.error = e?.message ?? 'Something went wrong while creating category.'
-    throw e
-  } finally {
-    this.loading = false
-  }
-}
-,
-
+        const created = JSON.parse(raw) as CategoryDto
+        this.items.push(created)
+      } catch (e: any) {
+        this.error = e?.message ?? 'Something went wrong while creating category.'
+        throw e
+      } finally {
+        this.loading = false
+      }
+    },
     async updateCategory(
       id: number,
       payload: { name: string; code: string; description?: string }
@@ -72,9 +70,9 @@ async createCategory(payload: { name: string; code: string; description?: string
         const res = await fetch(`http://localhost:8080/api/categories/${id}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         })
 
         if (!res.ok) throw new Error(`Failed to update category (${res.status})`)
@@ -95,18 +93,18 @@ async createCategory(payload: { name: string; code: string; description?: string
       this.error = null
       try {
         const res = await fetch(`http://localhost:8080/api/categories/${id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
         })
 
-          if (!res.ok) throw new Error(`Failed to delete category (${res.status})`)
+        if (!res.ok) throw new Error(`Failed to delete category (${res.status})`)
 
         this.items = this.items.filter((c) => c.id !== id)
       } catch (e: any) {
-          this.error = e?.message ?? 'Something went wrong while deleting category.'
+        this.error = e?.message ?? 'Something went wrong while deleting category.'
         throw e
       } finally {
         this.loading = false
       }
-    }
-  }
+    },
+  },
 })

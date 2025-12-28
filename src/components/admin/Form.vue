@@ -26,18 +26,18 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  title: string
-  submitLabel: string
-  busyLabel?: string
-  submitting?: boolean
-  error?: string | null
-}>()
+  defineProps<{
+    title: string
+    submitLabel: string
+    busyLabel?: string
+    submitting?: boolean
+    error?: string | null
+  }>()
 
-defineEmits<{
-  (e: 'submit'): void
-  (e: 'cancel'): void
-}>()
+  defineEmits<{
+    (e: 'submit'): void
+    (e: 'cancel'): void
+  }>()
 </script>
 
 <!-- ✅ This file MUST exist -->
