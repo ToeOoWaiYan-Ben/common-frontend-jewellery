@@ -14,10 +14,7 @@ async function parseError(res: Response) {
   }
 }
 
-export async function http<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
+export async function http<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken()
 
   const headers = new Headers(options.headers || {})

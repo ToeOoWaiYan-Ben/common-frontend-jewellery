@@ -50,9 +50,7 @@
         <div class="dashboard__panel-header">
           <h3>Sales</h3>
           <div class="dashboard__panel-tabs">
-            <button class="dashboard__tab dashboard__tab--active" type="button">
-              Area
-            </button>
+            <button class="dashboard__tab dashboard__tab--active" type="button">Area</button>
             <button class="dashboard__tab" type="button">Donut</button>
           </div>
         </div>
@@ -67,9 +65,7 @@
       <div class="card dashboard__panel">
         <div class="dashboard__panel-header">
           <h3>Visitors</h3>
-          <button class="dashboard__date-btn" type="button">
-            📅 Today
-          </button>
+          <button class="dashboard__date-btn" type="button">📅 Today</button>
         </div>
         <div class="dashboard__panel-body dashboard__panel-body--map">
           <!-- Placeholder for map -->
@@ -82,7 +78,6 @@
   </section>
 </template>
 
-
 <script setup lang="ts">
-import '/public/styles/admin/home.css'  
+  import '/public/styles/admin/home.css'
 </script>

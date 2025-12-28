@@ -67,7 +67,7 @@ export const useCustomersStore = defineStore('customers', {
         role?: string
         password?: string
         gmail?: string
-      },
+      }
     ) {
       this.loading = true
       this.error = null

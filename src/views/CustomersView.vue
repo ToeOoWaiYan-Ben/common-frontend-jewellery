@@ -1,511 +1,410 @@
 <template>
-<main class="content">
-<PageHeader title="Customers" subtitle="Manage customer accounts">
-<template #right>
-<button class="btn-primary" type="button" @click="onClickNew">
+  <main class="content">
+    <PageHeader title="Customers" subtitle="Manage customer accounts">
+      <template #right>
+        <button class="btn-primary" type="button" @click="onClickNew">
+          {{ showForm && !isEditing ? 'Close Form' : isEditing ? 'Editing...' : 'Create Customer' }}
+        </button>
+      </template>
+    </PageHeader>
 
-          {{
-
-            showForm && !isEditing
-
-              ? 'Close Form'
-
-              : isEditing
-
-                ? 'Editing...'
-
-                : 'Create Customer'
-
-          }}
-</button>
-</template>
-</PageHeader>
- 
     <FilterBar>
-<input
-
-        v-model="search"
-
-        class="search-input"
-
-        placeholder="Search customers..."
-
-      />
-<div class="pill">
-
+      <input v-model="search" class="search-input" placeholder="Search customers..." />
+      <div class="pill">
         Showing <strong>{{ filteredCount }}</strong> / <strong>{{ total }}</strong>
-</div>
-</FilterBar>
- 
+      </div>
+    </FilterBar>
+
     <CustomerForm
-
       v-if="showForm"
-
       :title="isEditing ? 'Edit Customer' : 'New Customer'"
-
       :submitLabel="isEditing ? 'Update Customer' : 'Create Customer'"
-
       :busyLabel="isEditing ? 'Updating…' : 'Saving…'"
-
       :submitting="submitting"
-
       :error="formError"
-
       @submit="handleSubmit"
-
       @cancel="closeForm"
->
-<div class="category-form__row">
-<label class="category-form__label">Name *</label>
-<input v-model="formName" class="category-form__input" placeholder="e.g. John Doe" />
-</div>
- 
+    >
       <div class="category-form__row">
-<label class="category-form__label">Phone *</label>
-<input v-model="formPhone" class="category-form__input" placeholder="e.g. 09xxxxxxxx" />
-</div>
- 
+        <label class="category-form__label">Name *</label>
+        <input v-model="formName" class="category-form__input" placeholder="e.g. John Doe" />
+      </div>
+
       <div class="category-form__row">
-<label class="category-form__label">Address *</label>
-<input v-model="formAddress" class="category-form__input" placeholder="e.g. Bangkok" />
-</div>
- 
+        <label class="category-form__label">Phone *</label>
+        <input v-model="formPhone" class="category-form__input" placeholder="e.g. 09xxxxxxxx" />
+      </div>
+
       <div class="category-form__row">
-<label class="category-form__label">Role *</label>
-<input v-model="formRole" class="category-form__input" placeholder="e.g. Admin / Staff / Customer" />
-</div>
- 
-      <!-- ✅ gmail optional -->
-<div class="category-form__row">
-<label class="category-form__label">Gmail (optional)</label>
-<input v-model="formGmail" class="category-form__input" placeholder="e.g. someone@gmail.com" />
-</div>
- 
-      <!-- password required only on create -->
-<div class="category-form__row">
-<label class="category-form__label">
+        <label class="category-form__label">Address *</label>
+        <input v-model="formAddress" class="category-form__input" placeholder="e.g. Bangkok" />
+      </div>
 
-          Password <span v-if="isEditing">(leave blank to keep)</span><span v-else>*</span>
-</label>
-<input
-
-          v-model="formPassword"
-
-          type="password"
-
+      <div class="category-form__row">
+        <label class="category-form__label">Role *</label>
+        <input
+          v-model="formRole"
           class="category-form__input"
-
-          :placeholder="isEditing ? 'Leave blank to keep' : 'Minimum 6 characters'"
-
+          placeholder="e.g. Admin / Staff / Customer"
         />
-</div>
-</CustomerForm>
- 
+      </div>
+
+      <!-- ✅ gmail optional -->
+      <div class="category-form__row">
+        <label class="category-form__label">Gmail (optional)</label>
+        <input
+          v-model="formGmail"
+          class="category-form__input"
+          placeholder="e.g. someone@gmail.com"
+        />
+      </div>
+
+      <!-- password required only on create -->
+      <div class="category-form__row">
+        <label class="category-form__label">
+          Password <span v-if="isEditing">(leave blank to keep)</span><span v-else>*</span>
+        </label>
+        <input
+          v-model="formPassword"
+          type="password"
+          class="category-form__input"
+          :placeholder="isEditing ? 'Leave blank to keep' : 'Minimum 6 characters'"
+        />
+      </div>
+    </CustomerForm>
+
     <section v-if="errorMessage" class="panel">
-<div class="alert alert--error">
-<span class="alert__icon">⚠</span>
-<span>{{ errorMessage }}</span>
-</div>
-</section>
- 
+      <div class="alert alert--error">
+        <span class="alert__icon">⚠</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </section>
+
     <section v-else-if="isLoading" class="panel">
-<div class="users-empty">Loading customers…</div>
-</section>
- 
+      <div class="users-empty">Loading customers…</div>
+    </section>
+
     <AdminTable
-
       v-else
-
       :columns="columns"
-
       :rows="filteredRows"
-
       title="All customers"
-
       :page-size="20"
-
       :editingId="editingId"
-
       :rowKey="'id'"
-
       @page-change="onPageChange"
->
-<!-- gmail cell -->
-<template #cell-gmail="{ value }">
-<span>{{ value ? value : '-' }}</span>
-</template>
- 
+    >
+      <!-- gmail cell -->
+      <template #cell-gmail="{ value }">
+        <span>{{ value ? value : '-' }}</span>
+      </template>
+
       <!-- actions -->
-<template #cell-actions="{ row }">
-<div class="table-actions">
-<button class="btn-link btn-link--primary" type="button" @click="onClickEdit(row)">
-
+      <template #cell-actions="{ row }">
+        <div class="table-actions">
+          <button class="btn-link btn-link--primary" type="button" @click="onClickEdit(row)">
             Edit
-</button>
-<button class="btn-link btn-link--danger" type="button" @click="onClickDelete(row.id)">
-
+          </button>
+          <button class="btn-link btn-link--danger" type="button" @click="onClickDelete(row.id)">
             Delete
-</button>
-</div>
+          </button>
+        </div>
+      </template>
+    </AdminTable>
+  </main>
 </template>
-</AdminTable>
-</main>
-</template>
- 
+
 <script setup lang="ts">
+  import { computed, onMounted, ref } from 'vue'
 
-import { computed, onMounted, ref } from 'vue'
+  import { storeToRefs } from 'pinia'
 
-import { storeToRefs } from 'pinia'
+  import PageHeader from '../components/admin/PageHeader.vue'
 
-import PageHeader from '../components/admin/PageHeader.vue'
+  import FilterBar from '../components/admin/FilterBar.vue'
 
-import FilterBar from '../components/admin/FilterBar.vue'
+  import CustomerForm from '../components/admin/Form.vue'
 
-import CustomerForm from '../components/admin/Form.vue'
+  import AdminTable, { type TableColumn } from '../components/admin/AdminTable.vue'
 
-import AdminTable, { type TableColumn } from '../components/admin/AdminTable.vue'
+  import { useCustomersStore } from '../stores/useCustomersStore'
 
-import { useCustomersStore } from '../stores/useCustomersStore'
+  import type { CustomerDto } from '../dtos/CustomerDto'
 
-import type { CustomerDto } from '../dtos/CustomerDto'
- 
-const store = useCustomersStore()
+  const store = useCustomersStore()
 
-const { items, loading, error } = storeToRefs(store)
- 
-onMounted(() => {
+  const { items, loading, error } = storeToRefs(store)
 
-  store.loadCustomers()
-
-})
- 
-const isLoading = computed(() => loading.value)
-
-const errorMessage = computed(() => error.value)
- 
-const search = ref('')
- 
-const filteredRows = computed(() => {
-
-  const term = search.value.trim().toLowerCase()
-
-  if (!term) return items.value
- 
-  return items.value.filter((c: CustomerDto) => {
-
-    return (
-
-      (c.name ?? '').toLowerCase().includes(term) ||
-
-      (c.phone ?? '').toLowerCase().includes(term) ||
-
-      (c.address ?? '').toLowerCase().includes(term) ||
-
-      (c.role ?? '').toLowerCase().includes(term) ||
-
-      ((c.gmail ?? '').toLowerCase().includes(term))
-
-    )
-
+  onMounted(() => {
+    store.loadCustomers()
   })
 
-})
- 
-const total = computed(() => items.value.length)
+  const isLoading = computed(() => loading.value)
 
-const filteredCount = computed(() => filteredRows.value.length)
- 
-const columns: TableColumn[] = [
+  const errorMessage = computed(() => error.value)
 
-  { key: 'id', label: '#', width: '70px' },
+  const search = ref('')
 
-  { key: 'name', label: 'Name' },
+  const filteredRows = computed(() => {
+    const term = search.value.trim().toLowerCase()
 
-  { key: 'phone', label: 'Phone', width: '140px' },
+    if (!term) return items.value
 
-  { key: 'address', label: 'Address' },
+    return items.value.filter((c: CustomerDto) => {
+      return (
+        (c.name ?? '').toLowerCase().includes(term) ||
+        (c.phone ?? '').toLowerCase().includes(term) ||
+        (c.address ?? '').toLowerCase().includes(term) ||
+        (c.role ?? '').toLowerCase().includes(term) ||
+        (c.gmail ?? '').toLowerCase().includes(term)
+      )
+    })
+  })
 
-  { key: 'role', label: 'Role', width: '120px' },
+  const total = computed(() => items.value.length)
 
-  { key: 'gmail', label: 'Gmail', width: '220px' },
+  const filteredCount = computed(() => filteredRows.value.length)
 
-  { key: 'actions', label: '', width: '160px', align: 'right' }
+  const columns: TableColumn[] = [
+    { key: 'id', label: '#', width: '70px' },
 
-]
- 
-function onPageChange(page: number) {
+    { key: 'name', label: 'Name' },
 
-  console.log('Customers page →', page)
+    { key: 'phone', label: 'Phone', width: '140px' },
 
-}
- 
-/* ----- form state ----- */
+    { key: 'address', label: 'Address' },
 
-const showForm = ref(false)
+    { key: 'role', label: 'Role', width: '120px' },
 
-const isEditing = ref(false)
+    { key: 'gmail', label: 'Gmail', width: '220px' },
 
-const editingId = ref<number | null>(null)
- 
-const formName = ref('')
+    { key: 'actions', label: '', width: '160px', align: 'right' },
+  ]
 
-const formPhone = ref('')
-
-const formAddress = ref('')
-
-const formRole = ref('')
-
-const formGmail = ref('') // ✅ optional
-
-const formPassword = ref('')
- 
-const submitting = ref(false)
-
-const formError = ref<string | null>(null)
- 
-function resetForm() {
-
-  formName.value = ''
-
-  formPhone.value = ''
-
-  formAddress.value = ''
-
-  formRole.value = ''
-
-  formGmail.value = ''
-
-  formPassword.value = ''
-
-  formError.value = null
-
-  isEditing.value = false
-
-  editingId.value = null
-
-}
- 
-function closeForm() {
-
-  resetForm()
-
-  showForm.value = false
-
-}
- 
-function onClickNew() {
-
-  if (showForm.value && !isEditing.value) {
-
-    closeForm()
-
-    return
-
+  function onPageChange(page: number) {
+    console.log('Customers page →', page)
   }
 
-  resetForm()
+  /* ----- form state ----- */
 
-  showForm.value = true
+  const showForm = ref(false)
 
-}
- 
-function onClickEdit(row: CustomerDto) {
+  const isEditing = ref(false)
 
-  showForm.value = true
+  const editingId = ref<number | null>(null)
 
-  isEditing.value = true
+  const formName = ref('')
 
-  editingId.value = Number(row.id)
- 
-  formName.value = row.name ?? ''
+  const formPhone = ref('')
 
-  formPhone.value = row.phone ?? ''
+  const formAddress = ref('')
 
-  formAddress.value = row.address ?? ''
+  const formRole = ref('')
 
-  formRole.value = row.role ?? ''
+  const formGmail = ref('') // ✅ optional
 
-  formGmail.value = row.gmail ?? '' // ✅ can be empty
+  const formPassword = ref('')
 
-  formPassword.value = '' // never prefill password
- 
-  formError.value = null
+  const submitting = ref(false)
 
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  const formError = ref<string | null>(null)
 
-}
- 
-async function handleSubmit() {
+  function resetForm() {
+    formName.value = ''
 
-  formError.value = null
- 
-  if (!formName.value.trim() || !formPhone.value.trim() || !formAddress.value.trim() || !formRole.value.trim()) {
+    formPhone.value = ''
 
-    formError.value = 'Name, Phone, Address and Role are required.'
+    formAddress.value = ''
 
-    return
+    formRole.value = ''
 
+    formGmail.value = ''
+
+    formPassword.value = ''
+
+    formError.value = null
+
+    isEditing.value = false
+
+    editingId.value = null
   }
- 
-  // create requires password
 
-  if (!isEditing.value && !formPassword.value.trim()) {
+  function closeForm() {
+    resetForm()
 
-    formError.value = 'Password is required.'
-
-    return
-
+    showForm.value = false
   }
- 
-  submitting.value = true
 
-  try {
+  function onClickNew() {
+    if (showForm.value && !isEditing.value) {
+      closeForm()
 
-    if (isEditing.value && editingId.value != null) {
-
-      await store.updateCustomer(editingId.value, {
-
-        name: formName.value.trim(),
-
-        phone: formPhone.value.trim(),
-
-        address: formAddress.value.trim(),
-
-        role: formRole.value.trim(),
-
-        gmail: formGmail.value.trim() || undefined, // ✅ optional
-
-        password: formPassword.value.trim() || undefined // ✅ optional in update
-
-      })
-
-    } else {
-
-      await store.createCustomer({
-
-        name: formName.value.trim(),
-
-        phone: formPhone.value.trim(),
-
-        address: formAddress.value.trim(),
-
-        role: formRole.value.trim(),
-
-        gmail: formGmail.value.trim() || undefined, // ✅ optional
-
-        password: formPassword.value.trim()
-
-      })
-
+      return
     }
- 
-    closeForm()
 
-  } catch (e: any) {
+    resetForm()
 
-    formError.value = e?.message ?? 'Something went wrong while saving customer.'
-
-  } finally {
-
-    submitting.value = false
-
+    showForm.value = true
   }
 
-}
- 
-async function onClickDelete(id: number) {
+  function onClickEdit(row: CustomerDto) {
+    showForm.value = true
 
-  const ok = window.confirm('Are you sure you want to delete this customer?')
+    isEditing.value = true
 
-  if (!ok) return
- 
-  try {
+    editingId.value = Number(row.id)
 
-    await store.deleteCustomer(id)
+    formName.value = row.name ?? ''
 
-    if (editingId.value === id) closeForm()
+    formPhone.value = row.phone ?? ''
 
-  } catch (e: any) {
+    formAddress.value = row.address ?? ''
 
-    alert(e?.message ?? 'Something went wrong while deleting customer.')
+    formRole.value = row.role ?? ''
 
+    formGmail.value = row.gmail ?? '' // ✅ can be empty
+
+    formPassword.value = '' // never prefill password
+
+    formError.value = null
+
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-}
+  async function handleSubmit() {
+    formError.value = null
+
+    if (
+      !formName.value.trim() ||
+      !formPhone.value.trim() ||
+      !formAddress.value.trim() ||
+      !formRole.value.trim()
+    ) {
+      formError.value = 'Name, Phone, Address and Role are required.'
+
+      return
+    }
+
+    // create requires password
+
+    if (!isEditing.value && !formPassword.value.trim()) {
+      formError.value = 'Password is required.'
+
+      return
+    }
+
+    submitting.value = true
+
+    try {
+      if (isEditing.value && editingId.value != null) {
+        await store.updateCustomer(editingId.value, {
+          name: formName.value.trim(),
+
+          phone: formPhone.value.trim(),
+
+          address: formAddress.value.trim(),
+
+          role: formRole.value.trim(),
+
+          gmail: formGmail.value.trim() || undefined, // ✅ optional
+
+          password: formPassword.value.trim() || undefined, // ✅ optional in update
+        })
+      } else {
+        await store.createCustomer({
+          name: formName.value.trim(),
+
+          phone: formPhone.value.trim(),
+
+          address: formAddress.value.trim(),
+
+          role: formRole.value.trim(),
+
+          gmail: formGmail.value.trim() || undefined, // ✅ optional
+
+          password: formPassword.value.trim(),
+        })
+      }
+
+      closeForm()
+    } catch (e: any) {
+      formError.value = e?.message ?? 'Something went wrong while saving customer.'
+    } finally {
+      submitting.value = false
+    }
+  }
+
+  async function onClickDelete(id: number) {
+    const ok = window.confirm('Are you sure you want to delete this customer?')
+
+    if (!ok) return
+
+    try {
+      await store.deleteCustomer(id)
+
+      if (editingId.value === id) closeForm()
+    } catch (e: any) {
+      alert(e?.message ?? 'Something went wrong while deleting customer.')
+    }
+  }
 </script>
- 
+
 <style scoped>
+  .search-input {
+    width: 420px;
 
-.search-input {
+    max-width: 100%;
 
-  width: 420px;
+    padding: 10px 12px;
 
-  max-width: 100%;
+    border: 1px solid #e2e8f0;
 
-  padding: 10px 12px;
+    border-radius: 10px;
 
-  border: 1px solid #e2e8f0;
+    outline: none;
+  }
 
-  border-radius: 10px;
+  .pill {
+    display: inline-flex;
 
-  outline: none;
+    gap: 6px;
 
-}
- 
-.pill {
+    align-items: center;
 
-  display: inline-flex;
+    padding: 8px 10px;
 
-  gap: 6px;
+    border: 1px solid #e2e8f0;
 
-  align-items: center;
+    border-radius: 999px;
 
-  padding: 8px 10px;
+    background: #fff;
+  }
 
-  border: 1px solid #e2e8f0;
+  .table-actions {
+    display: flex;
 
-  border-radius: 999px;
+    justify-content: flex-end;
 
-  background: #fff;
+    gap: 12px;
+  }
 
-}
- 
-.table-actions {
+  .btn-link {
+    background: transparent;
 
-  display: flex;
+    border: 0;
 
-  justify-content: flex-end;
+    padding: 0;
 
-  gap: 12px;
+    cursor: pointer;
 
-}
- 
-.btn-link {
+    text-decoration: underline;
+  }
 
-  background: transparent;
+  .btn-link--primary {
+    color: #1d4ed8;
+  }
 
-  border: 0;
-
-  padding: 0;
-
-  cursor: pointer;
-
-  text-decoration: underline;
-
-}
- 
-.btn-link--primary {
-
-  color: #1d4ed8;
-
-}
-
-.btn-link--danger {
-
-  color: #dc2626;
-
-}
+  .btn-link--danger {
+    color: #dc2626;
+  }
 </style>
-
- 

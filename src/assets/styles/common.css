@@ -745,8 +745,8 @@ body {
 /* ---------- Highlight row being edited ---------- */
 
 .row--editing {
-  background-color: #dcfce7;           /* bright green background */
-  box-shadow: inset 4px 0 0 #22c55e;   /* green bar on the left */
+  background-color: #dcfce7; /* bright green background */
+  box-shadow: inset 4px 0 0 #22c55e; /* green bar on the left */
   transition: background-color 0.3s ease;
 }
 
