@@ -66,6 +66,12 @@
                 Craft Form
               </RouterLink>
             </li>
+            <li>
+  <RouterLink to="/gem-type-form" class="side-nav__sub-link" active-class="side-nav__sub-link--active">
+    Gems Type Register Form
+  </RouterLink>
+</li>
+
           </ul>
         </li>
       </ul>

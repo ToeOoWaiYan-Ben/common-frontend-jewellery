@@ -32,13 +32,7 @@
         <span>{{ store.error }}</span>
       </div>
 
-      <AdminTable
-        title=""
-        :columns="columns"
-        :rows="filteredRows"
-        :pageSize="8"
-        :editingId="editId"
-      >
+      <AdminTable title="" :columns="columns" :rows="filteredRows" :pageSize="8" :editingId="editId">
         <template #cell-originalPrice="{ value }">
           {{ formatMoney(value as number | null | undefined) }}
         </template>
@@ -106,9 +100,20 @@
             />
           </div>
 
+          <!-- ✅ Gem Type dropdown -->
           <div class="gp-field">
             <label class="gp-label">Gem Type</label>
-            <input v-model.trim="form.gemType" class="gp-input" placeholder="e.g. Diamond" />
+
+            <select v-model="form.gemTypeId" class="gp-input">
+              <option :value="null">Select gem type</option>
+              <option v-for="t in gemTypesStore.items" :key="t.id" :value="t.id">
+                {{ t.name }}
+              </option>
+            </select>
+
+            <small v-if="gemTypesStore.items.length === 0" class="gp-muted" style="display:block; margin-top:6px;">
+              No gem types found. Please register gem types first.
+            </small>
           </div>
 
           <div class="gp-field">
@@ -123,7 +128,21 @@
 
           <div class="gp-field">
             <label class="gp-label">Cutting</label>
-            <input v-model.trim="form.cutting" class="gp-input" placeholder="e.g. Round" />
+<select v-model="form.cutting" class="gp-input">
+  <option value="">Select cutting</option>
+  <option value="Round">Round</option>
+  <option value="Princess">Princess</option>
+  <option value="Cushion">Cushion</option>
+  <option value="Emerald">Emerald</option>
+  <option value="Oval">Oval</option>
+  <option value="Pear">Pear</option>
+  <option value="Marquise">Marquise</option>
+  <option value="Heart">Heart</option>
+  <option value="Radiant">Radiant</option>
+  <option value="Asscher">Asscher</option>
+</select>
+
+            
           </div>
 
           <div class="gp-field">
@@ -167,19 +186,12 @@
 
           <div class="gp-field gp-field--full">
             <label class="gp-label">Description</label>
-            <textarea
-              v-model.trim="form.description"
-              class="gp-textarea"
-              rows="3"
-              placeholder="Short note about this package..."
-            />
+            <textarea v-model.trim="form.description" class="gp-textarea" rows="3" placeholder="Short note..." />
           </div>
         </div>
 
         <div class="gp-actions">
-          <button class="gp-btn" type="button" @click="resetForm" :disabled="store.loading">
-            Reset
-          </button>
+          <button class="gp-btn" type="button" @click="resetForm" :disabled="store.loading">Reset</button>
 
           <button
             class="gp-btn gp-btn--primary"
@@ -187,7 +199,7 @@
             @click="save"
             :disabled="store.loading || !form.name.trim()"
           >
-            {{ store.loading ? 'Saving...' : (isEdit ? 'Save changes' : 'Create package') }}
+            {{ store.loading ? 'Saving...' : isEdit ? 'Save changes' : 'Create package' }}
           </button>
         </div>
       </div>
@@ -212,10 +224,13 @@
               <span class="gp-muted">Name</span>
               <span class="gp-strong">{{ form.name || '-' }}</span>
             </div>
+
+            <!-- ✅ CHANGE THIS -->
             <div class="gp-preview-row">
               <span class="gp-muted">Gem</span>
-              <span class="gp-strong">{{ form.gemType || '-' }}</span>
+              <span class="gp-strong">{{ selectedGemTypeName }}</span>
             </div>
+
             <div class="gp-preview-row">
               <span class="gp-muted">Size</span>
               <span class="gp-strong">{{ form.gemsSize ?? '-' }}</span>
@@ -236,8 +251,10 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import AdminTable, { type TableColumn } from '../components/admin/AdminTable.vue'
 import { useGemsPackagesStore } from '../stores/gemsPackages'
 import type { GemsPackageDto } from '../dtos/GemsPackageDto'
+import { useGemTypesStore } from '../stores/gemTypes'
 
 const store = useGemsPackagesStore()
+const gemTypesStore = useGemTypesStore()
 
 const q = ref('')
 const showForm = ref(false)
@@ -253,10 +270,10 @@ const blank = (): Omit<GemsPackageDto, 'id'> => ({
   description: null,
   originalPrice: null,
   buyDate: null,
-  gemType: null,
+  gemTypeId: null,
   certificateId: null,
   sellerId: null,
-  sellerName: null,
+  sellerName: null
 })
 
 const form = reactive<Omit<GemsPackageDto, 'id'>>(blank())
@@ -268,7 +285,10 @@ const dirty = computed(() => JSON.stringify(form) !== snapshot.value)
 const columns: TableColumn[] = [
   { key: 'id', label: 'ID', width: '70px' },
   { key: 'name', label: 'Name', width: '220px' },
-  { key: 'gemType', label: 'Gem Type', width: '140px' },
+
+  // ✅ FIX: API returns gemTypeName, not gemType
+  { key: 'gemTypeName', label: 'Gem Type', width: '140px' },
+
   { key: 'packageNumber', label: 'Package No.' },
   { key: 'gemsSize', label: 'Gems Size' },
   { key: 'gemsWeight', label: 'Gems Weight' },
@@ -277,7 +297,7 @@ const columns: TableColumn[] = [
   { key: 'originalPrice', label: 'Price', align: 'right' },
   { key: 'buyDate', label: 'Buy Date', width: '120px' },
   { key: 'sellerName', label: 'Seller', width: '160px' },
-  { key: 'actions', label: 'Actions', width: '160px', align: 'center' },
+  { key: 'actions', label: 'Actions', width: '160px', align: 'center' }
 ]
 
 const filteredRows = computed(() => {
@@ -285,13 +305,20 @@ const filteredRows = computed(() => {
   if (!text) return store.items
   return store.items.filter((x) => {
     const a = (x.name ?? '').toLowerCase()
-    const b = (x.gemType ?? '').toLowerCase()
+    const b = (x.gemTypeName ?? '').toLowerCase()
     return a.includes(text) || b.includes(text)
   })
 })
 
+/** ✅ Step 3.4: show selected gem type name in preview */
+const selectedGemTypeName = computed(() => {
+  if (!form.gemTypeId) return '-'
+  return gemTypesStore.items.find((x) => x.id === form.gemTypeId)?.name ?? '-'
+})
+
 onMounted(async () => {
   await store.loadAll()
+  await gemTypesStore.loadAll()
 })
 
 // currency formatting
@@ -324,7 +351,13 @@ function openCreate() {
 function openEdit(row: GemsPackageDto) {
   showForm.value = true
   editId.value = row.id
-  Object.assign(form, { ...row })
+
+  // keep gemTypeId from API
+  Object.assign(form, {
+    ...row,
+    gemTypeId: row.gemTypeId ?? null
+  })
+
   ;(form as any).id = undefined
   snapshot.value = JSON.stringify(form)
 }
@@ -338,7 +371,7 @@ function resetForm() {
   if (isEdit.value) {
     const row = store.items.find((x) => x.id === editId.value)
     if (row) {
-      Object.assign(form, { ...row })
+      Object.assign(form, { ...row, gemTypeId: row.gemTypeId ?? null })
       ;(form as any).id = undefined
       snapshot.value = JSON.stringify(form)
     }
@@ -368,5 +401,4 @@ async function onDelete(row: GemsPackageDto) {
 }
 </script>
 
-<!-- ✅ THIS is where you add it (BOTTOM of the file) -->
 <style scoped src="@/styles/admin/gems-package-page.css"></style>
