@@ -7,8 +7,10 @@ import RegisterFormView from '../views/RegisterFormView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
 import CustomersView from '../views/CustomersView.vue'
 import CustomerFormView from '../views/CustomerFormView.vue'
+import LoginView from '../views/LoginView.vue'
 
 const routes: RouteRecordRaw[] = [
+  { path: '/login', name: 'login', component: LoginView },
   { path: '/', name: 'home', component: HomeView },
 
   { path: '/products', name: 'products', component: ProductsView },
