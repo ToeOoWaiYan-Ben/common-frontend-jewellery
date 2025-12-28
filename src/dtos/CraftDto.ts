@@ -1,7 +1,7 @@
 export interface CraftDto {
   id: number
   shopName: string
-  nic: string
+  nrc: string
   phone: string
   address: string
 }

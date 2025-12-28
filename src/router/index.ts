@@ -7,6 +7,7 @@ import ProductsView from '../views/ProductsView.vue'
 import RegisterFormView from '../views/RegisterFormView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
 import CraftsView from '../views/CraftsView.vue'
+import GemsPackagesView from '../views/GemPackagesView.vue'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: HomeView },
@@ -18,6 +19,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/category-form', redirect: '/categories' },
   { path: '/crafts', name: 'crafts', component: CraftsView },
   { path: '/craft-form', redirect: '/crafts' },
+  { path: '/gems-packages', name: 'gems-packages', component: GemsPackagesView },
 ]
 
 const router = createRouter({
