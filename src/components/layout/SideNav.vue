@@ -1,6 +1,5 @@
 <template>
   <aside class="side-nav">
-    <!-- Brand/top area -->
     <div class="side-nav__brand">
       <div class="side-nav__brand-logo">MA</div>
       <div class="side-nav__brand-text">
@@ -9,79 +8,141 @@
       </div>
     </div>
 
-    <!-- Menu -->
     <div class="side-nav__menu">
       <ul class="side-nav__list">
         <li class="side-nav__item">
-          <RouterLink to="/" class="side-nav__link" active-class="side-nav__link--active">
-            <span class="side-nav__link-icon">📊</span>
-            <span class="side-nav__link-label">Dashboard</span>
+          <RouterLink
+            to="/admin"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+            :class="{ 'side-nav__link--active': isActive('/admin') }"
+          >
+            <span>Dashboard</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink to="/users" class="side-nav__link" active-class="side-nav__link--active">
-            <span class="side-nav__link-icon">👥</span>
-            <span class="side-nav__link-label">Users</span>
+          <RouterLink
+            to="/admin/users"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span>Users</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink to="/orders" class="side-nav__link" active-class="side-nav__link--active">
-            <span class="side-nav__link-icon">🧾</span>
-            <span class="side-nav__link-label">Orders</span>
+          <RouterLink
+            to="/admin/orders"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span>Orders</span>
           </RouterLink>
         </li>
 
         <li class="side-nav__item">
-          <RouterLink to="/products" class="side-nav__link" active-class="side-nav__link--active">
-            <span class="side-nav__link-icon">📦</span>
-            <span class="side-nav__link-label">Products</span>
+          <RouterLink
+            to="/admin/products"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span>Products</span>
           </RouterLink>
         </li>
 
-        <!-- Forms group -->
+        <li class="side-nav__item">
+          <RouterLink
+            to="/admin/categories"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span>Categories</span>
+          </RouterLink>
+        </li>
+
+        <li class="side-nav__item">
+          <RouterLink
+            to="/admin/crafts"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span>Crafts</span>
+          </RouterLink>
+        </li>
+
+        <li class="side-nav__item">
+          <RouterLink
+            to="/admin/gems-packages"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            <span>Gems Packages</span>
+          </RouterLink>
+        </li>
+
         <li class="side-nav__item">
           <button type="button" class="side-nav__group-header" @click="toggleGroup('forms')">
-            <div class="side-nav__group-header-inner">
-              <span class="side-nav__link-icon">✎</span>
-              <span class="side-nav__group-label">Forms</span>
-              <span
-                class="side-nav__group-chevron"
-                :class="{ 'side-nav__group-chevron--open': isGroupOpen('forms') }"
-              >
-                ›
-              </span>
-            </div>
+            <span style="flex: 1">Forms</span>
+            <span :style="{ transform: isGroupOpen('forms') ? 'rotate(90deg)' : 'rotate(0deg)' }">
+              ›
+            </span>
           </button>
 
           <ul v-if="isGroupOpen('forms')" class="side-nav__sub-list">
             <li>
               <RouterLink
-                to="/register-form"
+                to="/admin/register-form"
                 class="side-nav__sub-link"
                 active-class="side-nav__sub-link--active"
               >
                 Register Form
               </RouterLink>
             </li>
+
+            <!-- you don't have /admin/another-form in router, so remove it (or add route) -->
+            <!--
             <li>
-              <RouterLink
-                to="/another-form"
-                class="side-nav__sub-link"
-                active-class="side-nav__sub-link--active"
-              >
-                Another Form
-              </RouterLink>
+              <RouterLink to="/admin/another-form" class="side-nav__sub-link">Another Form</RouterLink>
             </li>
-            <!-- NEW: Category Form -->
+            -->
+
             <li>
               <RouterLink
-                to="/category-form"
+                to="/admin/category-form"
                 class="side-nav__sub-link"
                 active-class="side-nav__sub-link--active"
               >
                 Category Form
+              </RouterLink>
+            </li>
+
+            <li>
+              <RouterLink
+                to="/admin/craft-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Craft Form
+              </RouterLink>
+            </li>
+
+            <li>
+              <RouterLink
+                to="/admin/gem-type-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Gems Type Register Form
+              </RouterLink>
+            </li>
+            <li>
+              <RouterLink
+                to="/seller-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Seller Register Form
               </RouterLink>
             </li>
           </ul>
@@ -92,15 +153,22 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
+  import { useRoute } from 'vue-router'
+
+  const route = useRoute()
 
   const openGroupId = ref<string | null>('forms')
 
   function toggleGroup(id: string) {
     openGroupId.value = openGroupId.value === id ? null : id
   }
-
   function isGroupOpen(id: string) {
     return openGroupId.value === id
+  }
+
+  // Optional: make Dashboard link active on /admin exactly
+  function isActive(path: string) {
+    return route.path === path
   }
 </script>

@@ -104,9 +104,6 @@
         description: description.value.trim() || undefined,
       })
 
-      // if needed: await categoriesStore.loadCategories()
-
-      // Go back to categories page
       router.push('/categories')
     } catch (e: any) {
       formError.value = e?.message ?? 'Something went wrong while creating the category.'

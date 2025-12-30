@@ -13,8 +13,8 @@
       showForm && !isEditing ? 'Close Form' : isEditing ? 'Editing...' : 'Create New Category'
     "
     idKey="id"
-    @changePage="goToPage"
-    @clickNew="onClickNew"
+    @click-new="onClickNew"
+    @change-page="goToPage"
     :editingId="editingId"
   >
     <!-- FORM SLOT (create / edit) -->

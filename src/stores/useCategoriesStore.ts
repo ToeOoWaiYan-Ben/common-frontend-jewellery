@@ -1,6 +1,8 @@
 // src/stores/useCategoriesStore.ts
 import { defineStore } from 'pinia'
 import type { CategoryDto } from '../dtos/CategoryDto'
+import { API_BASE_URL } from '../config/env'
+import { http } from '../services/http'
 
 interface CategoriesState {
   items: CategoryDto[]
@@ -24,36 +26,30 @@ export const useCategoriesStore = defineStore('categories', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch('http://localhost:8080/api/categories')
-        if (!res.ok) {
-          throw new Error(`Failed to fetch categories (${res.status})`)
-        }
-
-        this.items = (await res.json()) as CategoryDto[]
+        this.items = await http<CategoryDto[]>('/categories')
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading categories.'
       } finally {
         this.loading = false
       }
     },
-
     async createCategory(payload: { name: string; code: string; description?: string }) {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch('http://localhost:8080/api/categories', {
+        const res = await fetch(API_BASE_URL + '/categories', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
 
+        const raw = await res.text()
+
         if (!res.ok) {
-          throw new Error(`Failed to create category (${res.status})`)
+          throw new Error(raw || `Failed to create category (${res.status})`)
         }
 
-        const created = (await res.json()) as CategoryDto
+        const created = JSON.parse(raw) as CategoryDto
         this.items.push(created)
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while creating category.'
@@ -62,7 +58,6 @@ export const useCategoriesStore = defineStore('categories', {
         this.loading = false
       }
     },
-
     async updateCategory(
       id: number,
       payload: { name: string; code: string; description?: string }
@@ -70,7 +65,7 @@ export const useCategoriesStore = defineStore('categories', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`http://localhost:8080/api/categories/${id}`, {
+        const res = await fetch(API_BASE_URL + `/categories/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -78,16 +73,11 @@ export const useCategoriesStore = defineStore('categories', {
           body: JSON.stringify(payload),
         })
 
-        if (!res.ok) {
-          throw new Error(`Failed to update category (${res.status})`)
-        }
+        if (!res.ok) throw new Error(`Failed to update category (${res.status})`)
 
         const updated = (await res.json()) as CategoryDto
-
         const idx = this.items.findIndex((c) => c.id === id)
-        if (idx !== -1) {
-          this.items[idx] = updated
-        }
+        if (idx !== -1) this.items[idx] = updated
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while updating category.'
         throw e
@@ -96,18 +86,15 @@ export const useCategoriesStore = defineStore('categories', {
       }
     },
 
-    // DELETE
     async deleteCategory(id: number) {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`http://localhost:8080/api/categories/${id}`, {
+        const res = await fetch(API_BASE_URL + `/categories/${id}`, {
           method: 'DELETE',
         })
 
-        if (!res.ok) {
-          throw new Error(`Failed to delete category (${res.status})`)
-        }
+        if (!res.ok) throw new Error(`Failed to delete category (${res.status})`)
 
         this.items = this.items.filter((c) => c.id !== id)
       } catch (e: any) {
