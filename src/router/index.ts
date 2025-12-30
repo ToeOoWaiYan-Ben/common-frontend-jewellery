@@ -1,5 +1,12 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
+/* -------- Layout -------- */
+import AdminLayout from '../components/layout/AdminLayout.vue'
+
+/* -------- Auth -------- */
+import LoginView from '../views/LoginView.vue'
+
+/* -------- Admin Views -------- */
 import HomeView from '../views/HomeView.vue'
 import UsersView from '../views/UsersView.vue'
 import OrdersView from '../views/OrdersView.vue'
@@ -11,17 +18,85 @@ import GemsPackagesView from '../views/GemPackagesView.vue'
 import GemTypeFormView from '../views/GemTypeFormView.vue'
 
 const routes: RouteRecordRaw[] = [
-  { path: '/', name: 'home', component: HomeView },
-  { path: '/users', name: 'users', component: UsersView },
-  { path: '/orders', name: 'orders', component: OrdersView },
-  { path: '/products', name: 'products', component: ProductsView },
-  { path: '/register-form', name: 'register-form', component: RegisterFormView },
-  { path: '/categories', name: 'categories', component: CategoriesView },
-  { path: '/category-form', redirect: '/categories' },
-  { path: '/crafts', name: 'crafts', component: CraftsView },
-  { path: '/craft-form', redirect: '/crafts' },
-  { path: '/gems-packages', name: 'gems-packages', component: GemsPackagesView },
-  { path: '/gem-type-form', name: 'gem-type-form', component: GemTypeFormView },
+  /* ---------- Login ---------- */
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView,
+  },
+
+  /* ---------- Admin Area ---------- */
+  {
+    path: '/admin',
+    component: AdminLayout,
+    children: [
+      {
+        path: '',
+        name: 'home',
+        component: HomeView,
+      },
+      {
+        path: 'users',
+        name: 'users',
+        component: UsersView,
+      },
+      {
+        path: 'orders',
+        name: 'orders',
+        component: OrdersView,
+      },
+      {
+        path: 'products',
+        name: 'products',
+        component: ProductsView,
+      },
+      {
+        path: 'register-form',
+        name: 'register-form',
+        component: RegisterFormView,
+      },
+
+      /* -------- Categories -------- */
+      {
+        path: 'categories',
+        name: 'categories',
+        component: CategoriesView,
+      },
+      {
+        path: 'category-form',
+        redirect: '/admin/categories',
+      },
+
+      /* -------- Crafts -------- */
+      {
+        path: 'crafts',
+        name: 'crafts',
+        component: CraftsView,
+      },
+      {
+        path: 'craft-form',
+        redirect: '/admin/crafts',
+      },
+
+      /* -------- Gem Packages -------- */
+      {
+        path: 'gems-packages',
+        name: 'gems-packages',
+        component: GemsPackagesView,
+      },
+      {
+        path: 'gem-type-form',
+        name: 'gem-type-form',
+        component: GemTypeFormView,
+      },
+    ],
+  },
+
+  /* ---------- Fallback ---------- */
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/login',
+  },
 ]
 
 const router = createRouter({
