@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia'
 import type { GemsPackageDto } from '../dtos/GemsPackageDto'
 import { API_BASE_URL } from '../config/env'
+import { http } from '../services/http'
 
 interface State {
   items: GemsPackageDto[]
   loading: boolean
   error: string | null
 }
+
+const BASE_URL = API_BASE_URL + '/gems-packages'
 
 export const useGemsPackagesStore = defineStore('gemsPackages', {
   state: (): State => ({
@@ -20,9 +23,8 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(API_BASE_URL)
-        if (!res.ok) throw new Error(`Failed to fetch gems packages (${res.status})`)
-        this.items = (await res.json()) as GemsPackageDto[]
+        // ✅ use http() for GET like Categories example
+        this.items = await http<GemsPackageDto[]>('/gems-packages')
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to load gems packages.'
       } finally {
@@ -44,21 +46,18 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
           sellerName: payload.sellerName?.trim(),
         }
 
-        console.log('DEBUG CREATE body=', body)
-
-        const res = await fetch(API_BASE_URL, {
+        const res = await fetch(BASE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         })
 
-        if (!res.ok) {
-          const msg = await res.text().catch(() => '')
-          throw new Error(`Failed to create (${res.status}) ${msg}`)
-        }
+        const raw = await res.text()
+        if (!res.ok) throw new Error(raw || `Failed to create gems package (${res.status})`)
 
-        const created = (await res.json()) as GemsPackageDto
+        const created = JSON.parse(raw) as GemsPackageDto
         this.items.push(created)
+        return created
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to create.'
         throw e
@@ -77,22 +76,18 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
           color: payload.color?.trim(),
           cutting: payload.cutting?.trim(),
           description: payload.description?.trim(),
-          gemTypeId: payload.gemTypeId, // ✅ IMPORTANT
+          gemTypeId: payload.gemTypeId,
           sellerName: payload.sellerName?.trim(),
         }
 
-        console.log('DEBUG UPDATE body=', body)
-
-        const res = await fetch(`${API_BASE_URL}/${id}`, {
+        const res = await fetch(`${BASE_URL}/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         })
 
-        if (!res.ok) {
-          const msg = await res.text().catch(() => '')
-          throw new Error(`Failed to update (${res.status}) ${msg}`)
-        }
+        const raw = await res.text()
+        if (!res.ok) throw new Error(raw || `Failed to update gems package (${res.status})`)
 
         const idx = this.items.findIndex((x) => x.id === id)
         if (idx === -1) {
@@ -100,11 +95,11 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
           return
         }
 
-        const contentType = res.headers.get('content-type') || ''
-        if (res.status === 204 || !contentType.includes('application/json')) {
+        // some backends return updated JSON, some return empty
+        if (!raw) {
           this.items[idx] = { id, ...body } as any
         } else {
-          this.items[idx] = (await res.json()) as GemsPackageDto
+          this.items[idx] = JSON.parse(raw) as GemsPackageDto
         }
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to update.'
@@ -118,8 +113,9 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' })
-        if (!res.ok) throw new Error(`Failed to delete (${res.status})`)
+        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
+        const raw = await res.text()
+        if (!res.ok) throw new Error(raw || `Failed to delete gems package (${res.status})`)
         this.items = this.items.filter((x) => x.id !== id)
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to delete.'

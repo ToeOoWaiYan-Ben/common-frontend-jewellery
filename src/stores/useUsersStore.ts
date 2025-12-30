@@ -1,8 +1,7 @@
-// src/stores/useUsersStore.ts
 import { defineStore } from 'pinia'
 import type { UserDto } from '../dtos/UserDto'
-import { API_BASE_URL } from '../config/env'
-const BASE_URL = API_BASE_URL + '/customers'
+import { http } from '../services/http'
+
 interface UsersState {
   items: UserDto[]
   loading: boolean
@@ -25,10 +24,8 @@ export const useUsersStore = defineStore('users', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(BASE_URL)
-        if (!res.ok) throw new Error(`Failed to fetch users (${res.status})`)
-
-        this.items = (await res.json()) as UserDto[]
+        // ✅ use http() for GET
+        this.items = await http<UserDto[]>('/customers')
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading users.'
       } finally {
