@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
 import type { CraftDto } from '../dtos/CraftDto'
+import { API_BASE_URL } from '../config/env'
+import { http } from '../services/http'
 
 interface CraftsState {
   items: CraftDto[]
   loading: boolean
   error: string | null
 }
-import { API_BASE_URL } from '../config/env'
+
 const BASE_URL = API_BASE_URL + '/crafts'
 
-// Backend might return any of these keys for shop name.
-// We normalize them to CraftDto.shopName.
 type CraftApi = {
   id: number
   shopName?: string | null
@@ -21,7 +21,6 @@ type CraftApi = {
   address?: string | null
 }
 
-// Convert backend object -> frontend CraftDto
 function mapToCraftDto(x: CraftApi): CraftDto {
   return {
     id: x.id,
@@ -48,10 +47,8 @@ export const useCraftsStore = defineStore('crafts', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(API_BASE_URL)
-        if (!res.ok) throw new Error(`Failed to fetch crafts (${res.status})`)
-
-        const raw = (await res.json()) as CraftApi[]
+        // ✅ use http() for GET
+        const raw = await http<CraftApi[]>('/crafts')
         this.items = raw.map(mapToCraftDto)
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading crafts.'
@@ -77,13 +74,13 @@ export const useCraftsStore = defineStore('crafts', {
           body: JSON.stringify(body),
         })
 
-        if (!res.ok) {
-          const msg = await res.text().catch(() => '')
-          throw new Error(`Failed to create craft (${res.status}) ${msg}`)
-        }
+        const raw = await res.text()
+        if (!res.ok) throw new Error(raw || `Failed to create craft (${res.status})`)
 
-        const created = (await res.json()) as CraftDto
+        const createdRaw = JSON.parse(raw) as CraftApi
+        const created = mapToCraftDto(createdRaw)
         this.items.push(created)
+        return created
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while creating craft.'
         throw e
@@ -91,6 +88,7 @@ export const useCraftsStore = defineStore('crafts', {
         this.loading = false
       }
     },
+
     async updateCraft(id: number, payload: Omit<CraftDto, 'id'>) {
       this.loading = true
       this.error = null
@@ -99,17 +97,15 @@ export const useCraftsStore = defineStore('crafts', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            shopName: payload.shopName,
-            nrc: payload.nrc,
-            phone: payload.phone,
-            address: payload.address,
+            shopName: payload.shopName?.trim(),
+            nrc: payload.nrc?.trim(),
+            phone: payload.phone?.trim(),
+            address: payload.address?.trim(),
           }),
         })
 
-        if (!res.ok) {
-          const msg = await res.text().catch(() => '')
-          throw new Error(`Failed to update craft (${res.status}) ${msg}`)
-        }
+        const raw = await res.text()
+        if (!res.ok) throw new Error(raw || `Failed to update craft (${res.status})`)
 
         const idx = this.items.findIndex((c) => c.id === id)
         if (idx === -1) {
@@ -117,12 +113,10 @@ export const useCraftsStore = defineStore('crafts', {
           return
         }
 
-        const contentType = res.headers.get('content-type') || ''
-
-        if (res.status === 204 || !contentType.includes('application/json')) {
+        if (!raw) {
           this.items[idx] = { id, ...payload }
         } else {
-          const updatedRaw = (await res.json()) as CraftApi
+          const updatedRaw = JSON.parse(raw) as CraftApi
           this.items[idx] = mapToCraftDto(updatedRaw)
         }
       } catch (e: any) {
@@ -138,12 +132,8 @@ export const useCraftsStore = defineStore('crafts', {
       this.error = null
       try {
         const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
-
-        if (!res.ok) {
-          const msg = await res.text().catch(() => '')
-          throw new Error(`Failed to delete craft (${res.status}) ${msg}`)
-        }
-
+        const raw = await res.text()
+        if (!res.ok) throw new Error(raw || `Failed to delete craft (${res.status})`)
         this.items = this.items.filter((c) => c.id !== id)
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while deleting craft.'

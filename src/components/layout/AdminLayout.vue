@@ -10,6 +10,7 @@
         <router-view />
       </main>
     </div>
+    
 
     <AppFooter />
   </div>

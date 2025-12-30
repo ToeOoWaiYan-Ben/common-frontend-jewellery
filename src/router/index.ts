@@ -1,3 +1,4 @@
+// src/router/index.ts
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 /* -------- Layout -------- */
@@ -5,6 +6,7 @@ import AdminLayout from '../components/layout/AdminLayout.vue'
 
 /* -------- Auth -------- */
 import LoginView from '../views/LoginView.vue'
+import { useAuthStore } from '../stores/useAuthStore'
 
 /* -------- Admin Views -------- */
 import HomeView from '../views/HomeView.vue'
@@ -27,81 +29,55 @@ const routes: RouteRecordRaw[] = [
 
   /* ---------- Admin Area ---------- */
   {
-    path: '/',
+    path: '/admin',
     component: AdminLayout,
     children: [
-      {
-        path: '',
-        name: 'home',
-        component: HomeView,
-      },
-      {
-        path: 'users',
-        name: 'users',
-        component: UsersView,
-      },
-      {
-        path: 'orders',
-        name: 'orders',
-        component: OrdersView,
-      },
-      {
-        path: 'products',
-        name: 'products',
-        component: ProductsView,
-      },
-      {
-        path: 'register-form',
-        name: 'register-form',
-        component: RegisterFormView,
-      },
+      { path: '', name: 'home', component: HomeView },
+
+      { path: 'users', name: 'users', component: UsersView },
+      { path: 'orders', name: 'orders', component: OrdersView },
+      { path: 'products', name: 'products', component: ProductsView },
+      { path: 'register-form', name: 'register-form', component: RegisterFormView },
 
       /* -------- Categories -------- */
-      {
-        path: 'categories',
-        name: 'categories',
-        component: CategoriesView,
-      },
-      {
-        path: 'category-form',
-        redirect: '/admin/categories',
-      },
+      { path: 'categories', name: 'categories', component: CategoriesView },
+      { path: 'category-form', redirect: '/admin/categories' },
 
       /* -------- Crafts -------- */
-      {
-        path: 'crafts',
-        name: 'crafts',
-        component: CraftsView,
-      },
-      {
-        path: 'craft-form',
-        redirect: '/admin/crafts',
-      },
+      { path: 'crafts', name: 'crafts', component: CraftsView },
+      { path: 'craft-form', redirect: '/admin/crafts' },
 
       /* -------- Gem Packages -------- */
-      {
-        path: 'gems-packages',
-        name: 'gems-packages',
-        component: GemsPackagesView,
-      },
-      {
-        path: 'gem-type-form',
-        name: 'gem-type-form',
-        component: GemTypeFormView,
-      },
+      { path: 'gems-packages', name: 'gems-packages', component: GemsPackagesView },
+      { path: 'gem-type-form', name: 'gem-type-form', component: GemTypeFormView },
     ],
   },
 
+  /* ---------- Default ---------- */
+  { path: '/', redirect: '/admin' },
+
   /* ---------- Fallback ---------- */
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/login',
-  },
+  { path: '/:pathMatch(.*)*', redirect: '/login' },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+/* ---------- Route Guard ---------- */
+router.beforeEach((to) => {
+  const auth = useAuthStore()
+
+  // Not logged in → block admin pages
+  if (!auth.isLoggedIn && to.path.startsWith('/admin')) {
+    return '/login'
+  }
+
+  // Logged in → don't allow going back to login
+  if (auth.isLoggedIn && to.path === '/login') {
+    return '/admin'
+  }
 })
 
 export default router

@@ -115,7 +115,7 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref } from 'vue'
-  import { useGemTypesStore } from '../stores/gemTypes'
+  import { useGemTypesStore } from '../stores/useGemTypesStore'
 
   const store = useGemTypesStore()
 

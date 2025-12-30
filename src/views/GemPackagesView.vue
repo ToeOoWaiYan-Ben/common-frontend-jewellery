@@ -268,9 +268,9 @@
 <script setup lang="ts">
   import { computed, onMounted, reactive, ref } from 'vue'
   import AdminTable, { type TableColumn } from '../components/admin/AdminTable.vue'
-  import { useGemsPackagesStore } from '../stores/gemsPackages'
+  import { useGemsPackagesStore } from '../stores/useGemsPackagesStore'
   import type { GemsPackageDto } from '../dtos/GemsPackageDto'
-  import { useGemTypesStore } from '../stores/gemTypes'
+  import { useGemTypesStore } from '../stores/useGemTypesStore'
 
   const store = useGemsPackagesStore()
   const gemTypesStore = useGemTypesStore()
