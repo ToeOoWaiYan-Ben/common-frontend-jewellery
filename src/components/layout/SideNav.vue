@@ -95,6 +95,15 @@
                 Gems Type Register Form
               </RouterLink>
             </li>
+            <li>
+              <RouterLink
+                to="/seller-form"
+                class="side-nav__sub-link"
+                active-class="side-nav__sub-link--active"
+              >
+                Seller Register Form
+              </RouterLink>            
+            </li>
           </ul>
         </li>
       </ul>
