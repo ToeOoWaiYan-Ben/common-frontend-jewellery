@@ -1,3 +1,4 @@
+// src/stores/useAuthStore.ts
 import { defineStore } from 'pinia'
 import { loginApi } from '../services/authApi'
 import type { LoginRequestDto } from '../dtos/auth/LoginDto'
@@ -23,13 +24,16 @@ export const useAuthStore = defineStore('auth', {
     async login(payload: LoginRequestDto) {
       this.loading = true
       this.error = null
-      console.log("here is the function payload-->",payload)
+      this.token = null
+      localStorage.removeItem('token')
+
       try {
         const data = await loginApi(payload)
+        const token = (data as any).accessToken ?? (data as any).token
+        if (!token) throw new Error('No token returned from server')
 
-        // assumes backend returns { token: "..." }
-        this.token = data.token
-        localStorage.setItem('token', data.token)
+        this.token = token
+        localStorage.setItem('token', token)
 
         return data
       } catch (e: any) {

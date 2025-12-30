@@ -1,6 +1,8 @@
 // src/stores/useCategoriesStore.ts
 import { defineStore } from 'pinia'
 import type { CategoryDto } from '../dtos/CategoryDto'
+import { API_BASE_URL } from '../config/env'
+import { http } from '../services/http'
 
 interface CategoriesState {
   items: CategoryDto[]
@@ -24,28 +26,24 @@ export const useCategoriesStore = defineStore('categories', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch('http://localhost:8080/api/categories')
-        if (!res.ok) throw new Error(`Failed to fetch categories (${res.status})`)
-
-        this.items = (await res.json()) as CategoryDto[]
+        this.items = await http<CategoryDto[]>('/categories')
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading categories.'
       } finally {
         this.loading = false
       }
     },
-
     async createCategory(payload: { name: string; code: string; description?: string }) {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch('http://localhost:8080/api/categories', {
+        const res = await fetch(API_BASE_URL + '/categories', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
 
-        const raw = await res.text() // <-- read error message too
+        const raw = await res.text()
 
         if (!res.ok) {
           throw new Error(raw || `Failed to create category (${res.status})`)
@@ -67,7 +65,7 @@ export const useCategoriesStore = defineStore('categories', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`http://localhost:8080/api/categories/${id}`, {
+        const res = await fetch(API_BASE_URL + `/categories/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -92,7 +90,7 @@ export const useCategoriesStore = defineStore('categories', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`http://localhost:8080/api/categories/${id}`, {
+        const res = await fetch(API_BASE_URL + `/categories/${id}`, {
           method: 'DELETE',
         })
 

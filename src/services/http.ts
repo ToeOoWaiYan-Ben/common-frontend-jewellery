@@ -1,8 +1,16 @@
 // src/services/http.ts
-const BASE_URL = 'http://localhost:8080'
+import { API_BASE_URL } from '../config/env'
 
 function getToken() {
   return localStorage.getItem('token')
+}
+
+function isPublicEndpoint(path: string) {
+  return (
+    path.startsWith('/auth/login') ||
+    path.startsWith('/auth/register') ||
+    path.startsWith('/auth/refresh')
+  )
 }
 
 async function parseError(res: Response) {
@@ -15,16 +23,20 @@ async function parseError(res: Response) {
 }
 
 export async function http<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = getToken()
-
   const headers = new Headers(options.headers || {})
-  // If body is FormData, browser sets content-type automatically
-  if (!(options.body instanceof FormData)) {
-    if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
-  }
-  if (token) headers.set('Authorization', `Bearer ${token}`)
 
-  const res = await fetch(`${BASE_URL}${path}`, {
+  if (!(options.body instanceof FormData)) {
+    if (!headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json')
+    }
+  }
+
+  if (!isPublicEndpoint(path)) {
+    const token = getToken()
+    if (token) headers.set('Authorization', `Bearer ${token}`)
+  }
+
+  const res = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers,
   })
@@ -34,7 +46,6 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
     throw new Error(msg)
   }
 
-  // handle 204 No Content
   if (res.status === 204) return undefined as T
   return (await res.json()) as T
 }

@@ -27,7 +27,7 @@ const routes: RouteRecordRaw[] = [
 
   /* ---------- Admin Area ---------- */
   {
-    path: '/admin',
+    path: '/',
     component: AdminLayout,
     children: [
       {

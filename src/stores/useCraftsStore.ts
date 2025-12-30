@@ -6,8 +6,8 @@ interface CraftsState {
   loading: boolean
   error: string | null
 }
-
-const BASE_URL = 'http://localhost:8080/api/crafts'
+import { API_BASE_URL } from '../config/env'
+const BASE_URL = API_BASE_URL + '/crafts'
 
 // Backend might return any of these keys for shop name.
 // We normalize them to CraftDto.shopName.
@@ -48,7 +48,7 @@ export const useCraftsStore = defineStore('crafts', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(BASE_URL)
+        const res = await fetch(API_BASE_URL)
         if (!res.ok) throw new Error(`Failed to fetch crafts (${res.status})`)
 
         const raw = (await res.json()) as CraftApi[]
@@ -117,11 +117,9 @@ export const useCraftsStore = defineStore('crafts', {
           return
         }
 
-        // ✅ handle both JSON response and empty response (204)
         const contentType = res.headers.get('content-type') || ''
 
         if (res.status === 204 || !contentType.includes('application/json')) {
-          // backend returned no body → update locally
           this.items[idx] = { id, ...payload }
         } else {
           const updatedRaw = (await res.json()) as CraftApi
