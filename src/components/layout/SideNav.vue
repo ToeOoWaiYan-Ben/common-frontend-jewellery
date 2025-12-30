@@ -138,7 +138,7 @@
             </li>
             <li>
               <RouterLink
-                to="/seller-form"
+                to="/admin/seller-form"
                 class="side-nav__sub-link"
                 active-class="side-nav__sub-link--active"
               >
