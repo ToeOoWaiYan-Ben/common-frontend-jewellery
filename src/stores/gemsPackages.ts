@@ -1,13 +1,12 @@
 import { defineStore } from 'pinia'
 import type { GemsPackageDto } from '../dtos/GemsPackageDto'
+import { API_BASE_URL } from '../config/env'
 
 interface State {
   items: GemsPackageDto[]
   loading: boolean
   error: string | null
 }
-
-const BASE_URL = 'http://localhost:8080/api/gems-packages'
 
 export const useGemsPackagesStore = defineStore('gemsPackages', {
   state: (): State => ({
@@ -21,7 +20,7 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(BASE_URL)
+        const res = await fetch(API_BASE_URL)
         if (!res.ok) throw new Error(`Failed to fetch gems packages (${res.status})`)
         this.items = (await res.json()) as GemsPackageDto[]
       } catch (e: any) {
@@ -47,7 +46,7 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
 
         console.log('DEBUG CREATE body=', body)
 
-        const res = await fetch(BASE_URL, {
+        const res = await fetch(API_BASE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -84,7 +83,7 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
 
         console.log('DEBUG UPDATE body=', body)
 
-        const res = await fetch(`${BASE_URL}/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -119,7 +118,7 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
+        const res = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' })
         if (!res.ok) throw new Error(`Failed to delete (${res.status})`)
         this.items = this.items.filter((x) => x.id !== id)
       } catch (e: any) {

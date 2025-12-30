@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { API_BASE_URL } from '../config/env'
 
 export interface GemTypeDto {
   id: number
@@ -10,8 +11,6 @@ interface State {
   loading: boolean
   error: string | null
 }
-
-const BASE_URL = 'http://localhost:8080/api/gem-types'
 
 export const useGemTypesStore = defineStore('gemTypes', {
   state: (): State => ({
@@ -25,7 +24,7 @@ export const useGemTypesStore = defineStore('gemTypes', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(BASE_URL)
+        const res = await fetch(API_BASE_URL)
         if (!res.ok) throw new Error(`Failed to fetch gem types (${res.status})`)
         this.items = (await res.json()) as GemTypeDto[]
       } catch (e: any) {
@@ -39,7 +38,7 @@ export const useGemTypesStore = defineStore('gemTypes', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(BASE_URL, {
+        const res = await fetch(API_BASE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name }),
@@ -59,7 +58,7 @@ export const useGemTypesStore = defineStore('gemTypes', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`${BASE_URL}/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name }),
@@ -80,7 +79,7 @@ export const useGemTypesStore = defineStore('gemTypes', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
+        const res = await fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' })
         if (!res.ok) {
           const msg = await res.text().catch(() => '')
           throw new Error(`Failed to delete (${res.status}) ${msg}`)
