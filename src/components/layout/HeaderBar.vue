@@ -3,7 +3,6 @@
     <div class="app-header__left">
       <button class="app-header__toggle" type="button" aria-label="Toggle sidebar">☰</button>
 
-      <a href="#" class="app-header__brand">My Admin</a>
     </div>
 
     <nav class="app-header__nav">
