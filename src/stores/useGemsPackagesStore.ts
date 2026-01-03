@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import type { GemsPackageDto } from '../dtos/GemsPackageDto'
-import { API_BASE_URL } from '../config/env'
 import { http } from '../services/http'
 
 interface State {
@@ -8,8 +7,6 @@ interface State {
   loading: boolean
   error: string | null
 }
-
-const BASE_URL = API_BASE_URL + '/gems-packages'
 
 export const useGemsPackagesStore = defineStore('gemsPackages', {
   state: (): State => ({
@@ -23,7 +20,6 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
       this.loading = true
       this.error = null
       try {
-        // ✅ use http() for GET like Categories example
         this.items = await http<GemsPackageDto[]>('/gems-packages')
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to load gems packages.'
@@ -46,16 +42,11 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
           sellerName: payload.sellerName?.trim(),
         }
 
-        const res = await fetch(BASE_URL, {
+        const created = await http<GemsPackageDto>('/gems-packages', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         })
 
-        const raw = await res.text()
-        if (!res.ok) throw new Error(raw || `Failed to create gems package (${res.status})`)
-
-        const created = JSON.parse(raw) as GemsPackageDto
         this.items.push(created)
         return created
       } catch (e: any) {
@@ -80,14 +71,14 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
           sellerName: payload.sellerName?.trim(),
         }
 
-        const res = await fetch(`${BASE_URL}/${id}`, {
+        // If backend returns JSON:
+        // const updated = await http<GemsPackageDto>(`/gems-packages/${id}`, { method:'PUT', body: JSON.stringify(body) })
+
+        // If backend returns 204:
+        await http<void>(`/gems-packages/${id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         })
-
-        const raw = await res.text()
-        if (!res.ok) throw new Error(raw || `Failed to update gems package (${res.status})`)
 
         const idx = this.items.findIndex((x) => x.id === id)
         if (idx === -1) {
@@ -95,12 +86,7 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
           return
         }
 
-        // some backends return updated JSON, some return empty
-        if (!raw) {
-          this.items[idx] = { id, ...body } as any
-        } else {
-          this.items[idx] = JSON.parse(raw) as GemsPackageDto
-        }
+        this.items[idx] = { id, ...body } as any
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to update.'
         throw e
@@ -113,9 +99,7 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
-        const raw = await res.text()
-        if (!res.ok) throw new Error(raw || `Failed to delete gems package (${res.status})`)
+        await http<void>(`/gems-packages/${id}`, { method: 'DELETE' })
         this.items = this.items.filter((x) => x.id !== id)
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to delete.'
