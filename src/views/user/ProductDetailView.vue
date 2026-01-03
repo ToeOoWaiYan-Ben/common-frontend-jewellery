@@ -36,9 +36,7 @@
         <button class="store-nav__link" type="button" @click="goTo('/user/catalog')">HOME</button>
         <button class="store-nav__link" type="button">CONTACT</button>
         <button class="store-nav__link" type="button">ABOUT US</button>
-        <button class="store-nav__link store-nav__link--active" type="button">
-          JEWELRY
-        </button>
+        <button class="store-nav__link store-nav__link--active" type="button">JEWELRY</button>
       </nav>
     </header>
 
@@ -104,12 +102,8 @@
             </div>
 
             <div class="info-actions">
-              <button class="primary-btn" type="button">
-                Add to Cart
-              </button>
-              <button class="ghost-btn" type="button" @click="goBack">
-                Back
-              </button>
+              <button class="primary-btn" type="button">Add to Cart</button>
+              <button class="ghost-btn" type="button" @click="goBack">Back</button>
             </div>
 
             <!-- ✅ Description + Details UNDER buttons -->
@@ -194,7 +188,7 @@
       name: 'B.ZERO1 NECKLACE',
       shortDesc: 'B.zero1 18 kt yellow gold mini pendant | necklace with chain',
       description:
-        "Drawing its inspiration from the world’s most renowned amphitheatre, the Colosseum, the B.zero1 18 kt yellow gold chain necklace is a groundbreaking statement of Bulgari’s daring creative vision. The purity of its famed spiral, rendered through the powerful lines of the mini pendant in 18 kt yellow gold, is the emblem of the collection’s audacious essence and innovative spirit.",
+        'Drawing its inspiration from the world’s most renowned amphitheatre, the Colosseum, the B.zero1 18 kt yellow gold chain necklace is a groundbreaking statement of Bulgari’s daring creative vision. The purity of its famed spiral, rendered through the powerful lines of the mini pendant in 18 kt yellow gold, is the emblem of the collection’s audacious essence and innovative spirit.',
       price: 80000000,
       images: [
         'https://images.unsplash.com/photo-1601121141461-9d664ddc2c8b?auto=format&fit=crop&w=900&q=60',

@@ -138,7 +138,7 @@
   overflow: hidden; /* ✅ keep image inside radius */
   border: 1px solid #e2e8f0;
 
-  background-image: url("https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2000&q=60");
+  background-image: url('https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2000&q=60');
   background-size: cover;
   background-position: center;
 

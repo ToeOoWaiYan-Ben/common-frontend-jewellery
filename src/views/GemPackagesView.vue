@@ -285,6 +285,7 @@
   import { useGemsPackagesStore } from '../stores/useGemsPackagesStore'
   import type { GemsPackageDto } from '../dtos/GemsPackageDto'
   import { useGemTypesStore } from '../stores/useGemTypesStore'
+  import { useSellersStore } from '../stores/useSellerStore'
 
   const store = useGemsPackagesStore()
   const gemTypesStore = useGemTypesStore()

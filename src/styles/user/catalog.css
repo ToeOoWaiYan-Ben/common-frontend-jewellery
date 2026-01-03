@@ -135,7 +135,7 @@
   overflow: hidden; /* ✅ keep image inside radius */
   border: 1px solid #e2e8f0;
 
-  background-image: url("https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2000&q=60");
+  background-image: url('https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2000&q=60');
   background-size: cover;
   background-position: center;
 
@@ -345,7 +345,9 @@
   font-weight: 900;
   color: #64748b;
   transform: rotate(0deg);
-  transition: transform 0.15s ease, color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
 }
 
 .acc-chev--open {
@@ -355,7 +357,7 @@
 
 .acc-item--open {
   border-color: #1d4ed8;
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.10);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
 }
 
 .acc-body {
@@ -595,7 +597,9 @@
   cursor: pointer;
   font-size: 13px;
   line-height: 1;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .pagination-btn:hover {

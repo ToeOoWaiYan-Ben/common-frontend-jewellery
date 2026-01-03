@@ -2,7 +2,6 @@
   <header class="app-header">
     <div class="app-header__left">
       <button class="app-header__toggle" type="button" aria-label="Toggle sidebar">☰</button>
-
     </div>
 
     <nav class="app-header__nav">

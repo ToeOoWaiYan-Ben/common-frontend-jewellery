@@ -125,7 +125,9 @@
             >
               <button class="acc-header" type="button" @click="toggleCategory(group.key)">
                 <span class="acc-title">{{ group.label }}</span>
-                <span class="acc-chev" :class="{ 'acc-chev--open': openCategory === group.key }">⌄</span>
+                <span class="acc-chev" :class="{ 'acc-chev--open': openCategory === group.key }"
+                  >⌄</span
+                >
               </button>
 
               <div v-if="openCategory === group.key" class="acc-body">
@@ -187,9 +189,7 @@
 
               <div class="card__actions">
                 <!-- ✅ IMPORTANT: go to detail of clicked item -->
-                <button class="small-btn" type="button" @click="goDetail(p.id)">
-                  Add to Cart
-                </button>
+                <button class="small-btn" type="button" @click="goDetail(p.id)">Add to Cart</button>
 
                 <button class="small-btn small-btn--ghost" type="button">♡</button>
               </div>
@@ -199,7 +199,11 @@
 
         <!-- pagination -->
         <div class="pagination">
-          <button class="pagination-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === 1"
+            @click="goToPage(currentPage - 1)"
+          >
             ‹ Prev
           </button>
 
@@ -213,7 +217,11 @@
             {{ page }}
           </button>
 
-          <button class="pagination-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === totalPages"
+            @click="goToPage(currentPage + 1)"
+          >
             Next ›
           </button>
         </div>
@@ -255,20 +263,133 @@
     'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=900&q=60'
 
   const products = ref<Product[]>([
-    { id: 1, name: 'Global Knives – Gold Ring', price: 820, type: 'Rings', category: 'Trending', size: 'M', imageUrl: img1, badge: 'SALE', createdAt: '2025-12-01' },
-    { id: 2, name: 'Flash Furniture Necklace', price: 650, type: 'Necklaces', category: 'New Arrival', size: 'S', imageUrl: img2, badge: 'NEW', createdAt: '2025-12-20' },
-    { id: 3, name: 'Silver Pearl Bracelet', price: 490, type: 'Bracelet', category: 'Best Seller', size: 'L', imageUrl: img3, createdAt: '2025-11-15' },
-    { id: 4, name: 'Crystal Earrings Set', price: 390, type: 'Earrings', category: 'Trending', size: 'XS', imageUrl: img4, createdAt: '2025-10-01' },
+    {
+      id: 1,
+      name: 'Global Knives – Gold Ring',
+      price: 820,
+      type: 'Rings',
+      category: 'Trending',
+      size: 'M',
+      imageUrl: img1,
+      badge: 'SALE',
+      createdAt: '2025-12-01',
+    },
+    {
+      id: 2,
+      name: 'Flash Furniture Necklace',
+      price: 650,
+      type: 'Necklaces',
+      category: 'New Arrival',
+      size: 'S',
+      imageUrl: img2,
+      badge: 'NEW',
+      createdAt: '2025-12-20',
+    },
+    {
+      id: 3,
+      name: 'Silver Pearl Bracelet',
+      price: 490,
+      type: 'Bracelet',
+      category: 'Best Seller',
+      size: 'L',
+      imageUrl: img3,
+      createdAt: '2025-11-15',
+    },
+    {
+      id: 4,
+      name: 'Crystal Earrings Set',
+      price: 390,
+      type: 'Earrings',
+      category: 'Trending',
+      size: 'XS',
+      imageUrl: img4,
+      createdAt: '2025-10-01',
+    },
 
-    { id: 5, name: 'Rose Gold Ring Classic', price: 910, type: 'Rings', category: 'New Arrival', size: 'S', imageUrl: img1, createdAt: '2025-12-25' },
-    { id: 6, name: 'Necklace – Minimal Charm', price: 520, type: 'Necklaces', category: 'Best Seller', size: 'M', imageUrl: img2, createdAt: '2025-09-01' },
-    { id: 7, name: 'Earrings – Diamond Drop', price: 740, type: 'Earrings', category: 'New Arrival', size: 'XS', imageUrl: img4, badge: 'NEW', createdAt: '2025-12-22' },
-    { id: 8, name: 'Bracelet – Gold Twist', price: 610, type: 'Bracelet', category: 'Trending', size: 'L', imageUrl: img3, badge: 'SALE', createdAt: '2025-08-10' },
+    {
+      id: 5,
+      name: 'Rose Gold Ring Classic',
+      price: 910,
+      type: 'Rings',
+      category: 'New Arrival',
+      size: 'S',
+      imageUrl: img1,
+      createdAt: '2025-12-25',
+    },
+    {
+      id: 6,
+      name: 'Necklace – Minimal Charm',
+      price: 520,
+      type: 'Necklaces',
+      category: 'Best Seller',
+      size: 'M',
+      imageUrl: img2,
+      createdAt: '2025-09-01',
+    },
+    {
+      id: 7,
+      name: 'Earrings – Diamond Drop',
+      price: 740,
+      type: 'Earrings',
+      category: 'New Arrival',
+      size: 'XS',
+      imageUrl: img4,
+      badge: 'NEW',
+      createdAt: '2025-12-22',
+    },
+    {
+      id: 8,
+      name: 'Bracelet – Gold Twist',
+      price: 610,
+      type: 'Bracelet',
+      category: 'Trending',
+      size: 'L',
+      imageUrl: img3,
+      badge: 'SALE',
+      createdAt: '2025-08-10',
+    },
 
-    { id: 9, name: 'Rings – Twin Stone', price: 880, type: 'Rings', category: 'Best Seller', size: 'M', imageUrl: img1, createdAt: '2025-06-01' },
-    { id: 10, name: 'Necklaces – Pearl Line', price: 560, type: 'Necklaces', category: 'Trending', size: 'S', imageUrl: img2, createdAt: '2025-05-01' },
-    { id: 11, name: 'Bracelet – Silver Chain', price: 420, type: 'Bracelet', category: 'New Arrival', size: 'XS', imageUrl: img3, badge: 'NEW', createdAt: '2025-12-10' },
-    { id: 12, name: 'Earrings – Star Shine', price: 330, type: 'Earrings', category: 'Best Seller', size: 'L', imageUrl: img4, createdAt: '2025-03-01' },
+    {
+      id: 9,
+      name: 'Rings – Twin Stone',
+      price: 880,
+      type: 'Rings',
+      category: 'Best Seller',
+      size: 'M',
+      imageUrl: img1,
+      createdAt: '2025-06-01',
+    },
+    {
+      id: 10,
+      name: 'Necklaces – Pearl Line',
+      price: 560,
+      type: 'Necklaces',
+      category: 'Trending',
+      size: 'S',
+      imageUrl: img2,
+      createdAt: '2025-05-01',
+    },
+    {
+      id: 11,
+      name: 'Bracelet – Silver Chain',
+      price: 420,
+      type: 'Bracelet',
+      category: 'New Arrival',
+      size: 'XS',
+      imageUrl: img3,
+      badge: 'NEW',
+      createdAt: '2025-12-10',
+    },
+    {
+      id: 12,
+      name: 'Earrings – Star Shine',
+      price: 330,
+      type: 'Earrings',
+      category: 'Best Seller',
+      size: 'L',
+      imageUrl: img4,
+      createdAt: '2025-03-01',
+    },
   ])
 
   const sizeOptions: Array<Product['size']> = ['XS', 'S', 'M', 'L']
@@ -276,7 +397,11 @@
 
   type CategoryKey = 'necklaces' | 'earrings' | 'bracelet' | 'rings'
   const categoryGroups = [
-    { key: 'necklaces' as const, label: 'Necklaces & Pendants', options: ['chains', 'chokers', 'lockets', 'pendants'] },
+    {
+      key: 'necklaces' as const,
+      label: 'Necklaces & Pendants',
+      options: ['chains', 'chokers', 'lockets', 'pendants'],
+    },
     { key: 'earrings' as const, label: 'Earrings', options: ['studs', 'hoops', 'drops'] },
     { key: 'bracelet' as const, label: 'Bracelet', options: ['bangles', 'charm', 'cuff'] },
     { key: 'rings' as const, label: 'Rings', options: ['engagement', 'stacking', 'classic'] },
@@ -337,7 +462,9 @@
     return items
   })
 
-  const totalPages = computed(() => Math.max(1, Math.ceil(sortedProducts.value.length / pageSize.value)))
+  const totalPages = computed(() =>
+    Math.max(1, Math.ceil(sortedProducts.value.length / pageSize.value))
+  )
 
   const pagedProducts = computed(() => {
     const start = (currentPage.value - 1) * pageSize.value
