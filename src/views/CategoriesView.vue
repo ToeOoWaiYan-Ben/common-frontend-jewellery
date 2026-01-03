@@ -57,7 +57,7 @@
         <textarea
           id="description"
           v-model="formDescription"
-          rows="3"
+          rows="4"
           class="category-form__input category-form__textarea"
           placeholder="Optional description…"
         ></textarea>

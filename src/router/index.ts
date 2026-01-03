@@ -20,12 +20,32 @@ import GemsPackagesView from '../views/GemPackagesView.vue'
 import GemTypeFormView from '../views/GemTypeFormView.vue'
 import SellerFormView from '../views/SellerFormView.vue'
 
+/* ✅ User Storefront Views */
+import CatalogView from '../views/user/CatalogView.vue'
+import ProductDetailView from '../views/user/ProductDetailView.vue'
+
 const routes: RouteRecordRaw[] = [
   /* ---------- Login ---------- */
   {
     path: '/login',
     name: 'login',
     component: LoginView,
+  },
+
+  /* ✅ ---------- USER STOREFRONT (NO LOGIN REQUIRED) ---------- */
+  {
+    path: '/user',
+    redirect: '/user/catalog',
+  },
+  {
+    path: '/user/catalog',
+    name: 'user-catalog',
+    component: CatalogView,
+  },
+  {
+    path: '/user/product/:id',
+    name: 'user-product-detail',
+    component: ProductDetailView,
   },
 
   /* ---------- Admin Area ---------- */
@@ -49,21 +69,9 @@ const routes: RouteRecordRaw[] = [
       { path: 'craft-form', redirect: '/admin/crafts' },
 
       /* -------- Gem Packages -------- */
-      {
-        path: 'gems-packages',
-        name: 'gems-packages',
-        component: GemsPackagesView,
-      },
-      {
-        path: 'gem-type-form',
-        name: 'gem-type-form',
-        component: GemTypeFormView,
-      },
-      {
-        path: 'seller-form',
-        name: 'seller-form',
-        component: SellerFormView,
-      },
+      { path: 'gems-packages', name: 'gems-packages', component: GemsPackagesView },
+      { path: 'gem-type-form', name: 'gem-type-form', component: GemTypeFormView },
+      { path: 'seller-form', name: 'seller-form', component: SellerFormView },
     ],
   },
 
@@ -81,6 +89,9 @@ const router = createRouter({
 
 /* ---------- Route Guard ---------- */
 router.beforeEach((to) => {
+  // ✅ allow all /user pages without login
+  if (to.path.startsWith('/user')) return true
+
   const auth = useAuthStore()
 
   // Not logged in → block admin pages
@@ -92,6 +103,8 @@ router.beforeEach((to) => {
   if (auth.isLoggedIn && to.path === '/login') {
     return '/admin'
   }
+
+  return true
 })
 
 export default router
