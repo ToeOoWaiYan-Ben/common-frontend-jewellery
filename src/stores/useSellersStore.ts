@@ -1,22 +1,13 @@
+// src/stores/useSellersStore.ts
 import { defineStore } from 'pinia'
+import type { SellerDto } from '../dtos/SellerDto'
 import { http } from '../services/http'
 
-export interface GemTypeDto {
-  id: number
-  name: string
-}
-
-interface State {
-  items: GemTypeDto[]
-  loading: boolean
-  error: string | null
-}
-
-export const useGemTypesStore = defineStore('gemTypes', {
-  state: (): State => ({
-    items: [],
+export const useSellersStore = defineStore('sellers', {
+  state: () => ({
+    items: [] as SellerDto[],
     loading: false,
-    error: null,
+    error: null as string | null,
   }),
 
   actions: {
@@ -24,46 +15,45 @@ export const useGemTypesStore = defineStore('gemTypes', {
       this.loading = true
       this.error = null
       try {
-        this.items = await http<GemTypeDto[]>('/gem-types')
+        this.items = await http<SellerDto[]>('/sellers')
       } catch (e: any) {
-        this.error = e?.message ?? 'Failed to load gem types.'
+        this.error = e?.message ?? 'Failed to load sellers.'
       } finally {
         this.loading = false
       }
     },
 
-    async create(name: string) {
+    async create(payload: Omit<SellerDto, 'id'>) {
       this.loading = true
       this.error = null
       try {
-        const created = await http<GemTypeDto>('/gem-types', {
+        const created = await http<SellerDto>('/sellers', {
           method: 'POST',
-          body: JSON.stringify({ name: name.trim() }),
+          body: JSON.stringify(payload),
         })
         this.items.push(created)
         return created
       } catch (e: any) {
-        this.error = e?.message ?? 'Failed to create gem type.'
+        this.error = e?.message ?? 'Failed to create seller.'
         throw e
       } finally {
         this.loading = false
       }
     },
 
-    async update(id: number, name: string) {
+    async update(id: number, payload: Omit<SellerDto, 'id'>) {
       this.loading = true
       this.error = null
       try {
-        // if backend returns 204:
-        await http<void>(`/gem-types/${id}`, {
+        await http<void>(`/sellers/${id}`, {
           method: 'PUT',
-          body: JSON.stringify({ name: name.trim() }),
+          body: JSON.stringify(payload),
         })
 
         const idx = this.items.findIndex((x) => x.id === id)
-        if (idx !== -1) this.items[idx] = { id, name: name.trim() }
+        if (idx !== -1) this.items[idx] = { id, ...payload } as any
       } catch (e: any) {
-        this.error = e?.message ?? 'Failed to update gem type.'
+        this.error = e?.message ?? 'Failed to update seller.'
         throw e
       } finally {
         this.loading = false
@@ -74,10 +64,10 @@ export const useGemTypesStore = defineStore('gemTypes', {
       this.loading = true
       this.error = null
       try {
-        await http<void>(`/gem-types/${id}`, { method: 'DELETE' })
+        await http<void>(`/sellers/${id}`, { method: 'DELETE' })
         this.items = this.items.filter((x) => x.id !== id)
       } catch (e: any) {
-        this.error = e?.message ?? 'Failed to delete gem type.'
+        this.error = e?.message ?? 'Failed to delete seller.'
         throw e
       } finally {
         this.loading = false

@@ -5,6 +5,16 @@ function getToken() {
   return localStorage.getItem('token')
 }
 
+function clearAuth() {
+  localStorage.removeItem('token')
+}
+
+function redirectToLogin() {
+  // simplest (no router import needed)
+  const next = encodeURIComponent(window.location.pathname + window.location.search)
+  window.location.href = `/login?next=${next}`
+}
+
 function isPublicEndpoint(path: string) {
   return (
     path.startsWith('/auth/login') ||
@@ -16,7 +26,7 @@ function isPublicEndpoint(path: string) {
 async function parseError(res: Response) {
   try {
     const data = await res.json()
-    return data?.message || data?.error || JSON.stringify(data)
+    return data?.message || data?.error || data?.detail || JSON.stringify(data)
   } catch {
     return null
   }
@@ -40,6 +50,12 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
     ...options,
     headers,
   })
+
+  if ((res.status === 401 || res.status === 403) && !isPublicEndpoint(path)) {
+    clearAuth()
+    redirectToLogin()
+    throw new Error('Unauthorized: redirecting to login')
+  }
 
   if (!res.ok) {
     const msg = (await parseError(res)) || `${res.status} ${res.statusText}`

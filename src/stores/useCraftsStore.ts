@@ -1,6 +1,6 @@
+// src/stores/useCraftsStore.ts
 import { defineStore } from 'pinia'
 import type { CraftDto } from '../dtos/CraftDto'
-import { API_BASE_URL } from '../config/env'
 import { http } from '../services/http'
 
 interface CraftsState {
@@ -8,8 +8,6 @@ interface CraftsState {
   loading: boolean
   error: string | null
 }
-
-const BASE_URL = API_BASE_URL + '/crafts'
 
 type CraftApi = {
   id: number
@@ -47,7 +45,6 @@ export const useCraftsStore = defineStore('crafts', {
       this.loading = true
       this.error = null
       try {
-        // ✅ use http() for GET
         const raw = await http<CraftApi[]>('/crafts')
         this.items = raw.map(mapToCraftDto)
       } catch (e: any) {
@@ -68,16 +65,11 @@ export const useCraftsStore = defineStore('crafts', {
           address: payload.address?.trim(),
         }
 
-        const res = await fetch(BASE_URL, {
+        const createdRaw = await http<CraftApi>('/crafts', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         })
 
-        const raw = await res.text()
-        if (!res.ok) throw new Error(raw || `Failed to create craft (${res.status})`)
-
-        const createdRaw = JSON.parse(raw) as CraftApi
         const created = mapToCraftDto(createdRaw)
         this.items.push(created)
         return created
@@ -93,19 +85,28 @@ export const useCraftsStore = defineStore('crafts', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`${BASE_URL}/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            shopName: payload.shopName?.trim(),
-            nrc: payload.nrc?.trim(),
-            phone: payload.phone?.trim(),
-            address: payload.address?.trim(),
-          }),
-        })
+        const body = {
+          shopName: payload.shopName?.trim(),
+          nrc: payload.nrc?.trim(),
+          phone: payload.phone?.trim(),
+          address: payload.address?.trim(),
+        }
 
-        const raw = await res.text()
-        if (!res.ok) throw new Error(raw || `Failed to update craft (${res.status})`)
+        // if backend returns JSON -> CraftApi
+        // if backend returns 204 -> http<void> is OK
+        let updatedItem: CraftDto | null = null
+
+        try {
+          const updatedRaw = await http<CraftApi>(`/crafts/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(body),
+          })
+          updatedItem = mapToCraftDto(updatedRaw)
+        } catch (err: any) {
+          // if your backend returns 204 No Content, http() won't throw.
+          // so we only reach here on real error.
+          throw err
+        }
 
         const idx = this.items.findIndex((c) => c.id === id)
         if (idx === -1) {
@@ -113,12 +114,7 @@ export const useCraftsStore = defineStore('crafts', {
           return
         }
 
-        if (!raw) {
-          this.items[idx] = { id, ...payload }
-        } else {
-          const updatedRaw = JSON.parse(raw) as CraftApi
-          this.items[idx] = mapToCraftDto(updatedRaw)
-        }
+        this.items[idx] = updatedItem ?? { id, ...payload }
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while updating craft.'
         throw e
@@ -131,9 +127,7 @@ export const useCraftsStore = defineStore('crafts', {
       this.loading = true
       this.error = null
       try {
-        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
-        const raw = await res.text()
-        if (!res.ok) throw new Error(raw || `Failed to delete craft (${res.status})`)
+        await http<void>(`/crafts/${id}`, { method: 'DELETE' })
         this.items = this.items.filter((c) => c.id !== id)
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while deleting craft.'

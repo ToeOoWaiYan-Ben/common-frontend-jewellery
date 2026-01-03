@@ -113,7 +113,7 @@
 
 <script setup lang="ts">
   import { onMounted, reactive, ref } from 'vue'
-  import { useSellersStore } from '../stores/useSellerStore'
+  import { useSellersStore } from '../stores/useSellersStore'
   import type { SellerDto } from '../dtos/SellerDto'
 
   const store = useSellersStore()
