@@ -53,26 +53,6 @@
 
         <li class="side-nav__item">
           <RouterLink
-            to="/admin/categories"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
-            <span>Categories</span>
-          </RouterLink>
-        </li>
-
-        <li class="side-nav__item">
-          <RouterLink
-            to="/admin/crafts"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
-            <span>Crafts</span>
-          </RouterLink>
-        </li>
-
-        <li class="side-nav__item">
-          <RouterLink
             to="/admin/gems-packages"
             class="side-nav__link"
             active-class="side-nav__link--active"
