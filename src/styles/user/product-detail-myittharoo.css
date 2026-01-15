@@ -1,0 +1,274 @@
+.pd-page {
+  background: #fff;
+  min-height: 100vh;
+}
+
+.pd-container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* breadcrumb */
+.pd-breadcrumb {
+  border-bottom: 1px solid #eee;
+  background: #fff;
+}
+.pd-breadcrumb .pd-container {
+  padding: 14px 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: #111;
+  opacity: 0.85;
+}
+.pd-crumbLink {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  font-size: 13px;
+  color: #111;
+  opacity: 0.8;
+}
+.pd-crumbLink:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+.pd-crumbSep {
+  opacity: 0.6;
+}
+.pd-crumbNow {
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* main */
+.pd-main {
+  padding: 28px 0 56px 0;
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  gap: 34px;
+}
+
+/* gallery */
+.pd-gallery {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.pd-thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  top: 110px;
+}
+
+.pd-thumb {
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  padding: 8px;
+  cursor: pointer;
+  height: 82px;
+  width: 82px;
+  display: grid;
+  place-items: center;
+}
+.pd-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.pd-thumb.active {
+  border-color: #111;
+}
+
+.pd-heroImg {
+  border: 1px solid #e6e6e6;
+  min-height: 520px;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.pd-heroImg img {
+  width: 100%;
+  height: 100%;
+  max-height: 520px;
+  object-fit: contain;
+}
+
+/* info */
+.pd-info {
+  position: sticky;
+  top: 110px;
+  align-self: start;
+  border: 1px solid #e6e6e6;
+  padding: 22px;
+}
+
+.pd-topline {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pd-badge {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+}
+.pd-badge.sale {
+  background: #f3f0ea;
+}
+.pd-badge.new {
+  background: #fff;
+}
+
+.pd-title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #111;
+}
+
+.pd-sub {
+  margin: 10px 0 0 0;
+  font-size: 13px;
+  color: #444;
+  line-height: 1.7;
+}
+
+.pd-priceRow {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.pd-price {
+  font-size: 18px;
+  font-weight: 900;
+  color: #111;
+}
+
+.pd-heart {
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  font-size: 18px;
+  opacity: 0.85;
+}
+.pd-heart:hover {
+  border-color: #aaa;
+  opacity: 1;
+}
+
+.pd-actions {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.pd-btn {
+  padding: 14px 14px;
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+.pd-btn:hover {
+  opacity: 0.92;
+}
+.pd-btn.ghost {
+  background: #fff;
+  color: #111;
+}
+
+/* tabs */
+.pd-tabs {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+.pd-tab {
+  border: 0;
+  background: transparent;
+  padding: 14px 8px;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 13px;
+  opacity: 0.75;
+}
+.pd-tab.active {
+  opacity: 1;
+  border-bottom: 2px solid #111;
+}
+
+.pd-panel {
+  padding-top: 14px;
+}
+
+.pd-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.9;
+  color: #222;
+  white-space: pre-line;
+}
+
+.pd-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+  color: #222;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.pd-note {
+  margin-top: 18px;
+  font-size: 12px;
+  opacity: 0.75;
+  border-top: 1px solid #eee;
+  padding-top: 14px;
+}
+
+/* not found */
+.pd-notfound {
+  padding: 50px 0;
+}
+
+/* responsive */
+@media (max-width: 980px) {
+  .pd-main {
+    grid-template-columns: 1fr;
+  }
+  .pd-info {
+    position: static;
+  }
+  .pd-thumbs {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .pd-gallery {
+    grid-template-columns: 1fr;
+  }
+  .pd-heroImg {
+    min-height: 420px;
+  }
+}

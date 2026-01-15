@@ -2,89 +2,90 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 /* -------- Layout -------- */
-import AdminLayout from '../components/layout/AdminLayout.vue'
+import AdminLayout from '@/components/layout/AdminLayout.vue'
 
 /* -------- Auth -------- */
-import LoginView from '../views/LoginView.vue'
-import { useAuthStore } from '../stores/useAuthStore'
+import LoginView from '@/views/LoginView.vue'
+import { useAuthStore } from '@/stores/useAuthStore'
 
 /* -------- Admin Views -------- */
-import HomeView from '../views/HomeView.vue'
-import UsersView from '../views/UsersView.vue'
-import OrdersView from '../views/OrdersView.vue'
-import ProductsView from '../views/ProductsView.vue'
-import RegisterFormView from '../views/RegisterFormView.vue'
-import CategoriesView from '../views/CategoriesView.vue'
-import CraftsView from '../views/CraftsView.vue'
-import GemsPackagesView from '../views/GemPackagesView.vue'
-import GemTypeFormView from '../views/GemTypeFormView.vue'
-import SellerFormView from '../views/SellerFormView.vue'
+import HomeView from '@/views/HomeView.vue'
+import UsersView from '@/views/UsersView.vue'
+import OrdersView from '@/views/OrdersView.vue'
+import ProductsView from '@/views/ProductsView.vue'
+import RegisterFormView from '@/views/RegisterFormView.vue'
+import CategoriesView from '@/views/CategoriesView.vue'
+import CraftsView from '@/views/CraftsView.vue'
+import GemsPackagesView from '@/views/GemPackagesView.vue'
+import GemTypeFormView from '@/views/GemTypeFormView.vue'
+import SellerFormView from '@/views/SellerFormView.vue'
+import SettingsView from '@/views/SettingsView.vue'
 
-/* ✅ User Storefront Views */
-import CatalogView from '../views/user/CatalogView.vue'
-import ProductDetailView from '../views/user/ProductDetailView.vue'
+/* -------- User Storefront Views -------- */
+import CatalogView from '@/views/user/CatalogView.vue'
+import ProductDetailView from '@/views/user/ProductDetailView.vue'
 
 const routes: RouteRecordRaw[] = [
-  /* ---------- Login ---------- */
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginView,
-  },
+  /* ---------- Default ---------- */
+  { path: '/', redirect: '/user/catalog' },
 
-  /* ✅ ---------- USER STOREFRONT (NO LOGIN REQUIRED) ---------- */
-  {
-    path: '/user',
-    redirect: '/user/catalog',
-  },
+  /* ---------- Auth ---------- */
+  { path: '/login', name: 'login', component: LoginView },
+
+  /* ---------- USER STOREFRONT (NO LOGIN REQUIRED) ---------- */
+  { path: '/user', redirect: '/user/catalog' },
+
   {
     path: '/user/catalog',
     name: 'user-catalog',
     component: CatalogView,
   },
+
   {
     path: '/user/product/:id',
     name: 'user-product-detail',
     component: ProductDetailView,
+    props: true,
   },
 
-  /* ---------- Admin Area ---------- */
+  /* ---------- ADMIN AREA (LOGIN REQUIRED) ---------- */
   {
     path: '/admin',
     component: AdminLayout,
     children: [
       { path: '', name: 'home', component: HomeView },
-
       { path: 'users', name: 'users', component: UsersView },
       { path: 'orders', name: 'orders', component: OrdersView },
       { path: 'products', name: 'products', component: ProductsView },
       { path: 'register-form', name: 'register-form', component: RegisterFormView },
 
-      /* -------- Categories -------- */
       { path: 'categories', name: 'categories', component: CategoriesView },
       { path: 'category-form', redirect: '/admin/categories' },
 
-      /* -------- Crafts -------- */
       { path: 'crafts', name: 'crafts', component: CraftsView },
       { path: 'craft-form', redirect: '/admin/crafts' },
 
-      /* -------- Gem Packages -------- */
       { path: 'gems-packages', name: 'gems-packages', component: GemsPackagesView },
       { path: 'gem-type-form', name: 'gem-type-form', component: GemTypeFormView },
       { path: 'seller-form', name: 'seller-form', component: SellerFormView },
+
+      { path: 'settings', name: 'admin-settings', component: SettingsView },
     ],
   },
 
-  /* ---------- Default ---------- */
-  { path: '/', redirect: '/admin' },
-
   /* ---------- Fallback ---------- */
-  { path: '/:pathMatch(.*)*', redirect: '/login' },
+  // ✅ If unknown URL, send to storefront instead of login
+  { path: '/:pathMatch(.*)*', redirect: '/user/catalog' },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+
+  // ✅ Reset scroll when changing pages (catalog/detail)
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 /* ---------- Route Guard ---------- */
@@ -94,15 +95,11 @@ router.beforeEach((to) => {
 
   const auth = useAuthStore()
 
-  // Not logged in → block admin pages
-  if (!auth.isLoggedIn && to.path.startsWith('/admin')) {
-    return '/login'
-  }
+  // ✅ admin requires login
+  if (!auth.isLoggedIn && to.path.startsWith('/admin')) return '/login'
 
-  // Logged in → don't allow going back to login
-  if (auth.isLoggedIn && to.path === '/login') {
-    return '/admin'
-  }
+  // ✅ if already logged in and tries to go /login
+  if (auth.isLoggedIn && to.path === '/login') return '/admin'
 
   return true
 })

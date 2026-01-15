@@ -11,13 +11,8 @@
     <div class="side-nav__menu">
       <ul class="side-nav__list">
         <li class="side-nav__item">
-          <RouterLink
-            to="/admin"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-            :class="{ 'side-nav__link--active': isActive('/admin') }"
-          >
-            <span>Dashboard</span>
+          <RouterLink to="/admin" class="side-nav__link" active-class="side-nav__link--active">
+            Dashboard
           </RouterLink>
         </li>
 
@@ -27,7 +22,7 @@
             class="side-nav__link"
             active-class="side-nav__link--active"
           >
-            <span>Users</span>
+            Users
           </RouterLink>
         </li>
 
@@ -37,7 +32,7 @@
             class="side-nav__link"
             active-class="side-nav__link--active"
           >
-            <span>Orders</span>
+            Orders
           </RouterLink>
         </li>
 
@@ -47,7 +42,7 @@
             class="side-nav__link"
             active-class="side-nav__link--active"
           >
-            <span>Products</span>
+            Products
           </RouterLink>
         </li>
 
@@ -57,98 +52,89 @@
             class="side-nav__link"
             active-class="side-nav__link--active"
           >
-            <span>Gems Packages</span>
+            Gems Packages
           </RouterLink>
         </li>
 
+        <!-- ✅ Setting is now a route -->
         <li class="side-nav__item">
-          <button type="button" class="side-nav__group-header" @click="toggleGroup('forms')">
-            <span style="flex: 1">Forms</span>
-            <span :style="{ transform: isGroupOpen('forms') ? 'rotate(90deg)' : 'rotate(0deg)' }">
-              ›
-            </span>
-          </button>
-
-          <ul v-if="isGroupOpen('forms')" class="side-nav__sub-list">
-            <li>
-              <RouterLink
-                to="/admin/register-form"
-                class="side-nav__sub-link"
-                active-class="side-nav__sub-link--active"
-              >
-                Register Form
-              </RouterLink>
-            </li>
-
-            <!-- you don't have /admin/another-form in router, so remove it (or add route) -->
-            <!--
-            <li>
-              <RouterLink to="/admin/another-form" class="side-nav__sub-link">Another Form</RouterLink>
-            </li>
-            -->
-
-            <li>
-              <RouterLink
-                to="/admin/category-form"
-                class="side-nav__sub-link"
-                active-class="side-nav__sub-link--active"
-              >
-                Category Form
-              </RouterLink>
-            </li>
-
-            <li>
-              <RouterLink
-                to="/admin/craft-form"
-                class="side-nav__sub-link"
-                active-class="side-nav__sub-link--active"
-              >
-                Craft Form
-              </RouterLink>
-            </li>
-
-            <li>
-              <RouterLink
-                to="/admin/gem-type-form"
-                class="side-nav__sub-link"
-                active-class="side-nav__sub-link--active"
-              >
-                Gems Type Register Form
-              </RouterLink>
-            </li>
-            <li>
-              <RouterLink
-                to="/admin/seller-form"
-                class="side-nav__sub-link"
-                active-class="side-nav__sub-link--active"
-              >
-                Seller Register Form
-              </RouterLink>
-            </li>
-          </ul>
+          <RouterLink
+            to="/admin/settings"
+            class="side-nav__link"
+            active-class="side-nav__link--active"
+          >
+            Setting
+          </RouterLink>
         </li>
       </ul>
     </div>
   </aside>
 </template>
 
-<script setup lang="ts">
-  import { ref, computed } from 'vue'
-  import { useRoute } from 'vue-router'
+<script setup lang="ts"></script>
 
-  const route = useRoute()
+<style scoped>
+.side-nav {
+  width: 260px;
+  min-height: 100vh;
+  background: #f6f8ff;
+  border-right: 1px solid #e7eaf5;
+}
 
-  const openGroupId = ref<string | null>('forms')
+.side-nav__brand {
+  display: flex;
+  gap: 12px;
+  padding: 18px 16px;
+  align-items: center;
+  border-bottom: 1px solid #e7eaf5;
+  background: #fff;
+}
 
-  function toggleGroup(id: string) {
-    openGroupId.value = openGroupId.value === id ? null : id
-  }
-  function isGroupOpen(id: string) {
-    return openGroupId.value === id
-  }
+.side-nav__brand-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #5a67d8;
+  color: #fff;
+  font-weight: 700;
+}
 
-  // Optional: make Dashboard link active on /admin exactly
-  function isActive(path: string) {
-    return route.path === path
-  }
-</script>
+.side-nav__brand-title {
+  font-weight: 700;
+  margin: 0;
+}
+.side-nav__brand-subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.side-nav__menu {
+  padding: 12px 10px;
+}
+.side-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.side-nav__link {
+  display: block;
+  padding: 12px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #1f2937;
+  font-size: 14px;
+}
+.side-nav__link:hover {
+  background: #eef2ff;
+}
+.side-nav__link--active {
+  background: #8b90c9;
+  color: #fff;
+}
+</style>
