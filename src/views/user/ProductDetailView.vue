@@ -179,7 +179,11 @@
 
         <div class="pd-info">
           <div class="pd-topline">
-            <span v-if="product.badge" class="pd-badge" :class="product.badge === 'Sale' ? 'sale' : 'new'">
+            <span
+              v-if="product.badge"
+              class="pd-badge"
+              :class="product.badge === 'Sale' ? 'sale' : 'new'"
+            >
               {{ product.badge }}
             </span>
           </div>
@@ -208,7 +212,12 @@
             >
               Description
             </button>
-            <button class="pd-tab" :class="{ active: tab === 'details' }" type="button" @click="tab = 'details'">
+            <button
+              class="pd-tab"
+              :class="{ active: tab === 'details' }"
+              type="button"
+              @click="tab = 'details'"
+            >
               Details
             </button>
           </div>
