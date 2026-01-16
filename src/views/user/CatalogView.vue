@@ -1,232 +1,55 @@
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import StoreHeader from '@/components/user/StoreHeader.vue'
-
-type Product = {
-  id: number
-  name: string
-  price: number
-  badge?: 'New' | 'Sale'
-  subtitle?: string
-  imageUrl: string
-  category?: string
-}
-
-const router = useRouter()
-const route = useRoute()
-
-/* ---------------- Images ---------------- */
-const img1 =
-  'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=60'
-const img2 =
-  'https://images.unsplash.com/photo-1601121141461-9d6644b2925b?auto=format&fit=crop&w=1200&q=60'
-const img3 =
-  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=60'
-const img4 =
-  'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=60'
-const img5 =
-  'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=1200&q=60'
-const img6 =
-  'https://images.unsplash.com/photo-1520975958225-7e4efb3a9e77?auto=format&fit=crop&w=1200&q=60'
-const img7 =
-  'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=60'
-const img8 =
-  'https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=1200&q=60'
-const img9 =
-  'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=60'
-const img10 =
-  'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=60'
-
-/* ---------------- Demo products (20) ---------------- */
-const products = ref<Product[]>([
-  { id: 1, name: 'Idyllia motif ring', subtitle: 'Mixed cuts, Heart, Pink, Mixed metal finish', price: 820, badge: 'New', imageUrl: img1, category: 'Rings' },
-  { id: 2, name: 'Hyperbola ring', subtitle: 'Round cut, White, Rhodium plated', price: 650, badge: 'Sale', imageUrl: img2, category: 'Rings' },
-  { id: 3, name: 'Stilla cocktail ring', subtitle: 'Round cut, Pavé, White, Rhodium plated', price: 490, badge: 'Sale', imageUrl: img3, category: 'Rings' },
-  { id: 4, name: 'Matrix ring', subtitle: 'Baguette cut, Blue, Rhodium plated', price: 390, badge: 'Sale', imageUrl: img4, category: 'Rings' },
-
-  { id: 5, name: 'Pearl drop earrings', subtitle: 'Crystal pearl, White, Rhodium plated', price: 520, badge: 'New', imageUrl: img5, category: 'Earrings' },
-  { id: 6, name: 'Classic necklace', subtitle: 'Crystal, Silver tone, Minimal', price: 710, imageUrl: img6, category: 'Necklaces' },
-  { id: 7, name: 'Halo pendant', subtitle: 'Round cut, White, Silver tone', price: 590, badge: 'New', imageUrl: img7, category: 'Pendants' },
-  { id: 8, name: 'Elegant hoop earrings', subtitle: 'Hoop earrings, Crystal, Silver tone', price: 460, imageUrl: img8, category: 'Earrings' },
-
-  { id: 9, name: 'Stackable ring set', subtitle: '3-piece set, Mixed cuts, Silver tone', price: 880, badge: 'Sale', imageUrl: img9, category: 'Rings' },
-  { id: 10, name: 'Choker necklace', subtitle: 'Crystal line, White, Rhodium plated', price: 990, badge: 'New', imageUrl: img10, category: 'Chokers' },
-
-  { id: 11, name: 'Stud earrings', subtitle: 'Round cut, White, Minimal', price: 320, imageUrl: img5, category: 'Stud earrings' },
-  { id: 12, name: 'Statement necklace', subtitle: 'Mixed stones, Silver tone finish', price: 1450, badge: 'Sale', imageUrl: img6, category: 'Necklaces' },
-  { id: 13, name: 'Heart pendant', subtitle: 'Heart cut, Pink, Silver tone', price: 610, imageUrl: img7, category: 'Pendants' },
-  { id: 14, name: 'Mini hoop earrings', subtitle: 'Small hoops, White crystal', price: 410, imageUrl: img8, category: 'Hoop earrings' },
-
-  { id: 15, name: 'Baguette ring', subtitle: 'Baguette cut, White, Rhodium plated', price: 530, badge: 'New', imageUrl: img4, category: 'Rings' },
-  { id: 16, name: 'Tennis bracelet', subtitle: 'Line bracelet, White, Silver tone', price: 1250, imageUrl: img9, category: 'Bracelets' },
-  { id: 17, name: 'Pavé ring', subtitle: 'Pavé setting, White, Silver tone', price: 570, imageUrl: img3, category: 'Rings' },
-  { id: 18, name: 'Crystal pendant', subtitle: 'Single stone, White, Minimal', price: 450, badge: 'Sale', imageUrl: img7, category: 'Pendants' },
-
-  { id: 19, name: 'Long drop earrings', subtitle: 'Elegant drop, White crystal', price: 680, imageUrl: img5, category: 'Earrings' },
-  { id: 20, name: 'Layered necklace', subtitle: '2-layer chain, Silver tone', price: 780, imageUrl: img6, category: 'Necklaces' },
-])
-
-/* ---------------- UI State ---------------- */
-const selectedCategory = ref<string>((route.query.category as string) || 'All')
-const availableOnline = ref(false)
-const priceMin = ref<number | null>(null)
-const priceMax = ref<number | null>(null)
-const sortBy = ref<'relevance' | 'new' | 'priceLow' | 'priceHigh'>('relevance')
-
-const showSort = ref(false)
-const showFilter = ref(false)
-
-/* ✅ Show 20 results */
-const pageSize = ref(10)
-const currentPage = ref(1)
-
-watch(
-  () => route.query.category,
-  (v) => {
-    selectedCategory.value = (v as string) || 'All'
-    currentPage.value = 1
-  }
-)
-
-const categories = computed(() => {
-  const set = new Set<string>()
-  products.value.forEach((p) => p.category && set.add(p.category))
-  return ['All', ...Array.from(set)]
-})
-
-const filteredProducts = computed(() => {
-  let arr = [...products.value]
-
-  if (selectedCategory.value !== 'All') {
-    arr = arr.filter((p) => p.category === selectedCategory.value)
-  }
-
-  if (priceMin.value != null) arr = arr.filter((p) => p.price >= priceMin.value!)
-  if (priceMax.value != null) arr = arr.filter((p) => p.price <= priceMax.value!)
-
-  // UI demo toggle (no real data behind it yet)
-  if (availableOnline.value) arr = arr
-
-  if (sortBy.value === 'new') {
-    arr = arr.sort((a, b) => (b.badge === 'New' ? 1 : 0) - (a.badge === 'New' ? 1 : 0))
-  } else if (sortBy.value === 'priceLow') {
-    arr = arr.sort((a, b) => a.price - b.price)
-  } else if (sortBy.value === 'priceHigh') {
-    arr = arr.sort((a, b) => b.price - a.price)
-  }
-
-  return arr
-})
-
-const totalResults = computed(() => filteredProducts.value.length)
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredProducts.value.length / pageSize.value)))
-
-const pagedProducts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return filteredProducts.value.slice(start, start + pageSize.value)
-})
-
-function formatPrice(v: number) {
-  return `฿${v.toLocaleString('en-US')}`
-}
-
-function openDetail(p: Product) {
-  router.push(`/user/product/${p.id}`)
-}
-
-function toggleWish(p: Product) {
-  alert(`Wishlist: ${p.name}`)
-}
-
-function resetAllFilters() {
-  availableOnline.value = false
-  selectedCategory.value = 'All'
-  priceMin.value = null
-  priceMax.value = null
-  currentPage.value = 1
-}
-
-function applyFilters() {
-  currentPage.value = 1
-  showFilter.value = false
-}
-
-function selectCategory(c: string) {
-  selectedCategory.value = c
-  currentPage.value = 1
-}
-
-function chooseSort(v: typeof sortBy.value) {
-  sortBy.value = v
-  showSort.value = false
-  currentPage.value = 1
-}
-
-function nextPage() {
-  if (currentPage.value < totalPages.value) currentPage.value++
-}
-
-function prevPage() {
-  if (currentPage.value > 1) currentPage.value--
-}
-
-const heroTitle = computed(() => {
-  if (selectedCategory.value === 'All') return 'Jewelry Collection'
-  return `${selectedCategory.value} Collection`
-})
-</script>
-
 <template>
-  <section class="catalog">
-    <StoreHeader />
-
-    <!-- HERO (uses your CSS sw-hero / sw-hero__bg / sw-hero__content) -->
+  <div class="catalog">
+    <!-- ✅ HERO -->
     <section class="sw-hero">
-      <div class="sw-hero__bg"></div>
+      <!-- ✅ Background image layer (this is what you were missing) -->
+      <div
+        class="sw-hero__bg"
+        :style="{ backgroundImage: `url(${heroImageUrl})` }"
+        aria-hidden="true"
+      ></div>
 
       <div class="sw-hero__content">
         <div class="sw-crumbs">
-          <span class="sw-crumb">Home</span>
+          <span>Home</span>
           <span class="sw-sep">/</span>
-          <span class="sw-crumb">Jewelry</span>
+          <span>Jewelry</span>
           <span class="sw-sep">/</span>
-          <span class="sw-crumb sw-crumb--active">
-            {{ selectedCategory === 'All' ? 'Collection' : selectedCategory }}
-          </span>
+          <span class="sw-crumb--active">Collection</span>
         </div>
 
-        <h1 class="sw-hero__title">{{ heroTitle }}</h1>
-
+        <h1 class="sw-hero__title">Jewelry Collection</h1>
         <p class="sw-hero__desc">
-          Discover premium rings, necklaces, and earrings designed for everyday shine and special moments.
+          The perfect choice for an elegant outfit. Discover premium rings, necklaces, and earrings designed for everyday shine.
         </p>
       </div>
     </section>
 
-    <!-- RESULTS FULL WIDTH -->
+    <!-- ✅ FULL WIDTH bar -->
     <section class="sw-resultsFull">
       <div class="swbar">
-        <div class="swbar__count">{{ totalResults }} Results</div>
+        <div class="swbar__count">{{ filteredProducts.length }} Results</div>
 
         <div class="swbar__right">
-          <button class="swbtn" type="button" @click="showFilter = true">
-            <span class="swbtn__icon">⟂</span>
+          <button class="swbtn" type="button" @click="openFilter">
+            <span class="swbtn__icon">⎘</span>
             Filters
           </button>
 
-          <button class="swbtn" type="button" @click="showSort = true">
+          <button class="swbtn" type="button" @click="openSort">
             <span class="swbtn__icon">⇅</span>
             Sort by
           </button>
         </div>
       </div>
 
-      <!-- GRID -->
-      <main class="results">
-        <div class="grid sw-grid">
+      <div class="results">
+        <div v-if="loading" class="sw-loading">Loading...</div>
+        <div v-else-if="error" class="sw-error">{{ error }}</div>
+
+        <div v-else class="grid sw-grid">
           <article v-for="p in pagedProducts" :key="p.id" class="sw-card">
-            <button class="sw-heart" type="button" @click.stop="toggleWish(p)" aria-label="Wishlist">
+            <button class="sw-heart" type="button" @click.stop="toggleWish(p)" aria-label="Add to wishlist">
               ♡
             </button>
 
@@ -252,61 +75,37 @@ const heroTitle = computed(() => {
           </article>
         </div>
 
-        <!-- PAGINATION (only shows if more than 20 results) -->
-        <div class="pagination" v-if="totalPages > 1">
-          <button class="pagination-btn" type="button" :disabled="currentPage === 1" @click="prevPage">
-            ‹ Prev
+        <!-- pagination -->
+        <div v-if="totalPages > 1" class="pagination">
+          <button class="pagination-btn" :disabled="currentPage === 1" @click="currentPage--">
+            Prev
           </button>
 
-          <button class="pagination-btn pagination-btn--active" type="button">
-            Page {{ currentPage }} / {{ totalPages }}
+          <button
+            v-for="n in totalPages"
+            :key="n"
+            class="pagination-btn"
+            :class="{ 'pagination-btn--active': n === currentPage }"
+            @click="currentPage = n"
+          >
+            {{ n }}
           </button>
 
-          <button class="pagination-btn" type="button" :disabled="currentPage === totalPages" @click="nextPage">
-            Next ›
+          <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++">
+            Next
           </button>
         </div>
-      </main>
+      </div>
     </section>
 
-    <!-- SORT Drawer -->
-    <div v-if="showSort" class="sw-overlay" @click="showSort = false"></div>
-    <aside v-if="showSort" class="sw-drawer" role="dialog" aria-modal="true">
-      <div class="sw-drawer__head">
-        <div class="sw-drawer__title">Sort by</div>
-        <button class="sw-x" type="button" @click="showSort = false">✕</button>
-      </div>
+    <!-- ✅ Overlay -->
+    <div v-if="drawerOpen" class="sw-overlay" @click="closeDrawer"></div>
 
-      <div class="sw-drawer__body">
-        <button class="sw-radio" type="button" @click="chooseSort('relevance')">
-          Relevance <span class="sw-check" v-if="sortBy === 'relevance'">✓</span>
-        </button>
-
-        <button class="sw-radio" type="button" @click="chooseSort('new')">
-          New In <span class="sw-check" v-if="sortBy === 'new'">✓</span>
-        </button>
-
-        <button class="sw-radio" type="button" @click="chooseSort('priceLow')">
-          Price (lowest first) <span class="sw-check" v-if="sortBy === 'priceLow'">✓</span>
-        </button>
-
-        <button class="sw-radio" type="button" @click="chooseSort('priceHigh')">
-          Price (highest first) <span class="sw-check" v-if="sortBy === 'priceHigh'">✓</span>
-        </button>
-      </div>
-
-      <div class="sw-drawer__foot">
-        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="showSort = false">Close</button>
-        <button class="sw-footBtn" type="button" @click="showSort = false">Apply</button>
-      </div>
-    </aside>
-
-    <!-- FILTER Drawer -->
-    <div v-if="showFilter" class="sw-overlay" @click="showFilter = false"></div>
-    <aside v-if="showFilter" class="sw-drawer" role="dialog" aria-modal="true">
+    <!-- ✅ FILTER DRAWER -->
+    <aside v-if="drawerOpen && drawerMode === 'filter'" class="sw-drawer" @click.stop>
       <div class="sw-drawer__head">
         <div class="sw-drawer__title">Filters</div>
-        <button class="sw-x" type="button" @click="showFilter = false">✕</button>
+        <button class="sw-x" type="button" @click="closeDrawer">✕</button>
       </div>
 
       <div class="sw-drawer__body">
@@ -319,41 +118,325 @@ const heroTitle = computed(() => {
 
         <div class="sw-sep2"></div>
 
-        <div class="sw-secTitle">Category</div>
-        <div class="sw-chipWrap">
+        <!-- Shop By -->
+        <button class="sw-accHead" type="button" @click="acc.shopBy = !acc.shopBy">
+          <span>Shop By</span>
+          <span class="sw-accChevron" :class="{ open: acc.shopBy }">⌄</span>
+        </button>
+        <div v-if="acc.shopBy" class="sw-accBody">
+          <label class="sw-checkRow">
+            <input type="checkbox" v-model="shopBy.sale" />
+            Sale
+          </label>
+          <label class="sw-checkRow">
+            <input type="checkbox" v-model="shopBy.new" />
+            New
+          </label>
+          <label class="sw-checkRow">
+            <input type="checkbox" v-model="shopBy.onlineExclusive" />
+            Online exclusive
+          </label>
+        </div>
+
+        <div class="sw-sep2"></div>
+
+        <!-- Color -->
+        <button class="sw-accHead" type="button" @click="acc.color = !acc.color">
+          <span>Color</span>
+          <span class="sw-accChevron" :class="{ open: acc.color }">⌄</span>
+        </button>
+        <div v-if="acc.color" class="sw-accBody">
           <button
-            v-for="c in categories"
-            :key="c"
-            class="sw-chip"
-            :class="{ active: selectedCategory === c }"
+            v-for="c in colors"
+            :key="c.name"
+            class="sw-colorRow"
             type="button"
-            @click="selectCategory(c)"
+            @click="toggleColor(c.name)"
           >
-            {{ c }}
+            <span class="sw-colorBox" :style="{ background: c.hex }"></span>
+            <span class="sw-colorName">{{ c.name }}</span>
+            <span class="sw-colorTick">{{ selectedColors.includes(c.name) ? '✓' : '' }}</span>
           </button>
         </div>
 
         <div class="sw-sep2"></div>
 
-        <div class="sw-secTitle">Price Range</div>
-        <div class="sw-priceWrap">
-          <div class="sw-price__field">
-            <div class="sw-price__label">Min</div>
-            <input class="sw-price__input" type="number" v-model.number="priceMin" placeholder="0" />
+        <!-- Material -->
+        <button class="sw-accHead" type="button" @click="acc.material = !acc.material">
+          <span>Material</span>
+          <span class="sw-accChevron" :class="{ open: acc.material }">⌄</span>
+        </button>
+        <div v-if="acc.material" class="sw-accBody">
+          <label v-for="m in materials" :key="m" class="sw-checkRow">
+            <input type="checkbox" :value="m" v-model="selectedMaterials" />
+            {{ m }}
+          </label>
+        </div>
+
+        <div class="sw-sep2"></div>
+
+        <!-- Price -->
+        <button class="sw-accHead" type="button" @click="acc.price = !acc.price">
+          <span>Price Range</span>
+          <span class="sw-accChevron" :class="{ open: acc.price }">⌄</span>
+        </button>
+        <div v-if="acc.price" class="sw-accBody">
+          <div class="sw-priceWrap">
+            <div class="sw-price__field">
+              <div class="sw-price__label">Min. Price</div>
+              <input class="sw-price__input" type="number" v-model.number="priceMin" placeholder="0" />
+            </div>
+            <div class="sw-price__field">
+              <div class="sw-price__label">Max. Price</div>
+              <input class="sw-price__input" type="number" v-model.number="priceMax" placeholder="999999" />
+            </div>
           </div>
-          <div class="sw-price__field">
-            <div class="sw-price__label">Max</div>
-            <input class="sw-price__input" type="number" v-model.number="priceMax" placeholder="9999" />
-          </div>
+        </div>
+
+        <div class="sw-sep2"></div>
+
+        <!-- Reductions -->
+        <button class="sw-accHead" type="button" @click="acc.reduction = !acc.reduction">
+          <span>Reductions by %</span>
+          <span class="sw-accChevron" :class="{ open: acc.reduction }">⌄</span>
+        </button>
+        <div v-if="acc.reduction" class="sw-accBody">
+          <button class="sw-radio2" type="button" @click="reduction = ''">
+            All <span>{{ reduction === '' ? '✓' : '' }}</span>
+          </button>
+          <button class="sw-radio2" type="button" @click="reduction = '20'">
+            20% <span>{{ reduction === '20' ? '✓' : '' }}</span>
+          </button>
+          <button class="sw-radio2" type="button" @click="reduction = '30'">
+            30% <span>{{ reduction === '30' ? '✓' : '' }}</span>
+          </button>
+          <button class="sw-radio2" type="button" @click="reduction = '40'">
+            40% <span>{{ reduction === '40' ? '✓' : '' }}</span>
+          </button>
         </div>
       </div>
 
       <div class="sw-drawer__foot">
-        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="resetAllFilters">Reset all</button>
-        <button class="sw-footBtn" type="button" @click="applyFilters">Show {{ totalResults }} products</button>
+        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="resetFilters">
+          Reset all
+        </button>
+        <button class="sw-footBtn" type="button" @click="applyFilters">
+          Show {{ filteredProducts.length }} products
+        </button>
       </div>
     </aside>
-  </section>
+
+    <!-- ✅ SORT DRAWER -->
+    <aside v-if="drawerOpen && drawerMode === 'sort'" class="sw-drawer" @click.stop>
+      <div class="sw-drawer__head">
+        <div class="sw-drawer__title">Sort by</div>
+        <button class="sw-x" type="button" @click="closeDrawer">✕</button>
+      </div>
+
+      <div class="sw-drawer__body">
+        <div class="sw-sortList">
+          <button class="sw-radio" :class="{ 'is-active': sortBy === 'relevance' }" type="button" @click="sortBy = 'relevance'">
+            Relevance <span class="sw-check">{{ sortBy === 'relevance' ? '✓' : '' }}</span>
+          </button>
+          <button class="sw-radio" :class="{ 'is-active': sortBy === 'new' }" type="button" @click="sortBy = 'new'">
+            New in <span class="sw-check">{{ sortBy === 'new' ? '✓' : '' }}</span>
+          </button>
+          <button class="sw-radio" :class="{ 'is-active': sortBy === 'priceLow' }" type="button" @click="sortBy = 'priceLow'">
+            Price (lowest first) <span class="sw-check">{{ sortBy === 'priceLow' ? '✓' : '' }}</span>
+          </button>
+          <button class="sw-radio" :class="{ 'is-active': sortBy === 'priceHigh' }" type="button" @click="sortBy = 'priceHigh'">
+            Price (highest first) <span class="sw-check">{{ sortBy === 'priceHigh' ? '✓' : '' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="sw-drawer__foot">
+        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="closeDrawer">
+          Close
+        </button>
+        <button class="sw-footBtn" type="button" @click="applySort">
+          Apply
+        </button>
+      </div>
+    </aside>
+  </div>
 </template>
 
-<style scoped src="@/styles/user/catalog.css"></style>
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import http from '@/services/http'
+
+type Product = {
+  id: number
+  name: string
+  price: number
+  imageUrl?: string
+  badge?: string
+  subtitle?: string
+  category?: string
+  color?: string
+  material?: string
+}
+
+const router = useRouter()
+
+const loading = ref(false)
+const error = ref('')
+const products = ref<Product[]>([])
+
+const heroImageUrl = ref(
+  'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70'
+)
+
+const drawerOpen = ref(false)
+const drawerMode = ref<'filter' | 'sort'>('filter')
+
+const currentPage = ref(1)
+const pageSize = ref(20)
+
+const sortBy = ref<'relevance' | 'new' | 'priceLow' | 'priceHigh'>('relevance')
+
+/* Filter states */
+const availableOnline = ref(false)
+const shopBy = ref({ sale: false, new: false, onlineExclusive: false })
+const selectedColors = ref<string[]>([])
+const selectedMaterials = ref<string[]>([])
+const priceMin = ref<number | null>(null)
+const priceMax = ref<number | null>(null)
+const reduction = ref('')
+
+const acc = ref({
+  shopBy: true,
+  color: false,
+  material: false,
+  price: false,
+  reduction: false,
+})
+
+const colors = [
+  { name: 'White', hex: '#f2f2f2' },
+  { name: 'Blue', hex: '#2d5bff' },
+  { name: 'Pink', hex: '#ff3ea5' },
+  { name: 'Green', hex: '#1fa44a' },
+  { name: 'Black', hex: '#111111' },
+  { name: 'Purple', hex: '#7b5cff' },
+]
+
+const materials = ['Crystal pearl', 'Gold-tone finish', 'Mixed metal finish', 'Rhodium plated', 'Rose gold-tone finish', 'Cubic Zirconia']
+
+function toggleColor(name: string) {
+  if (selectedColors.value.includes(name)) {
+    selectedColors.value = selectedColors.value.filter(x => x !== name)
+  } else {
+    selectedColors.value.push(name)
+  }
+}
+
+function openFilter() {
+  drawerMode.value = 'filter'
+  drawerOpen.value = true
+}
+function openSort() {
+  drawerMode.value = 'sort'
+  drawerOpen.value = true
+}
+function closeDrawer() {
+  drawerOpen.value = false
+}
+
+function resetFilters() {
+  availableOnline.value = false
+  shopBy.value = { sale: false, new: false, onlineExclusive: false }
+  selectedColors.value = []
+  selectedMaterials.value = []
+  priceMin.value = null
+  priceMax.value = null
+  reduction.value = ''
+  currentPage.value = 1
+}
+
+function applyFilters() {
+  currentPage.value = 1
+  closeDrawer()
+}
+
+function applySort() {
+  currentPage.value = 1
+  closeDrawer()
+}
+
+const filteredProducts = computed(() => {
+  let list = [...products.value]
+
+  // example filters (safe defaults)
+  if (shopBy.value.sale) list = list.filter(p => p.badge === 'Sale')
+  if (shopBy.value.new) list = list.filter(p => p.badge === 'New')
+  if (selectedColors.value.length) list = list.filter(p => p.color && selectedColors.value.includes(p.color))
+  if (selectedMaterials.value.length) list = list.filter(p => p.material && selectedMaterials.value.includes(p.material))
+  if (priceMin.value != null) list = list.filter(p => p.price >= priceMin.value!)
+  if (priceMax.value != null) list = list.filter(p => p.price <= priceMax.value!)
+
+  // sort
+  if (sortBy.value === 'priceLow') list.sort((a, b) => a.price - b.price)
+  if (sortBy.value === 'priceHigh') list.sort((a, b) => b.price - a.price)
+
+  return list
+})
+
+const totalPages = computed(() => Math.ceil(filteredProducts.value.length / pageSize.value))
+
+const pagedProducts = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return filteredProducts.value.slice(start, start + pageSize.value)
+})
+
+function formatPrice(v: number) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'THB', maximumFractionDigits: 0 }).format(v)
+}
+
+function openDetail(p: Product) {
+  router.push({ name: 'product-detail', params: { id: p.id } })
+}
+
+function toggleWish(_p: Product) {
+  // optional
+}
+
+async function loadProducts() {
+  try {
+    loading.value = true
+    error.value = ''
+    const res = await http.get('/products')
+    const data = Array.isArray(res.data) ? res.data : []
+
+    // ✅ If backend returns less than 20, we duplicate to make 20 cards for UI testing
+    const many: Product[] = []
+    for (let i = 0; i < 20; i++) {
+      const base = data[i % Math.max(1, data.length)] ?? {
+        id: i + 1,
+        name: `Product ${i + 1}`,
+        price: 1500 + i * 99,
+        imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=60',
+      }
+      many.push({
+        ...base,
+        id: base.id ?? i + 1,
+        color: base.color ?? colors[i % colors.length].name,
+        material: base.material ?? materials[i % materials.length],
+        subtitle: base.subtitle ?? 'Elegant jewelry piece for everyday wear.',
+        badge: base.badge ?? (i % 6 === 0 ? 'Sale' : i % 5 === 0 ? 'New' : ''),
+      })
+    }
+    products.value = many
+  } catch (e: any) {
+    error.value = e?.message ?? 'Failed to load products'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadProducts)
+</script>
+
+<!-- ✅ IMPORTANT: you said no style inside .vue, so keep empty -->

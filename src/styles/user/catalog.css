@@ -7,7 +7,7 @@
 
 /* =========================
    HERO like Swarovski
-   ✅ text left, image right
+   ✅ text left, big photo, fade overlay
 ========================= */
 .sw-hero {
   position: relative;
@@ -16,17 +16,24 @@
   background: #fff;
 }
 
-/* background image layer */
+/* ✅ IMPORTANT: keep it behind everything */
 .sw-hero__bg {
   position: absolute;
   inset: 0;
-  background-image: url('https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2200&q=60');
+  z-index: 0;
+
+  /* ✅ ADD THIS */
+  background-image: url("https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70");
+
   background-size: cover;
   background-position: center right;
+  background-repeat: no-repeat;
+
   transform: scale(1.02);
 }
 
-/* left white overlay like Swarovski (so text readable) */
+
+/* overlay */
 .sw-hero::before {
   content: '';
   position: absolute;
@@ -42,29 +49,13 @@
   pointer-events: none;
 }
 
-/* big brand text top center */
-.sw-hero__brand {
-  position: absolute;
-  left: 50%;
-  top: 52px;
-  transform: translateX(-50%);
-  z-index: 2;
-  font-size: 92px;
-  font-weight: 900;
-  letter-spacing: 7px;
-  color: #111;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-/* left content block */
 .sw-hero__content {
   position: relative;
   z-index: 3;
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
   height: 100%;
-  padding-top: 190px;
+  padding-top: 140px;
 
   display: flex;
   flex-direction: column;
@@ -74,7 +65,6 @@
   text-align: left;
 }
 
-/* breadcrumbs */
 .sw-crumbs {
   display: flex;
   align-items: center;
@@ -94,15 +84,15 @@
   opacity: 1;
 }
 
-/* title + desc */
+/* title like screenshot */
 .sw-hero__title {
   margin: 0;
-  font-size: 70px;
-  font-weight: 600;
+  font-size: 78px;
+  font-weight: 900;
   letter-spacing: -1px;
   color: #111;
-  line-height: 1.05;
-  max-width: 720px;
+  line-height: 1.0;
+  max-width: 820px;
 }
 
 .sw-hero__desc {
@@ -176,6 +166,15 @@
   background: #f5f2ea;
 }
 
+/* Loading/Error */
+.sw-loading,
+.sw-error {
+  padding: 18px;
+  background: #fff;
+  border: 1px solid #eee;
+  font-weight: 700;
+}
+
 /* =========================
    Grid like Swarovski
 ========================= */
@@ -199,7 +198,6 @@
   grid-template-rows: 1fr auto;
 }
 
-/* heart */
 .sw-heart {
   position: absolute;
   top: 14px;
@@ -221,7 +219,6 @@
   border-radius: 999px;
 }
 
-/* image area */
 .sw-img {
   padding: 34px 24px 10px 24px;
   display: grid;
@@ -231,11 +228,10 @@
 
 .sw-img img {
   width: 100%;
-  height: 280px;
+  height: 300px;
   object-fit: contain;
 }
 
-/* text area */
 .sw-info {
   padding: 14px 18px 18px 18px;
   display: grid;
@@ -329,7 +325,7 @@
 }
 
 /* =========================
-   Drawer (Filter/Sort)
+   Drawer (shared)
 ========================= */
 .sw-overlay {
   position: fixed;
@@ -360,15 +356,16 @@
 }
 
 .sw-drawer__title {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 900;
   color: #111;
+  letter-spacing: -0.2px;
 }
 
 .sw-x {
   border: 0;
   background: transparent;
-  font-size: 18px;
+  font-size: 22px;
   cursor: pointer;
   padding: 6px 8px;
 }
@@ -379,7 +376,7 @@
 }
 
 .sw-drawer__foot {
-  padding: 14px 18px;
+  padding: 18px;
   border-top: 1px solid #eee;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -391,8 +388,14 @@
   background: #111;
   color: #fff;
   font-weight: 900;
-  padding: 12px 14px;
+  padding: 14px 14px;
   cursor: pointer;
+  height: 48px;
+  font-size: 14px;
+}
+
+.sw-footBtn:hover {
+  opacity: 0.92;
 }
 
 .sw-footBtn--ghost {
@@ -401,24 +404,202 @@
   border-color: #111;
 }
 
-.sw-radio {
+.sw-footBtn--ghost:hover {
+  background: #fafafa;
+}
+
+.sw-muted {
+  padding: 10px 0;
+  color: #666;
+  font-size: 13px;
+}
+
+/* =========================
+   Filter Drawer – Swarovski look
+========================= */
+.sw-sep2 {
+  height: 1px;
+  background: #ececec;
+  margin: 18px 0;
+}
+
+.sw-accHead {
   width: 100%;
   border: 0;
   background: transparent;
-  padding: 14px 0;
+  padding: 18px 0;
   cursor: pointer;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-weight: 700;
+  justify-content: space-between;
+
+  font-size: 14px;
+  font-weight: 800;
   color: #111;
-  border-bottom: 1px solid #f0f0f0;
 }
 
-.sw-check {
+.sw-accChevron {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+
+  border: 1px solid transparent;
+  opacity: 0.75;
+
+  transform: rotate(0deg);
+  transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.sw-accChevron.open {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.sw-accHead:hover .sw-accChevron {
+  border-color: #e5e5e5;
+}
+
+.sw-accBody {
+  padding: 8px 0 2px 0;
+}
+
+/* checkbox row */
+.sw-checkRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 14px;
+  color: #111;
+}
+
+/* hide native checkbox */
+.sw-checkRow input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #cfcfcf;
+  border-radius: 3px;
+  background: #fff;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.sw-checkRow input:checked {
+  border-color: #111;
+  background: #111;
+}
+
+.sw-checkRow input:checked::after {
+  content: "✓";
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* color list row */
+.sw-colorRow {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 0;
+  font-size: 14px;
+  color: #111;
+}
+
+.sw-colorRow:hover {
+  background: #fafafa;
+}
+
+.sw-colorBox {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+
+.sw-colorName {
+  flex: 1;
+  opacity: 0.95;
+}
+
+.sw-colorTick {
+  width: 26px;
+  text-align: right;
   font-weight: 900;
 }
 
+/* reductions list (radio-like) */
+.sw-radio2 {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.sw-radio2:hover {
+  background: #fafafa;
+}
+
+/* price inputs */
+.sw-priceWrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 10px 0 2px 0;
+}
+
+.sw-price__field {
+  display: grid;
+}
+
+.sw-price__label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.sw-price__input {
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 0;
+  padding: 12px 12px;
+  outline: none;
+  font-size: 14px;
+  background: #fff;
+}
+
+.sw-price__input:focus {
+  border-color: #111;
+}
+
+/* top toggle row */
 .sw-row {
   display: flex;
   justify-content: space-between;
@@ -427,28 +608,18 @@
 }
 
 .sw-row__label {
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   color: #111;
 }
 
-.sw-sep2 {
-  height: 1px;
-  background: #eee;
-  margin: 14px 0;
-}
-
-.sw-secTitle {
-  font-weight: 900;
-  font-size: 14px;
-  margin: 8px 0 8px 0;
-}
-
+/* toggle */
 .sw-toggle {
-  width: 52px;
-  height: 28px;
+  width: 54px;
+  height: 30px;
   border-radius: 999px;
-  border: 1px solid #ddd;
-  background: #f2f2f2;
+  border: 1px solid #d9d9d9;
+  background: #f3f3f3;
   padding: 2px;
   cursor: pointer;
   display: flex;
@@ -456,11 +627,11 @@
 }
 
 .sw-toggle__dot {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 999px;
   background: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid #d9d9d9;
   transform: translateX(0);
   transition: transform 0.15s ease;
 }
@@ -475,58 +646,52 @@
   border-color: #111;
 }
 
-.sw-chipWrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 8px 0 2px 0;
+/* =========================
+   Sort Drawer – Swarovski look
+========================= */
+.sw-sortList {
+  padding-top: 6px;
 }
 
-.sw-chip {
-  border: 1px solid #e0e0e0;
-  background: #fff;
-  padding: 10px 14px;
-  border-radius: 999px;
+.sw-radio {
+  width: 100%;
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  font-weight: 800;
-  font-size: 13px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 18px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+
+  border-bottom: 1px solid #eee;
 }
 
-.sw-chip.active {
-  border-color: #111;
+.sw-radio:hover {
+  background: #fafafa;
 }
 
-.sw-priceWrap {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  padding: 6px 0 2px 0;
+.sw-radio:active {
+  background: #f3f3f3;
 }
 
-.sw-price__field {
-  display: grid;
-  gap: 6px;
+.sw-radio.is-active {
+  font-weight: 900;
 }
 
-.sw-price__label {
-  font-size: 12px;
-  font-weight: 800;
-  color: #444;
+.sw-check {
+  font-weight: 900;
+  font-size: 18px;
+  opacity: 0.9;
 }
 
-.sw-price__input {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 10px 12px;
-  outline: none;
-  font-size: 14px;
-}
-
-.sw-price__input:focus {
-  border-color: #111;
-}
-
-/* responsive */
+/* =========================
+   Responsive
+========================= */
 @media (min-width: 1400px) {
   .sw-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -538,14 +703,8 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .sw-hero__brand {
-    font-size: 64px;
-    top: 62px;
-    letter-spacing: 5px;
-  }
-
   .sw-hero__title {
-    font-size: 52px;
+    font-size: 56px;
   }
 }
 
@@ -558,17 +717,12 @@
     height: 500px;
   }
 
-  .sw-hero__brand {
-    font-size: 54px;
-    top: 70px;
-  }
-
   .sw-hero__content {
-    padding-top: 170px;
+    padding-top: 120px;
   }
 
   .sw-hero__title {
-    font-size: 42px;
+    font-size: 44px;
   }
 }
 
@@ -579,11 +733,6 @@
 
   .sw-hero {
     height: 440px;
-  }
-
-  .sw-hero__brand {
-    font-size: 38px;
-    letter-spacing: 3px;
   }
 
   .sw-hero__title {
