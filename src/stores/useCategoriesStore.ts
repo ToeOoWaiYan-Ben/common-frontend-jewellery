@@ -51,7 +51,10 @@ export const useCategoriesStore = defineStore('categories', {
       }
     },
 
-    async updateCategory(id: number, payload: { name: string; code: string; description?: string }) {
+    async updateCategory(
+      id: number,
+      payload: { name: string; code: string; description?: string }
+    ) {
       this.loading = true
       this.error = null
       try {

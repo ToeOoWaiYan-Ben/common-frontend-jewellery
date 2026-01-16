@@ -44,15 +44,21 @@
           <div class="mh-mega__col">
             <div class="mh-mega__title">Earrings</div>
             <button class="mh-mega__item" @click="goCategory('Earrings')">Earrings</button>
-            <button class="mh-mega__item" @click="goCategory('Stud earrings')">Stud earrings</button>
-            <button class="mh-mega__item" @click="goCategory('Hoop earrings')">Hoop earrings</button>
+            <button class="mh-mega__item" @click="goCategory('Stud earrings')">
+              Stud earrings
+            </button>
+            <button class="mh-mega__item" @click="goCategory('Hoop earrings')">
+              Hoop earrings
+            </button>
           </div>
 
           <div class="mh-mega__col">
             <div class="mh-mega__title">Rings</div>
             <button class="mh-mega__item" @click="goCategory('Rings')">Rings</button>
             <button class="mh-mega__item" @click="goCategory('Band rings')">Band rings</button>
-            <button class="mh-mega__item" @click="goCategory('Stackable rings')">Stackable rings</button>
+            <button class="mh-mega__item" @click="goCategory('Stackable rings')">
+              Stackable rings
+            </button>
           </div>
 
           <div class="mh-mega__promo">
@@ -78,20 +84,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+  import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
 
-const router = useRouter()
-const open = ref(false)
+  const router = useRouter()
+  const open = ref(false)
 
-function go(path: string) {
-  router.push(path)
-}
+  function go(path: string) {
+    router.push(path)
+  }
 
-function goCategory(category: string) {
-  router.push({ path: '/user/catalog', query: { category } })
-  open.value = false
-}
+  function goCategory(category: string) {
+    router.push({ path: '/user/catalog', query: { category } })
+    open.value = false
+  }
 </script>
 
 <style scoped src="@/styles/user/store-header.css"></style>

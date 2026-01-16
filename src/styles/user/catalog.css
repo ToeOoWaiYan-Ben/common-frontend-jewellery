@@ -23,7 +23,7 @@
   z-index: 0;
 
   /* ✅ ADD THIS */
-  background-image: url("https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70");
+  background-image: url('https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70');
 
   background-size: cover;
   background-position: center right;
@@ -32,7 +32,6 @@
   transform: scale(1.02);
 }
 
-
 /* overlay */
 .sw-hero::before {
   content: '';
@@ -40,10 +39,10 @@
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.98) 0%,
-    rgba(255,255,255,0.96) 35%,
-    rgba(255,255,255,0.60) 55%,
-    rgba(255,255,255,0.0) 72%
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.96) 35%,
+    rgba(255, 255, 255, 0.6) 55%,
+    rgba(255, 255, 255, 0) 72%
   );
   z-index: 1;
   pointer-events: none;
@@ -91,7 +90,7 @@
   font-weight: 900;
   letter-spacing: -1px;
   color: #111;
-  line-height: 1.0;
+  line-height: 1;
   max-width: 820px;
 }
 
@@ -450,7 +449,10 @@
   opacity: 0.75;
 
   transform: rotate(0deg);
-  transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .sw-accChevron.open {
@@ -497,7 +499,7 @@
 }
 
 .sw-checkRow input:checked::after {
-  content: "✓";
+  content: '✓';
   color: #fff;
   font-size: 12px;
   font-weight: 900;
