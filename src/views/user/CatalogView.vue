@@ -1,8 +1,216 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import StoreHeader from '@/components/user/StoreHeader.vue'
+
+type Product = {
+  id: number
+  name: string
+  price: number
+  imageUrl: string
+  badge?: 'New' | 'Sale' | ''
+  subtitle?: string
+  color?: string
+  material?: string
+}
+
+const router = useRouter()
+
+/* ---------- Hero ---------- */
+const heroImageUrl = ref(
+  'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70'
+)
+
+/* ---------- State ---------- */
+const loading = ref(false)
+const error = ref('')
+const products = ref<Product[]>([])
+
+/* ---------- Drawer ---------- */
+const drawerOpen = ref(false)
+const drawerMode = ref<'filter' | 'sort'>('filter')
+
+/* ---------- Pagination ---------- */
+const currentPage = ref(1)
+const pageSize = ref(20)
+
+/* ---------- Sort ---------- */
+const sortBy = ref<'relevance' | 'new' | 'priceLow' | 'priceHigh'>('relevance')
+
+/* ---------- Filters ---------- */
+const availableOnline = ref(false) // UI only
+const shopBy = ref({ sale: false, new: false, onlineExclusive: false })
+const selectedColors = ref<string[]>([])
+const selectedMaterials = ref<string[]>([])
+const priceMin = ref<number | null>(null)
+const priceMax = ref<number | null>(null)
+const reduction = ref('') // UI only for now
+
+const acc = ref({
+  shopBy: true,
+  color: false,
+  material: false,
+  price: false,
+  reduction: false,
+})
+
+const colors = [
+  { name: 'White', hex: '#f2f2f2' },
+  { name: 'Blue', hex: '#2d5bff' },
+  { name: 'Pink', hex: '#ff3ea5' },
+  { name: 'Green', hex: '#1fa44a' },
+  { name: 'Black', hex: '#111111' },
+  { name: 'Purple', hex: '#7b5cff' },
+]
+
+const materials = [
+  'Crystal pearl',
+  'Gold-tone finish',
+  'Mixed metal finish',
+  'Rhodium plated',
+  'Rose gold-tone finish',
+  'Cubic Zirconia',
+]
+
+function toggleColor(name: string) {
+  if (selectedColors.value.includes(name)) {
+    selectedColors.value = selectedColors.value.filter((x) => x !== name)
+  } else {
+    selectedColors.value.push(name)
+  }
+}
+
+function openFilter() {
+  drawerMode.value = 'filter'
+  drawerOpen.value = true
+}
+function openSort() {
+  drawerMode.value = 'sort'
+  drawerOpen.value = true
+}
+function closeDrawer() {
+  drawerOpen.value = false
+}
+
+function resetFilters() {
+  availableOnline.value = false
+  shopBy.value = { sale: false, new: false, onlineExclusive: false }
+  selectedColors.value = []
+  selectedMaterials.value = []
+  priceMin.value = null
+  priceMax.value = null
+  reduction.value = ''
+  currentPage.value = 1
+}
+
+function applyFilters() {
+  currentPage.value = 1
+  closeDrawer()
+}
+
+function applySort() {
+  currentPage.value = 1
+  closeDrawer()
+}
+
+function formatPrice(v: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'THB',
+    maximumFractionDigits: 0,
+  }).format(v)
+}
+
+function openDetail(p: Product) {
+  // ✅ must match your router name: 'user-product-detail'
+  router.push({ name: 'user-product-detail', params: { id: p.id } })
+}
+
+function toggleWish(_p: Product) {
+  // optional for UI
+}
+
+/* ---------- Filtering + Sorting ---------- */
+const filteredProducts = computed(() => {
+  let list = [...products.value]
+
+  // shop by
+  if (shopBy.value.sale) list = list.filter((p) => p.badge === 'Sale')
+  if (shopBy.value.new) list = list.filter((p) => p.badge === 'New')
+
+  // colors
+  if (selectedColors.value.length) {
+    list = list.filter((p) => p.color && selectedColors.value.includes(p.color))
+  }
+
+  // materials
+  if (selectedMaterials.value.length) {
+    list = list.filter((p) => p.material && selectedMaterials.value.includes(p.material))
+  }
+
+  // price
+  if (priceMin.value != null) list = list.filter((p) => p.price >= priceMin.value!)
+  if (priceMax.value != null) list = list.filter((p) => p.price <= priceMax.value!)
+
+  // sort
+  if (sortBy.value === 'priceLow') list.sort((a, b) => a.price - b.price)
+  if (sortBy.value === 'priceHigh') list.sort((a, b) => b.price - a.price)
+
+  // (new/relevance demo: keep original order)
+  return list
+})
+
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(filteredProducts.value.length / pageSize.value))
+)
+
+const pagedProducts = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return filteredProducts.value.slice(start, start + pageSize.value)
+})
+
+/* ---------- Frontend-only demo data ---------- */
+onMounted(() => {
+  loading.value = true
+  error.value = ''
+
+  try {
+    const imgs = [
+      'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=60',
+      'https://images.unsplash.com/photo-1601121141461-9d6644b2925b?auto=format&fit=crop&w=1200&q=60',
+      'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=60',
+      'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=60',
+    ]
+
+    const many: Product[] = []
+    for (let i = 0; i < 20; i++) {
+      many.push({
+        id: i + 1,
+        name: `Jewelry Item ${i + 1}`,
+        price: 390 + i * 45,
+        imageUrl: imgs[i % imgs.length],
+        subtitle: 'Premium sparkle, designed for everyday wear.',
+        badge: i % 6 === 0 ? 'Sale' : i % 5 === 0 ? 'New' : '',
+        color: colors[i % colors.length].name,
+        material: materials[i % materials.length],
+      })
+    }
+
+    products.value = many
+  } catch (e: any) {
+    error.value = e?.message ?? 'Failed to load products'
+  } finally {
+    loading.value = false
+  }
+})
+</script>
+
 <template>
   <div class="catalog">
+    <StoreHeader />
+
     <!-- ✅ HERO -->
     <section class="sw-hero">
-      <!-- ✅ Background image layer (this is what you were missing) -->
       <div
         class="sw-hero__bg"
         :style="{ backgroundImage: `url(${heroImageUrl})` }"
@@ -25,7 +233,7 @@
       </div>
     </section>
 
-    <!-- ✅ FULL WIDTH bar -->
+    <!-- ✅ FULL WIDTH bar + results -->
     <section class="sw-resultsFull">
       <div class="swbar">
         <div class="swbar__count">{{ filteredProducts.length }} Results</div>
@@ -66,9 +274,7 @@
 
               <h3 class="sw-title" @click="openDetail(p)">{{ p.name }}</h3>
 
-              <p v-if="p.subtitle" class="sw-sub">
-                {{ p.subtitle }}
-              </p>
+              <p v-if="p.subtitle" class="sw-sub">{{ p.subtitle }}</p>
 
               <div class="sw-price">{{ formatPrice(p.price) }}</div>
             </div>
@@ -77,9 +283,7 @@
 
         <!-- pagination -->
         <div v-if="totalPages > 1" class="pagination">
-          <button class="pagination-btn" :disabled="currentPage === 1" @click="currentPage--">
-            Prev
-          </button>
+          <button class="pagination-btn" :disabled="currentPage === 1" @click="currentPage--">Prev</button>
 
           <button
             v-for="n in totalPages"
@@ -91,17 +295,15 @@
             {{ n }}
           </button>
 
-          <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++">
-            Next
-          </button>
+          <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++">Next</button>
         </div>
       </div>
     </section>
 
-    <!-- ✅ Overlay -->
+    <!-- overlay -->
     <div v-if="drawerOpen" class="sw-overlay" @click="closeDrawer"></div>
 
-    <!-- ✅ FILTER DRAWER -->
+    <!-- FILTER DRAWER -->
     <aside v-if="drawerOpen && drawerMode === 'filter'" class="sw-drawer" @click.stop>
       <div class="sw-drawer__head">
         <div class="sw-drawer__title">Filters</div>
@@ -217,16 +419,12 @@
       </div>
 
       <div class="sw-drawer__foot">
-        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="resetFilters">
-          Reset all
-        </button>
-        <button class="sw-footBtn" type="button" @click="applyFilters">
-          Show {{ filteredProducts.length }} products
-        </button>
+        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="resetFilters">Reset all</button>
+        <button class="sw-footBtn" type="button" @click="applyFilters">Show {{ filteredProducts.length }} products</button>
       </div>
     </aside>
 
-    <!-- ✅ SORT DRAWER -->
+    <!-- SORT DRAWER -->
     <aside v-if="drawerOpen && drawerMode === 'sort'" class="sw-drawer" @click.stop>
       <div class="sw-drawer__head">
         <div class="sw-drawer__title">Sort by</div>
@@ -251,192 +449,11 @@
       </div>
 
       <div class="sw-drawer__foot">
-        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="closeDrawer">
-          Close
-        </button>
-        <button class="sw-footBtn" type="button" @click="applySort">
-          Apply
-        </button>
+        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="closeDrawer">Close</button>
+        <button class="sw-footBtn" type="button" @click="applySort">Apply</button>
       </div>
     </aside>
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import http from '@/services/http'
-
-type Product = {
-  id: number
-  name: string
-  price: number
-  imageUrl?: string
-  badge?: string
-  subtitle?: string
-  category?: string
-  color?: string
-  material?: string
-}
-
-const router = useRouter()
-
-const loading = ref(false)
-const error = ref('')
-const products = ref<Product[]>([])
-
-const heroImageUrl = ref(
-  'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70'
-)
-
-const drawerOpen = ref(false)
-const drawerMode = ref<'filter' | 'sort'>('filter')
-
-const currentPage = ref(1)
-const pageSize = ref(20)
-
-const sortBy = ref<'relevance' | 'new' | 'priceLow' | 'priceHigh'>('relevance')
-
-/* Filter states */
-const availableOnline = ref(false)
-const shopBy = ref({ sale: false, new: false, onlineExclusive: false })
-const selectedColors = ref<string[]>([])
-const selectedMaterials = ref<string[]>([])
-const priceMin = ref<number | null>(null)
-const priceMax = ref<number | null>(null)
-const reduction = ref('')
-
-const acc = ref({
-  shopBy: true,
-  color: false,
-  material: false,
-  price: false,
-  reduction: false,
-})
-
-const colors = [
-  { name: 'White', hex: '#f2f2f2' },
-  { name: 'Blue', hex: '#2d5bff' },
-  { name: 'Pink', hex: '#ff3ea5' },
-  { name: 'Green', hex: '#1fa44a' },
-  { name: 'Black', hex: '#111111' },
-  { name: 'Purple', hex: '#7b5cff' },
-]
-
-const materials = ['Crystal pearl', 'Gold-tone finish', 'Mixed metal finish', 'Rhodium plated', 'Rose gold-tone finish', 'Cubic Zirconia']
-
-function toggleColor(name: string) {
-  if (selectedColors.value.includes(name)) {
-    selectedColors.value = selectedColors.value.filter(x => x !== name)
-  } else {
-    selectedColors.value.push(name)
-  }
-}
-
-function openFilter() {
-  drawerMode.value = 'filter'
-  drawerOpen.value = true
-}
-function openSort() {
-  drawerMode.value = 'sort'
-  drawerOpen.value = true
-}
-function closeDrawer() {
-  drawerOpen.value = false
-}
-
-function resetFilters() {
-  availableOnline.value = false
-  shopBy.value = { sale: false, new: false, onlineExclusive: false }
-  selectedColors.value = []
-  selectedMaterials.value = []
-  priceMin.value = null
-  priceMax.value = null
-  reduction.value = ''
-  currentPage.value = 1
-}
-
-function applyFilters() {
-  currentPage.value = 1
-  closeDrawer()
-}
-
-function applySort() {
-  currentPage.value = 1
-  closeDrawer()
-}
-
-const filteredProducts = computed(() => {
-  let list = [...products.value]
-
-  // example filters (safe defaults)
-  if (shopBy.value.sale) list = list.filter(p => p.badge === 'Sale')
-  if (shopBy.value.new) list = list.filter(p => p.badge === 'New')
-  if (selectedColors.value.length) list = list.filter(p => p.color && selectedColors.value.includes(p.color))
-  if (selectedMaterials.value.length) list = list.filter(p => p.material && selectedMaterials.value.includes(p.material))
-  if (priceMin.value != null) list = list.filter(p => p.price >= priceMin.value!)
-  if (priceMax.value != null) list = list.filter(p => p.price <= priceMax.value!)
-
-  // sort
-  if (sortBy.value === 'priceLow') list.sort((a, b) => a.price - b.price)
-  if (sortBy.value === 'priceHigh') list.sort((a, b) => b.price - a.price)
-
-  return list
-})
-
-const totalPages = computed(() => Math.ceil(filteredProducts.value.length / pageSize.value))
-
-const pagedProducts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return filteredProducts.value.slice(start, start + pageSize.value)
-})
-
-function formatPrice(v: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'THB', maximumFractionDigits: 0 }).format(v)
-}
-
-function openDetail(p: Product) {
-  router.push({ name: 'product-detail', params: { id: p.id } })
-}
-
-function toggleWish(_p: Product) {
-  // optional
-}
-
-async function loadProducts() {
-  try {
-    loading.value = true
-    error.value = ''
-    const res = await http.get('/products')
-    const data = Array.isArray(res.data) ? res.data : []
-
-    // ✅ If backend returns less than 20, we duplicate to make 20 cards for UI testing
-    const many: Product[] = []
-    for (let i = 0; i < 20; i++) {
-      const base = data[i % Math.max(1, data.length)] ?? {
-        id: i + 1,
-        name: `Product ${i + 1}`,
-        price: 1500 + i * 99,
-        imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=60',
-      }
-      many.push({
-        ...base,
-        id: base.id ?? i + 1,
-        color: base.color ?? colors[i % colors.length].name,
-        material: base.material ?? materials[i % materials.length],
-        subtitle: base.subtitle ?? 'Elegant jewelry piece for everyday wear.',
-        badge: base.badge ?? (i % 6 === 0 ? 'Sale' : i % 5 === 0 ? 'New' : ''),
-      })
-    }
-    products.value = many
-  } catch (e: any) {
-    error.value = e?.message ?? 'Failed to load products'
-  } finally {
-    loading.value = false
-  }
-}
-
-onMounted(loadProducts)
-</script>
-
-<!-- ✅ IMPORTANT: you said no style inside .vue, so keep empty -->
+<style scoped src="@/styles/user/catalog.css"></style>

@@ -1,14 +1,13 @@
-<!-- src/views/user/ProductDetailView.vue -->
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import StoreHeader from '@/components/user/StoreHeader.vue' // ✅ FIXED
+import StoreHeader from '@/components/user/StoreHeader.vue'
 
 type Product = {
   id: number
   name: string
   price: number
-  badge?: 'New' | 'Sale'
+  badge?: 'New' | 'Sale' | ''
   subtitle?: string
   imageUrl: string
   gallery?: string[]
@@ -21,7 +20,6 @@ const route = useRoute()
 
 const productId = computed(() => Number(route.params.id))
 
-// ✅ Demo images (replace with API later)
 const img1 =
   'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=60'
 const img2 =
@@ -146,7 +144,6 @@ function addToWishlist() {
     <StoreHeader />
 
     <section v-if="product" class="pd-wrap">
-      <!-- breadcrumb -->
       <div class="pd-breadcrumb">
         <div class="pd-container">
           <button class="pd-crumbLink" type="button" @click="backToCatalog">Home</button>
@@ -159,9 +156,7 @@ function addToWishlist() {
         </div>
       </div>
 
-      <!-- main layout -->
       <div class="pd-container pd-main">
-        <!-- left: gallery -->
         <div class="pd-gallery">
           <div class="pd-thumbs">
             <button
@@ -181,14 +176,9 @@ function addToWishlist() {
           </div>
         </div>
 
-        <!-- right: info -->
         <div class="pd-info">
           <div class="pd-topline">
-            <span
-              v-if="product.badge"
-              class="pd-badge"
-              :class="product.badge === 'Sale' ? 'sale' : 'new'"
-            >
+            <span v-if="product.badge" class="pd-badge" :class="product.badge === 'Sale' ? 'sale' : 'new'">
               {{ product.badge }}
             </span>
           </div>
@@ -206,17 +196,11 @@ function addToWishlist() {
             <button class="pd-btn ghost" type="button" @click="backToCatalog">Back to catalog</button>
           </div>
 
-          <!-- tabs -->
           <div class="pd-tabs">
             <button class="pd-tab" :class="{ active: tab === 'desc' }" type="button" @click="tab = 'desc'">
               Description
             </button>
-            <button
-              class="pd-tab"
-              :class="{ active: tab === 'details' }"
-              type="button"
-              @click="tab = 'details'"
-            >
+            <button class="pd-tab" :class="{ active: tab === 'details' }" type="button" @click="tab = 'details'">
               Details
             </button>
           </div>
@@ -236,7 +220,6 @@ function addToWishlist() {
       </div>
     </section>
 
-    <!-- not found -->
     <section v-else class="pd-container pd-notfound">
       <h2>Product not found</h2>
       <button class="pd-btn" type="button" @click="backToCatalog">Back to catalog</button>

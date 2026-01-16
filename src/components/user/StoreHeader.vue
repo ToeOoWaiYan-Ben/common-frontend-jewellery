@@ -1,6 +1,5 @@
 <template>
   <header class="mh-header">
-    <!-- Top black bar -->
     <div class="mh-topbar">
       <div class="mh-topbar__left">
         <span class="mh-topbar__item">Stores</span>
@@ -18,18 +17,17 @@
       </div>
     </div>
 
-    <!-- Brand -->
     <div class="mh-brand">
       <div class="mh-brand__logo">MYIT THAR OO</div>
     </div>
 
-    <!-- Nav -->
     <nav class="mh-nav">
-      <button class="mh-nav__link" type="button" @click="go('/user/home')">Home</button>
+      <!-- ✅ FIX: Home goes to catalog (you don't have /user/home route) -->
+      <button class="mh-nav__link" type="button" @click="go('/user/catalog')">Home</button>
+
       <button class="mh-nav__link" type="button">SALE</button>
       <button class="mh-nav__link" type="button">New In</button>
 
-      <!-- Jewelry dropdown (mega) -->
       <div class="mh-nav__dropdown" @mouseenter="open = true" @mouseleave="open = false">
         <button class="mh-nav__link mh-nav__link--active" type="button" :aria-expanded="open">
           Jewelry

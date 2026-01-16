@@ -2,28 +2,28 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 /* -------- Layout -------- */
-import AdminLayout from '@/components/layout/AdminLayout.vue'
+import AdminLayout from '../components/layout/AdminLayout.vue'
 
 /* -------- Auth -------- */
-import LoginView from '@/views/LoginView.vue'
-import { useAuthStore } from '@/stores/useAuthStore'
+import LoginView from '../views/LoginView.vue'
+import { useAuthStore } from '../stores/useAuthStore'
 
 /* -------- Admin Views -------- */
-import HomeView from '@/views/HomeView.vue'
-import UsersView from '@/views/UsersView.vue'
-import OrdersView from '@/views/OrdersView.vue'
-import ProductsView from '@/views/ProductsView.vue'
-import RegisterFormView from '@/views/RegisterFormView.vue'
-import CategoriesView from '@/views/CategoriesView.vue'
-import CraftsView from '@/views/CraftsView.vue'
-import GemsPackagesView from '@/views/GemPackagesView.vue'
-import GemTypeFormView from '@/views/GemTypeFormView.vue'
-import SellerFormView from '@/views/SellerFormView.vue'
-import SettingsView from '@/views/SettingsView.vue'
+import HomeView from '../views/HomeView.vue'
+import UsersView from '../views/UsersView.vue'
+import OrdersView from '../views/OrdersView.vue'
+import ProductsView from '../views/ProductsView.vue'
+import RegisterFormView from '../views/RegisterFormView.vue'
+import CategoriesView from '../views/CategoriesView.vue'
+import CraftsView from '../views/CraftsView.vue'
+import GemsPackagesView from '../views/GemPackagesView.vue'
+import GemTypeFormView from '../views/GemTypeFormView.vue'
+import SellerFormView from '../views/SellerFormView.vue'
+import SettingsView from '../views/SettingsView.vue'
 
 /* -------- User Storefront Views -------- */
-import CatalogView from '@/views/user/CatalogView.vue'
-import ProductDetailView from '@/views/user/ProductDetailView.vue'
+import CatalogView from '../views/user/CatalogView.vue'
+import ProductDetailView from '../views/user/ProductDetailView.vue'
 
 const routes: RouteRecordRaw[] = [
   /* ---------- Default ---------- */
