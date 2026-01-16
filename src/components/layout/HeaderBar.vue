@@ -15,8 +15,11 @@
       <div class="app-header__user">
         <div class="app-header__avatar">A</div>
         <div class="app-header__user-meta">
-          <span class="app-header__user-name">Admin</span>
-          <span class="app-header__user-role">Administrator</span>
+          <span class="app-header__user-name">{{ auth.userName }}</span>
+          <span class="app-header__user-role">{{ auth.userRole }}</span>
+        </div>
+        <div class="app-header__avatar">
+          {{ auth.userName.charAt(0).toUpperCase() }}
         </div>
 
         <!-- ✅ Logout button -->

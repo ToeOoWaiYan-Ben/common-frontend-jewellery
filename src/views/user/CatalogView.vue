@@ -20,7 +20,8 @@
 
         <h1 class="sw-hero__title">Jewelry Collection</h1>
         <p class="sw-hero__desc">
-          The perfect choice for an elegant outfit. Discover premium rings, necklaces, and earrings designed for everyday shine.
+          The perfect choice for an elegant outfit. Discover premium rings, necklaces, and earrings
+          designed for everyday shine.
         </p>
       </div>
     </section>
@@ -49,7 +50,12 @@
 
         <div v-else class="grid sw-grid">
           <article v-for="p in pagedProducts" :key="p.id" class="sw-card">
-            <button class="sw-heart" type="button" @click.stop="toggleWish(p)" aria-label="Add to wishlist">
+            <button
+              class="sw-heart"
+              type="button"
+              @click.stop="toggleWish(p)"
+              aria-label="Add to wishlist"
+            >
               ♡
             </button>
 
@@ -59,7 +65,11 @@
 
             <div class="sw-info">
               <div class="sw-smallLine">
-                <span v-if="p.badge" class="sw-badgeText" :class="p.badge === 'Sale' ? 'sale' : 'new'">
+                <span
+                  v-if="p.badge"
+                  class="sw-badgeText"
+                  :class="p.badge === 'Sale' ? 'sale' : 'new'"
+                >
                   {{ p.badge }}
                 </span>
               </div>
@@ -91,7 +101,11 @@
             {{ n }}
           </button>
 
-          <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++">
+          <button
+            class="pagination-btn"
+            :disabled="currentPage === totalPages"
+            @click="currentPage++"
+          >
             Next
           </button>
         </div>
@@ -111,7 +125,12 @@
       <div class="sw-drawer__body">
         <div class="sw-row">
           <div class="sw-row__label">Available online</div>
-          <button class="sw-toggle" :class="{ on: availableOnline }" type="button" @click="availableOnline = !availableOnline">
+          <button
+            class="sw-toggle"
+            :class="{ on: availableOnline }"
+            type="button"
+            @click="availableOnline = !availableOnline"
+          >
             <span class="sw-toggle__dot"></span>
           </button>
         </div>
@@ -184,11 +203,21 @@
           <div class="sw-priceWrap">
             <div class="sw-price__field">
               <div class="sw-price__label">Min. Price</div>
-              <input class="sw-price__input" type="number" v-model.number="priceMin" placeholder="0" />
+              <input
+                class="sw-price__input"
+                type="number"
+                v-model.number="priceMin"
+                placeholder="0"
+              />
             </div>
             <div class="sw-price__field">
               <div class="sw-price__label">Max. Price</div>
-              <input class="sw-price__input" type="number" v-model.number="priceMax" placeholder="999999" />
+              <input
+                class="sw-price__input"
+                type="number"
+                v-model.number="priceMax"
+                placeholder="999999"
+              />
             </div>
           </div>
         </div>
@@ -235,17 +264,39 @@
 
       <div class="sw-drawer__body">
         <div class="sw-sortList">
-          <button class="sw-radio" :class="{ 'is-active': sortBy === 'relevance' }" type="button" @click="sortBy = 'relevance'">
+          <button
+            class="sw-radio"
+            :class="{ 'is-active': sortBy === 'relevance' }"
+            type="button"
+            @click="sortBy = 'relevance'"
+          >
             Relevance <span class="sw-check">{{ sortBy === 'relevance' ? '✓' : '' }}</span>
           </button>
-          <button class="sw-radio" :class="{ 'is-active': sortBy === 'new' }" type="button" @click="sortBy = 'new'">
+          <button
+            class="sw-radio"
+            :class="{ 'is-active': sortBy === 'new' }"
+            type="button"
+            @click="sortBy = 'new'"
+          >
             New in <span class="sw-check">{{ sortBy === 'new' ? '✓' : '' }}</span>
           </button>
-          <button class="sw-radio" :class="{ 'is-active': sortBy === 'priceLow' }" type="button" @click="sortBy = 'priceLow'">
-            Price (lowest first) <span class="sw-check">{{ sortBy === 'priceLow' ? '✓' : '' }}</span>
+          <button
+            class="sw-radio"
+            :class="{ 'is-active': sortBy === 'priceLow' }"
+            type="button"
+            @click="sortBy = 'priceLow'"
+          >
+            Price (lowest first)
+            <span class="sw-check">{{ sortBy === 'priceLow' ? '✓' : '' }}</span>
           </button>
-          <button class="sw-radio" :class="{ 'is-active': sortBy === 'priceHigh' }" type="button" @click="sortBy = 'priceHigh'">
-            Price (highest first) <span class="sw-check">{{ sortBy === 'priceHigh' ? '✓' : '' }}</span>
+          <button
+            class="sw-radio"
+            :class="{ 'is-active': sortBy === 'priceHigh' }"
+            type="button"
+            @click="sortBy = 'priceHigh'"
+          >
+            Price (highest first)
+            <span class="sw-check">{{ sortBy === 'priceHigh' ? '✓' : '' }}</span>
           </button>
         </div>
       </div>
@@ -254,189 +305,201 @@
         <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="closeDrawer">
           Close
         </button>
-        <button class="sw-footBtn" type="button" @click="applySort">
-          Apply
-        </button>
+        <button class="sw-footBtn" type="button" @click="applySort">Apply</button>
       </div>
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { http } from '../../services/http'
+  import { computed, onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { http } from '../../services/http'
 
-type Product = {
-  id: number
-  name: string
-  price: number
-  imageUrl?: string
-  badge?: string
-  subtitle?: string
-  category?: string
-  color?: string
-  material?: string
-}
-
-const router = useRouter()
-
-const loading = ref(false)
-const error = ref('')
-const products = ref<Product[]>([])
-
-const heroImageUrl = ref(
-  'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70'
-)
-
-const drawerOpen = ref(false)
-const drawerMode = ref<'filter' | 'sort'>('filter')
-
-const currentPage = ref(1)
-const pageSize = ref(20)
-
-const sortBy = ref<'relevance' | 'new' | 'priceLow' | 'priceHigh'>('relevance')
-
-/* Filter states */
-const availableOnline = ref(false)
-const shopBy = ref({ sale: false, new: false, onlineExclusive: false })
-const selectedColors = ref<string[]>([])
-const selectedMaterials = ref<string[]>([])
-const priceMin = ref<number | null>(null)
-const priceMax = ref<number | null>(null)
-const reduction = ref('')
-
-const acc = ref({
-  shopBy: true,
-  color: false,
-  material: false,
-  price: false,
-  reduction: false,
-})
-
-const colors = [
-  { name: 'White', hex: '#f2f2f2' },
-  { name: 'Blue', hex: '#2d5bff' },
-  { name: 'Pink', hex: '#ff3ea5' },
-  { name: 'Green', hex: '#1fa44a' },
-  { name: 'Black', hex: '#111111' },
-  { name: 'Purple', hex: '#7b5cff' },
-]
-
-const materials = ['Crystal pearl', 'Gold-tone finish', 'Mixed metal finish', 'Rhodium plated', 'Rose gold-tone finish', 'Cubic Zirconia']
-
-function toggleColor(name: string) {
-  if (selectedColors.value.includes(name)) {
-    selectedColors.value = selectedColors.value.filter(x => x !== name)
-  } else {
-    selectedColors.value.push(name)
+  type Product = {
+    id: number
+    name: string
+    price: number
+    imageUrl?: string
+    badge?: string
+    subtitle?: string
+    category?: string
+    color?: string
+    material?: string
   }
-}
 
-function openFilter() {
-  drawerMode.value = 'filter'
-  drawerOpen.value = true
-}
-function openSort() {
-  drawerMode.value = 'sort'
-  drawerOpen.value = true
-}
-function closeDrawer() {
-  drawerOpen.value = false
-}
+  const router = useRouter()
 
-function resetFilters() {
-  availableOnline.value = false
-  shopBy.value = { sale: false, new: false, onlineExclusive: false }
-  selectedColors.value = []
-  selectedMaterials.value = []
-  priceMin.value = null
-  priceMax.value = null
-  reduction.value = ''
-  currentPage.value = 1
-}
+  const loading = ref(false)
+  const error = ref('')
+  const products = ref<Product[]>([])
 
-function applyFilters() {
-  currentPage.value = 1
-  closeDrawer()
-}
+  const heroImageUrl = ref(
+    'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70'
+  )
 
-function applySort() {
-  currentPage.value = 1
-  closeDrawer()
-}
+  const drawerOpen = ref(false)
+  const drawerMode = ref<'filter' | 'sort'>('filter')
 
-const filteredProducts = computed(() => {
-  let list = [...products.value]
+  const currentPage = ref(1)
+  const pageSize = ref(20)
 
-  // example filters (safe defaults)
-  if (shopBy.value.sale) list = list.filter(p => p.badge === 'Sale')
-  if (shopBy.value.new) list = list.filter(p => p.badge === 'New')
-  if (selectedColors.value.length) list = list.filter(p => p.color && selectedColors.value.includes(p.color))
-  if (selectedMaterials.value.length) list = list.filter(p => p.material && selectedMaterials.value.includes(p.material))
-  if (priceMin.value != null) list = list.filter(p => p.price >= priceMin.value!)
-  if (priceMax.value != null) list = list.filter(p => p.price <= priceMax.value!)
+  const sortBy = ref<'relevance' | 'new' | 'priceLow' | 'priceHigh'>('relevance')
 
-  // sort
-  if (sortBy.value === 'priceLow') list.sort((a, b) => a.price - b.price)
-  if (sortBy.value === 'priceHigh') list.sort((a, b) => b.price - a.price)
+  /* Filter states */
+  const availableOnline = ref(false)
+  const shopBy = ref({ sale: false, new: false, onlineExclusive: false })
+  const selectedColors = ref<string[]>([])
+  const selectedMaterials = ref<string[]>([])
+  const priceMin = ref<number | null>(null)
+  const priceMax = ref<number | null>(null)
+  const reduction = ref('')
 
-  return list
-})
+  const acc = ref({
+    shopBy: true,
+    color: false,
+    material: false,
+    price: false,
+    reduction: false,
+  })
 
-const totalPages = computed(() => Math.ceil(filteredProducts.value.length / pageSize.value))
+  const colors = [
+    { name: 'White', hex: '#f2f2f2' },
+    { name: 'Blue', hex: '#2d5bff' },
+    { name: 'Pink', hex: '#ff3ea5' },
+    { name: 'Green', hex: '#1fa44a' },
+    { name: 'Black', hex: '#111111' },
+    { name: 'Purple', hex: '#7b5cff' },
+  ]
 
-const pagedProducts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return filteredProducts.value.slice(start, start + pageSize.value)
-})
+  const materials = [
+    'Crystal pearl',
+    'Gold-tone finish',
+    'Mixed metal finish',
+    'Rhodium plated',
+    'Rose gold-tone finish',
+    'Cubic Zirconia',
+  ]
 
-function formatPrice(v: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'THB', maximumFractionDigits: 0 }).format(v)
-}
-
-function openDetail(p: Product) {
-  router.push({ name: 'product-detail', params: { id: p.id } })
-}
-
-function toggleWish(_p: Product) {
-  // optional
-}
-
-async function loadProducts() {
-  try {
-    loading.value = true
-    error.value = ''
-    const res = await http.get('/products')
-    const data = Array.isArray(res.data) ? res.data : []
-
-    // ✅ If backend returns less than 20, we duplicate to make 20 cards for UI testing
-    const many: Product[] = []
-    for (let i = 0; i < 20; i++) {
-      const base = data[i % Math.max(1, data.length)] ?? {
-        id: i + 1,
-        name: `Product ${i + 1}`,
-        price: 1500 + i * 99,
-        imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=60',
-      }
-      many.push({
-        ...base,
-        id: base.id ?? i + 1,
-        color: base.color ?? colors[i % colors.length].name,
-        material: base.material ?? materials[i % materials.length],
-        subtitle: base.subtitle ?? 'Elegant jewelry piece for everyday wear.',
-        badge: base.badge ?? (i % 6 === 0 ? 'Sale' : i % 5 === 0 ? 'New' : ''),
-      })
+  function toggleColor(name: string) {
+    if (selectedColors.value.includes(name)) {
+      selectedColors.value = selectedColors.value.filter((x) => x !== name)
+    } else {
+      selectedColors.value.push(name)
     }
-    products.value = many
-  } catch (e: any) {
-    error.value = e?.message ?? 'Failed to load products'
-  } finally {
-    loading.value = false
   }
-}
 
-onMounted(loadProducts)
+  function openFilter() {
+    drawerMode.value = 'filter'
+    drawerOpen.value = true
+  }
+  function openSort() {
+    drawerMode.value = 'sort'
+    drawerOpen.value = true
+  }
+  function closeDrawer() {
+    drawerOpen.value = false
+  }
+
+  function resetFilters() {
+    availableOnline.value = false
+    shopBy.value = { sale: false, new: false, onlineExclusive: false }
+    selectedColors.value = []
+    selectedMaterials.value = []
+    priceMin.value = null
+    priceMax.value = null
+    reduction.value = ''
+    currentPage.value = 1
+  }
+
+  function applyFilters() {
+    currentPage.value = 1
+    closeDrawer()
+  }
+
+  function applySort() {
+    currentPage.value = 1
+    closeDrawer()
+  }
+
+  const filteredProducts = computed(() => {
+    let list = [...products.value]
+
+    // example filters (safe defaults)
+    if (shopBy.value.sale) list = list.filter((p) => p.badge === 'Sale')
+    if (shopBy.value.new) list = list.filter((p) => p.badge === 'New')
+    if (selectedColors.value.length)
+      list = list.filter((p) => p.color && selectedColors.value.includes(p.color))
+    if (selectedMaterials.value.length)
+      list = list.filter((p) => p.material && selectedMaterials.value.includes(p.material))
+    if (priceMin.value != null) list = list.filter((p) => p.price >= priceMin.value!)
+    if (priceMax.value != null) list = list.filter((p) => p.price <= priceMax.value!)
+
+    // sort
+    if (sortBy.value === 'priceLow') list.sort((a, b) => a.price - b.price)
+    if (sortBy.value === 'priceHigh') list.sort((a, b) => b.price - a.price)
+
+    return list
+  })
+
+  const totalPages = computed(() => Math.ceil(filteredProducts.value.length / pageSize.value))
+
+  const pagedProducts = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    return filteredProducts.value.slice(start, start + pageSize.value)
+  })
+
+  function formatPrice(v: number) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'THB',
+      maximumFractionDigits: 0,
+    }).format(v)
+  }
+
+  function openDetail(p: Product) {
+    router.push({ name: 'product-detail', params: { id: p.id } })
+  }
+
+  function toggleWish(_p: Product) {
+    // optional
+  }
+
+  async function loadProducts() {
+    try {
+      loading.value = true
+      error.value = ''
+      const res = await http.get('/products')
+      const data = Array.isArray(res.data) ? res.data : []
+
+      // ✅ If backend returns less than 20, we duplicate to make 20 cards for UI testing
+      const many: Product[] = []
+      for (let i = 0; i < 20; i++) {
+        const base = data[i % Math.max(1, data.length)] ?? {
+          id: i + 1,
+          name: `Product ${i + 1}`,
+          price: 1500 + i * 99,
+          imageUrl:
+            'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=60',
+        }
+        many.push({
+          ...base,
+          id: base.id ?? i + 1,
+          color: base.color ?? colors[i % colors.length].name,
+          material: base.material ?? materials[i % materials.length],
+          subtitle: base.subtitle ?? 'Elegant jewelry piece for everyday wear.',
+          badge: base.badge ?? (i % 6 === 0 ? 'Sale' : i % 5 === 0 ? 'New' : ''),
+        })
+      }
+      products.value = many
+    } catch (e: any) {
+      error.value = e?.message ?? 'Failed to load products'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  onMounted(loadProducts)
 </script>
 
 <!-- ✅ IMPORTANT: you said no style inside .vue, so keep empty -->

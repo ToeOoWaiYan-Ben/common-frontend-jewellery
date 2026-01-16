@@ -1,9 +1,9 @@
 <template>
   <aside class="side-nav">
     <div class="side-nav__brand">
-      <div class="side-nav__brand-logo">MA</div>
+      <div class="side-nav__brand-logo"></div>
       <div class="side-nav__brand-text">
-        <p class="side-nav__brand-title">My Admin</p>
+        <p class="side-nav__brand-title">{{ auth.userName }}</p>
         <p class="side-nav__brand-subtitle">Dashboard</p>
       </div>
     </div>
@@ -71,70 +71,78 @@
   </aside>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { ref, computed } from 'vue'
+  import { useRoute } from 'vue-router'
+  import { useAuthStore } from '@/stores/useAuthStore'
 
+  const year = new Date().getFullYear()
+  const auth = useAuthStore()
+
+  const userName = computed(() => auth.userName)
+</script>
 <style scoped>
-.side-nav {
-  width: 260px;
-  min-height: 100vh;
-  background: #f6f8ff;
-  border-right: 1px solid #e7eaf5;
-}
+  .side-nav {
+    width: 260px;
+    min-height: 100vh;
+    background: #f6f8ff;
+    border-right: 1px solid #e7eaf5;
+  }
 
-.side-nav__brand {
-  display: flex;
-  gap: 12px;
-  padding: 18px 16px;
-  align-items: center;
-  border-bottom: 1px solid #e7eaf5;
-  background: #fff;
-}
+  .side-nav__brand {
+    display: flex;
+    gap: 12px;
+    padding: 18px 16px;
+    align-items: center;
+    border-bottom: 1px solid #e7eaf5;
+    background: #fff;
+  }
 
-.side-nav__brand-logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: #5a67d8;
-  color: #fff;
-  font-weight: 700;
-}
+  .side-nav__brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #5a67d8;
+    color: #fff;
+    font-weight: 700;
+  }
 
-.side-nav__brand-title {
-  font-weight: 700;
-  margin: 0;
-}
-.side-nav__brand-subtitle {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: #6b7280;
-}
+  .side-nav__brand-title {
+    font-weight: 700;
+    margin: 0;
+  }
+  .side-nav__brand-subtitle {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #6b7280;
+  }
 
-.side-nav__menu {
-  padding: 12px 10px;
-}
-.side-nav__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
+  .side-nav__menu {
+    padding: 12px 10px;
+  }
+  .side-nav__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
 
-.side-nav__link {
-  display: block;
-  padding: 12px 12px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: #1f2937;
-  font-size: 14px;
-}
-.side-nav__link:hover {
-  background: #eef2ff;
-}
-.side-nav__link--active {
-  background: #8b90c9;
-  color: #fff;
-}
+  .side-nav__link {
+    display: block;
+    padding: 12px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1f2937;
+    font-size: 14px;
+  }
+  .side-nav__link:hover {
+    background: #eef2ff;
+  }
+  .side-nav__link--active {
+    background: #8b90c9;
+    color: #fff;
+  }
 </style>

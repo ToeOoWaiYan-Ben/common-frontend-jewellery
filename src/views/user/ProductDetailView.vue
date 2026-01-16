@@ -1,144 +1,144 @@
 <!-- src/views/user/ProductDetailView.vue -->
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import StoreHeader from '@/components/user/StoreHeader.vue' // ✅ FIXED
+  import { computed, ref, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import StoreHeader from '@/components/user/StoreHeader.vue' // ✅ FIXED
 
-type Product = {
-  id: number
-  name: string
-  price: number
-  badge?: 'New' | 'Sale'
-  subtitle?: string
-  imageUrl: string
-  gallery?: string[]
-  description: string
-  details: string[]
-}
+  type Product = {
+    id: number
+    name: string
+    price: number
+    badge?: 'New' | 'Sale'
+    subtitle?: string
+    imageUrl: string
+    gallery?: string[]
+    description: string
+    details: string[]
+  }
 
-const router = useRouter()
-const route = useRoute()
+  const router = useRouter()
+  const route = useRoute()
 
-const productId = computed(() => Number(route.params.id))
+  const productId = computed(() => Number(route.params.id))
 
-// ✅ Demo images (replace with API later)
-const img1 =
-  'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=60'
-const img2 =
-  'https://images.unsplash.com/photo-1601121141461-9d6644b2925b?auto=format&fit=crop&w=1200&q=60'
-const img3 =
-  'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=60'
-const img4 =
-  'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=60'
+  // ✅ Demo images (replace with API later)
+  const img1 =
+    'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=60'
+  const img2 =
+    'https://images.unsplash.com/photo-1601121141461-9d6644b2925b?auto=format&fit=crop&w=1200&q=60'
+  const img3 =
+    'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=60'
+  const img4 =
+    'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=60'
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: 'Idyllia motif ring',
-    subtitle: 'Mixed cuts, Heart, Pink, Mixed metal finish',
-    price: 820,
-    badge: 'New',
-    imageUrl: img1,
-    gallery: [img1, img2, img3],
-    description:
-      'A refined everyday ring designed to shine in both casual and formal looks. The crystal setting catches light beautifully, giving a clean and premium finish that pairs easily with other pieces.',
-    details: [
-      'Material: Mixed metal finish',
-      'Color: Pink / Silver tone',
-      'Stone cut: Mixed cuts',
-      'Style: Motif ring',
-      'Care: Avoid water, perfume, and harsh chemicals',
-    ],
-  },
-  {
-    id: 2,
-    name: 'Hyperbola ring',
-    subtitle: 'Round cut, White, Rhodium plated',
-    price: 650,
-    badge: 'Sale',
-    imageUrl: img2,
-    gallery: [img2, img4, img3],
-    description:
-      'A sleek minimal ring with a modern sparkle. Its clean silhouette makes it perfect for stacking or wearing alone as a simple statement.',
-    details: [
-      'Material: Rhodium plated',
-      'Color: White',
-      'Stone cut: Round cut',
-      'Style: Band ring',
-      'Care: Store in a soft pouch after use',
-    ],
-  },
-  {
-    id: 3,
-    name: 'Stilla cocktail ring',
-    subtitle: 'Round cut, Pavé, White, Rhodium plated',
-    price: 490,
-    badge: 'Sale',
-    imageUrl: img3,
-    gallery: [img3, img2, img1],
-    description:
-      'A cocktail-style piece with pavé shine that looks premium on photos and in real life. Great for events, parties, and special occasions.',
-    details: [
-      'Material: Rhodium plated',
-      'Color: White',
-      'Stone cut: Round cut / Pavé',
-      'Style: Cocktail ring',
-      'Care: Wipe with dry soft cloth',
-    ],
-  },
-  {
-    id: 4,
-    name: 'Matrix ring',
-    subtitle: 'Baguette cut, Blue, Rhodium plated',
-    price: 390,
-    badge: 'Sale',
-    imageUrl: img4,
-    gallery: [img4, img3, img2],
-    description:
-      'A baguette-cut ring that delivers a crisp, modern sparkle. The blue tone adds a luxury accent while keeping the design clean.',
-    details: [
-      'Material: Rhodium plated',
-      'Color: Blue',
-      'Stone cut: Baguette cut',
-      'Style: Statement band',
-      'Care: Keep away from heat & humidity',
-    ],
-  },
-]
+  const products: Product[] = [
+    {
+      id: 1,
+      name: 'Idyllia motif ring',
+      subtitle: 'Mixed cuts, Heart, Pink, Mixed metal finish',
+      price: 820,
+      badge: 'New',
+      imageUrl: img1,
+      gallery: [img1, img2, img3],
+      description:
+        'A refined everyday ring designed to shine in both casual and formal looks. The crystal setting catches light beautifully, giving a clean and premium finish that pairs easily with other pieces.',
+      details: [
+        'Material: Mixed metal finish',
+        'Color: Pink / Silver tone',
+        'Stone cut: Mixed cuts',
+        'Style: Motif ring',
+        'Care: Avoid water, perfume, and harsh chemicals',
+      ],
+    },
+    {
+      id: 2,
+      name: 'Hyperbola ring',
+      subtitle: 'Round cut, White, Rhodium plated',
+      price: 650,
+      badge: 'Sale',
+      imageUrl: img2,
+      gallery: [img2, img4, img3],
+      description:
+        'A sleek minimal ring with a modern sparkle. Its clean silhouette makes it perfect for stacking or wearing alone as a simple statement.',
+      details: [
+        'Material: Rhodium plated',
+        'Color: White',
+        'Stone cut: Round cut',
+        'Style: Band ring',
+        'Care: Store in a soft pouch after use',
+      ],
+    },
+    {
+      id: 3,
+      name: 'Stilla cocktail ring',
+      subtitle: 'Round cut, Pavé, White, Rhodium plated',
+      price: 490,
+      badge: 'Sale',
+      imageUrl: img3,
+      gallery: [img3, img2, img1],
+      description:
+        'A cocktail-style piece with pavé shine that looks premium on photos and in real life. Great for events, parties, and special occasions.',
+      details: [
+        'Material: Rhodium plated',
+        'Color: White',
+        'Stone cut: Round cut / Pavé',
+        'Style: Cocktail ring',
+        'Care: Wipe with dry soft cloth',
+      ],
+    },
+    {
+      id: 4,
+      name: 'Matrix ring',
+      subtitle: 'Baguette cut, Blue, Rhodium plated',
+      price: 390,
+      badge: 'Sale',
+      imageUrl: img4,
+      gallery: [img4, img3, img2],
+      description:
+        'A baguette-cut ring that delivers a crisp, modern sparkle. The blue tone adds a luxury accent while keeping the design clean.',
+      details: [
+        'Material: Rhodium plated',
+        'Color: Blue',
+        'Stone cut: Baguette cut',
+        'Style: Statement band',
+        'Care: Keep away from heat & humidity',
+      ],
+    },
+  ]
 
-const product = computed(() => products.find((p) => p.id === productId.value))
+  const product = computed(() => products.find((p) => p.id === productId.value))
 
-const activeImage = ref<string>('')
-const tab = ref<'desc' | 'details'>('desc')
+  const activeImage = ref<string>('')
+  const tab = ref<'desc' | 'details'>('desc')
 
-watch(
-  product,
-  (p) => {
-    activeImage.value = p?.imageUrl ?? ''
-    tab.value = 'desc'
-  },
-  { immediate: true }
-)
+  watch(
+    product,
+    (p) => {
+      activeImage.value = p?.imageUrl ?? ''
+      tab.value = 'desc'
+    },
+    { immediate: true }
+  )
 
-function formatPrice(v: number) {
-  return `฿${v.toLocaleString('en-US')}`
-}
+  function formatPrice(v: number) {
+    return `฿${v.toLocaleString('en-US')}`
+  }
 
-function backToCatalog() {
-  router.push('/user/catalog')
-}
+  function backToCatalog() {
+    router.push('/user/catalog')
+  }
 
-function selectImage(url: string) {
-  activeImage.value = url
-}
+  function selectImage(url: string) {
+    activeImage.value = url
+  }
 
-function addToCart() {
-  alert('Added to cart ✅')
-}
+  function addToCart() {
+    alert('Added to cart ✅')
+  }
 
-function addToWishlist() {
-  alert('Added to wishlist ♡')
-}
+  function addToWishlist() {
+    alert('Added to wishlist ♡')
+  }
 </script>
 
 <template>
@@ -165,7 +165,7 @@ function addToWishlist() {
         <div class="pd-gallery">
           <div class="pd-thumbs">
             <button
-              v-for="(g, idx) in (product.gallery?.length ? product.gallery : [product.imageUrl])"
+              v-for="(g, idx) in product.gallery?.length ? product.gallery : [product.imageUrl]"
               :key="idx"
               class="pd-thumb"
               :class="{ active: activeImage === g }"
@@ -203,12 +203,19 @@ function addToWishlist() {
 
           <div class="pd-actions">
             <button class="pd-btn" type="button" @click="addToCart">Add to cart</button>
-            <button class="pd-btn ghost" type="button" @click="backToCatalog">Back to catalog</button>
+            <button class="pd-btn ghost" type="button" @click="backToCatalog">
+              Back to catalog
+            </button>
           </div>
 
           <!-- tabs -->
           <div class="pd-tabs">
-            <button class="pd-tab" :class="{ active: tab === 'desc' }" type="button" @click="tab = 'desc'">
+            <button
+              class="pd-tab"
+              :class="{ active: tab === 'desc' }"
+              type="button"
+              @click="tab = 'desc'"
+            >
               Description
             </button>
             <button
