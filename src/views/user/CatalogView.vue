@@ -1,6 +1,5 @@
-<!-- src/views/user/CatalogView.vue -->
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StoreHeader from '@/components/user/StoreHeader.vue'
 
@@ -8,16 +7,16 @@ type Product = {
   id: number
   name: string
   price: number
-  imageUrl: string
   badge?: 'New' | 'Sale'
-  category?: string
   subtitle?: string
+  imageUrl: string
+  category?: string
 }
 
 const router = useRouter()
 const route = useRoute()
 
-/* ---------- Demo data (replace with API later) ---------- */
+/* ---------------- Images ---------------- */
 const img1 =
   'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=60'
 const img2 =
@@ -27,148 +26,107 @@ const img3 =
 const img4 =
   'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=60'
 const img5 =
-  'https://images.unsplash.com/photo-1600721391689-2564bb8055de?auto=format&fit=crop&w=1200&q=60'
+  'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=1200&q=60'
 const img6 =
-  'https://images.unsplash.com/photo-1543295204-2ae345412549?auto=format&fit=crop&w=1200&q=60'
+  'https://images.unsplash.com/photo-1520975958225-7e4efb3a9e77?auto=format&fit=crop&w=1200&q=60'
+const img7 =
+  'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1200&q=60'
+const img8 =
+  'https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=1200&q=60'
+const img9 =
+  'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=60'
+const img10 =
+  'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=60'
 
-const allProducts = ref<Product[]>([
-  {
-    id: 1,
-    name: 'Idyllia motif ring',
-    subtitle: 'Mixed cuts, Heart, Pink',
-    price: 820,
-    badge: 'New',
-    category: 'Rings',
-    imageUrl: img1,
-  },
-  {
-    id: 2,
-    name: 'Hyperbola ring',
-    subtitle: 'Round cut, White',
-    price: 650,
-    badge: 'Sale',
-    category: 'Rings',
-    imageUrl: img2,
-  },
-  {
-    id: 3,
-    name: 'Stilla cocktail ring',
-    subtitle: 'Round cut, Pavé',
-    price: 490,
-    badge: 'Sale',
-    category: 'Rings',
-    imageUrl: img3,
-  },
-  {
-    id: 4,
-    name: 'Matrix ring',
-    subtitle: 'Baguette cut, Blue',
-    price: 390,
-    badge: 'Sale',
-    category: 'Rings',
-    imageUrl: img4,
-  },
-  {
-    id: 5,
-    name: 'Constella necklace',
-    subtitle: 'Crystal, Silver tone',
-    price: 1290,
-    badge: 'New',
-    category: 'Necklaces',
-    imageUrl: img5,
-  },
-  {
-    id: 6,
-    name: 'Sparkling earrings',
-    subtitle: 'Stud earrings, White',
-    price: 560,
-    category: 'Earrings',
-    imageUrl: img6,
-  },
+/* ---------------- Demo products (20) ---------------- */
+const products = ref<Product[]>([
+  { id: 1, name: 'Idyllia motif ring', subtitle: 'Mixed cuts, Heart, Pink, Mixed metal finish', price: 820, badge: 'New', imageUrl: img1, category: 'Rings' },
+  { id: 2, name: 'Hyperbola ring', subtitle: 'Round cut, White, Rhodium plated', price: 650, badge: 'Sale', imageUrl: img2, category: 'Rings' },
+  { id: 3, name: 'Stilla cocktail ring', subtitle: 'Round cut, Pavé, White, Rhodium plated', price: 490, badge: 'Sale', imageUrl: img3, category: 'Rings' },
+  { id: 4, name: 'Matrix ring', subtitle: 'Baguette cut, Blue, Rhodium plated', price: 390, badge: 'Sale', imageUrl: img4, category: 'Rings' },
+
+  { id: 5, name: 'Pearl drop earrings', subtitle: 'Crystal pearl, White, Rhodium plated', price: 520, badge: 'New', imageUrl: img5, category: 'Earrings' },
+  { id: 6, name: 'Classic necklace', subtitle: 'Crystal, Silver tone, Minimal', price: 710, imageUrl: img6, category: 'Necklaces' },
+  { id: 7, name: 'Halo pendant', subtitle: 'Round cut, White, Silver tone', price: 590, badge: 'New', imageUrl: img7, category: 'Pendants' },
+  { id: 8, name: 'Elegant hoop earrings', subtitle: 'Hoop earrings, Crystal, Silver tone', price: 460, imageUrl: img8, category: 'Earrings' },
+
+  { id: 9, name: 'Stackable ring set', subtitle: '3-piece set, Mixed cuts, Silver tone', price: 880, badge: 'Sale', imageUrl: img9, category: 'Rings' },
+  { id: 10, name: 'Choker necklace', subtitle: 'Crystal line, White, Rhodium plated', price: 990, badge: 'New', imageUrl: img10, category: 'Chokers' },
+
+  { id: 11, name: 'Stud earrings', subtitle: 'Round cut, White, Minimal', price: 320, imageUrl: img5, category: 'Stud earrings' },
+  { id: 12, name: 'Statement necklace', subtitle: 'Mixed stones, Silver tone finish', price: 1450, badge: 'Sale', imageUrl: img6, category: 'Necklaces' },
+  { id: 13, name: 'Heart pendant', subtitle: 'Heart cut, Pink, Silver tone', price: 610, imageUrl: img7, category: 'Pendants' },
+  { id: 14, name: 'Mini hoop earrings', subtitle: 'Small hoops, White crystal', price: 410, imageUrl: img8, category: 'Hoop earrings' },
+
+  { id: 15, name: 'Baguette ring', subtitle: 'Baguette cut, White, Rhodium plated', price: 530, badge: 'New', imageUrl: img4, category: 'Rings' },
+  { id: 16, name: 'Tennis bracelet', subtitle: 'Line bracelet, White, Silver tone', price: 1250, imageUrl: img9, category: 'Bracelets' },
+  { id: 17, name: 'Pavé ring', subtitle: 'Pavé setting, White, Silver tone', price: 570, imageUrl: img3, category: 'Rings' },
+  { id: 18, name: 'Crystal pendant', subtitle: 'Single stone, White, Minimal', price: 450, badge: 'Sale', imageUrl: img7, category: 'Pendants' },
+
+  { id: 19, name: 'Long drop earrings', subtitle: 'Elegant drop, White crystal', price: 680, imageUrl: img5, category: 'Earrings' },
+  { id: 20, name: 'Layered necklace', subtitle: '2-layer chain, Silver tone', price: 780, imageUrl: img6, category: 'Necklaces' },
 ])
 
-/* ---------- UI state ---------- */
-const loading = ref(false)
-const error = ref('')
-
-const sortBy = ref<'relevance' | 'new' | 'priceLow' | 'priceHigh'>('relevance')
+/* ---------------- UI State ---------------- */
+const selectedCategory = ref<string>((route.query.category as string) || 'All')
+const availableOnline = ref(false)
 const priceMin = ref<number | null>(null)
 const priceMax = ref<number | null>(null)
-const selectedCategory = ref<string>('All')
+const sortBy = ref<'relevance' | 'new' | 'priceLow' | 'priceHigh'>('relevance')
 
-/* ---------- Pagination ---------- */
-const pageSize = ref(9)
+const showSort = ref(false)
+const showFilter = ref(false)
+
+/* ✅ Show 20 results */
+const pageSize = ref(10)
 const currentPage = ref(1)
-
-/* ---------- Categories ---------- */
-const categories = computed(() => {
-  const set = new Set(allProducts.value.map((p) => p.category ?? 'Other'))
-  return ['All', ...Array.from(set)]
-})
-
-/* ---------- Query category from header mega menu ---------- */
-function applyCategoryFromQuery() {
-  const q = route.query.category
-  if (typeof q === 'string' && q.trim()) selectedCategory.value = q
-  else selectedCategory.value = 'All'
-}
-
-/* ✅ FIX: use function (no multiline @click expression) */
-function selectCategory(c: string) {
-  selectedCategory.value = c
-  currentPage.value = 1
-}
 
 watch(
   () => route.query.category,
-  () => {
-    applyCategoryFromQuery()
+  (v) => {
+    selectedCategory.value = (v as string) || 'All'
     currentPage.value = 1
   }
 )
 
-/* ---------- Filtering + sorting ---------- */
-const filteredProducts = computed(() => {
-  let items = [...allProducts.value]
-
-  // category
-  if (selectedCategory.value !== 'All') {
-    items = items.filter((p) => (p.category ?? 'Other') === selectedCategory.value)
-  }
-
-  // price range
-  if (priceMin.value != null && !Number.isNaN(priceMin.value)) {
-    items = items.filter((p) => p.price >= Number(priceMin.value))
-  }
-  if (priceMax.value != null && !Number.isNaN(priceMax.value)) {
-    items = items.filter((p) => p.price <= Number(priceMax.value))
-  }
-
-  // sort
-  if (sortBy.value === 'priceLow') items.sort((a, b) => a.price - b.price)
-  if (sortBy.value === 'priceHigh') items.sort((a, b) => b.price - a.price)
-
-  if (sortBy.value === 'new') {
-    items.sort((a, b) => Number(b.badge === 'New') - Number(a.badge === 'New'))
-  }
-
-  return items
+const categories = computed(() => {
+  const set = new Set<string>()
+  products.value.forEach((p) => p.category && set.add(p.category))
+  return ['All', ...Array.from(set)]
 })
 
-const totalFiltered = computed(() => filteredProducts.value.length)
-const totalPages = computed(() => Math.max(1, Math.ceil(totalFiltered.value / pageSize.value)))
+const filteredProducts = computed(() => {
+  let arr = [...products.value]
+
+  if (selectedCategory.value !== 'All') {
+    arr = arr.filter((p) => p.category === selectedCategory.value)
+  }
+
+  if (priceMin.value != null) arr = arr.filter((p) => p.price >= priceMin.value!)
+  if (priceMax.value != null) arr = arr.filter((p) => p.price <= priceMax.value!)
+
+  // UI demo toggle (no real data behind it yet)
+  if (availableOnline.value) arr = arr
+
+  if (sortBy.value === 'new') {
+    arr = arr.sort((a, b) => (b.badge === 'New' ? 1 : 0) - (a.badge === 'New' ? 1 : 0))
+  } else if (sortBy.value === 'priceLow') {
+    arr = arr.sort((a, b) => a.price - b.price)
+  } else if (sortBy.value === 'priceHigh') {
+    arr = arr.sort((a, b) => b.price - a.price)
+  }
+
+  return arr
+})
+
+const totalResults = computed(() => filteredProducts.value.length)
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredProducts.value.length / pageSize.value)))
 
 const pagedProducts = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return filteredProducts.value.slice(start, end)
+  return filteredProducts.value.slice(start, start + pageSize.value)
 })
 
-watch([selectedCategory, priceMin, priceMax, sortBy, pageSize], () => {
-  currentPage.value = 1
-})
-
-/* ---------- Actions ---------- */
 function formatPrice(v: number) {
   return `฿${v.toLocaleString('en-US')}`
 }
@@ -178,45 +136,44 @@ function openDetail(p: Product) {
 }
 
 function toggleWish(p: Product) {
-  alert(`Wishlist ♡: ${p.name}`)
+  alert(`Wishlist: ${p.name}`)
+}
+
+function resetAllFilters() {
+  availableOnline.value = false
+  selectedCategory.value = 'All'
+  priceMin.value = null
+  priceMax.value = null
+  currentPage.value = 1
 }
 
 function applyFilters() {
   currentPage.value = 1
+  showFilter.value = false
 }
 
-function resetFilters() {
-  selectedCategory.value = 'All'
-  priceMin.value = null
-  priceMax.value = null
-  sortBy.value = 'relevance'
+function selectCategory(c: string) {
+  selectedCategory.value = c
   currentPage.value = 1
-  router.replace({ path: '/user/catalog', query: {} })
 }
 
-function goPage(page: number) {
-  if (page < 1 || page > totalPages.value) return
-  currentPage.value = page
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+function chooseSort(v: typeof sortBy.value) {
+  sortBy.value = v
+  showSort.value = false
+  currentPage.value = 1
 }
 
-/* ---------- Fake load (for later API use) ---------- */
-async function loadProducts() {
-  try {
-    loading.value = true
-    error.value = ''
-    // later: const res = await http.get('/products')
-    // allProducts.value = res.data
-  } catch (e: any) {
-    error.value = e?.message ?? 'Failed to load products'
-  } finally {
-    loading.value = false
-  }
+function nextPage() {
+  if (currentPage.value < totalPages.value) currentPage.value++
 }
 
-onMounted(() => {
-  applyCategoryFromQuery()
-  loadProducts()
+function prevPage() {
+  if (currentPage.value > 1) currentPage.value--
+}
+
+const heroTitle = computed(() => {
+  if (selectedCategory.value === 'All') return 'Jewelry Collection'
+  return `${selectedCategory.value} Collection`
 })
 </script>
 
@@ -224,138 +181,178 @@ onMounted(() => {
   <section class="catalog">
     <StoreHeader />
 
-    <!-- hero -->
-    <div class="catalog-hero">
-      <div class="catalog-hero__overlay">
-        <p class="catalog-hero__kicker">MYIT THAR OO</p>
-        <h1 class="catalog-hero__title">Jewelry Collection</h1>
-        <p class="catalog-hero__subtitle">
-          Discover premium rings, necklaces, and earrings designed for everyday shine.
+    <!-- HERO (uses your CSS sw-hero / sw-hero__bg / sw-hero__content) -->
+    <section class="sw-hero">
+      <div class="sw-hero__bg"></div>
+
+      <div class="sw-hero__content">
+        <div class="sw-crumbs">
+          <span class="sw-crumb">Home</span>
+          <span class="sw-sep">/</span>
+          <span class="sw-crumb">Jewelry</span>
+          <span class="sw-sep">/</span>
+          <span class="sw-crumb sw-crumb--active">
+            {{ selectedCategory === 'All' ? 'Collection' : selectedCategory }}
+          </span>
+        </div>
+
+        <h1 class="sw-hero__title">{{ heroTitle }}</h1>
+
+        <p class="sw-hero__desc">
+          Discover premium rings, necklaces, and earrings designed for everyday shine and special moments.
         </p>
-
-        <button class="hero-btn" type="button" @click="resetFilters">Shop all</button>
       </div>
-    </div>
+    </section>
 
-    <div class="catalog-body">
-      <!-- left: filters -->
-      <aside class="filters">
-        <div class="filters__card">
-          <h3 class="filters__title">Filters</h3>
+    <!-- RESULTS FULL WIDTH -->
+    <section class="sw-resultsFull">
+      <div class="swbar">
+        <div class="swbar__count">{{ totalResults }} Results</div>
 
-          <div class="filters__row">
-            <div class="filters__label">Min</div>
-            <input v-model.number="priceMin" class="filters__input" type="number" placeholder="0" min="0" />
-          </div>
+        <div class="swbar__right">
+          <button class="swbtn" type="button" @click="showFilter = true">
+            <span class="swbtn__icon">⟂</span>
+            Filters
+          </button>
 
-          <div class="filters__row">
-            <div class="filters__label">Max</div>
-            <input v-model.number="priceMax" class="filters__input" type="number" placeholder="9999" min="0" />
-          </div>
+          <button class="swbtn" type="button" @click="showSort = true">
+            <span class="swbtn__icon">⇅</span>
+            Sort by
+          </button>
+        </div>
+      </div>
 
-          <button class="filters__btn" type="button" @click="applyFilters">Apply</button>
-          <button class="filters__btn filters__btn--muted" type="button" @click="resetFilters">
-            Reset
+      <!-- GRID -->
+      <main class="results">
+        <div class="grid sw-grid">
+          <article v-for="p in pagedProducts" :key="p.id" class="sw-card">
+            <button class="sw-heart" type="button" @click.stop="toggleWish(p)" aria-label="Wishlist">
+              ♡
+            </button>
+
+            <div class="sw-img" role="button" tabindex="0" @click="openDetail(p)">
+              <img :src="p.imageUrl" :alt="p.name" />
+            </div>
+
+            <div class="sw-info">
+              <div class="sw-smallLine">
+                <span v-if="p.badge" class="sw-badgeText" :class="p.badge === 'Sale' ? 'sale' : 'new'">
+                  {{ p.badge }}
+                </span>
+              </div>
+
+              <h3 class="sw-title" @click="openDetail(p)">{{ p.name }}</h3>
+
+              <p v-if="p.subtitle" class="sw-sub">
+                {{ p.subtitle }}
+              </p>
+
+              <div class="sw-price">{{ formatPrice(p.price) }}</div>
+            </div>
+          </article>
+        </div>
+
+        <!-- PAGINATION (only shows if more than 20 results) -->
+        <div class="pagination" v-if="totalPages > 1">
+          <button class="pagination-btn" type="button" :disabled="currentPage === 1" @click="prevPage">
+            ‹ Prev
+          </button>
+
+          <button class="pagination-btn pagination-btn--active" type="button">
+            Page {{ currentPage }} / {{ totalPages }}
+          </button>
+
+          <button class="pagination-btn" type="button" :disabled="currentPage === totalPages" @click="nextPage">
+            Next ›
+          </button>
+        </div>
+      </main>
+    </section>
+
+    <!-- SORT Drawer -->
+    <div v-if="showSort" class="sw-overlay" @click="showSort = false"></div>
+    <aside v-if="showSort" class="sw-drawer" role="dialog" aria-modal="true">
+      <div class="sw-drawer__head">
+        <div class="sw-drawer__title">Sort by</div>
+        <button class="sw-x" type="button" @click="showSort = false">✕</button>
+      </div>
+
+      <div class="sw-drawer__body">
+        <button class="sw-radio" type="button" @click="chooseSort('relevance')">
+          Relevance <span class="sw-check" v-if="sortBy === 'relevance'">✓</span>
+        </button>
+
+        <button class="sw-radio" type="button" @click="chooseSort('new')">
+          New In <span class="sw-check" v-if="sortBy === 'new'">✓</span>
+        </button>
+
+        <button class="sw-radio" type="button" @click="chooseSort('priceLow')">
+          Price (lowest first) <span class="sw-check" v-if="sortBy === 'priceLow'">✓</span>
+        </button>
+
+        <button class="sw-radio" type="button" @click="chooseSort('priceHigh')">
+          Price (highest first) <span class="sw-check" v-if="sortBy === 'priceHigh'">✓</span>
+        </button>
+      </div>
+
+      <div class="sw-drawer__foot">
+        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="showSort = false">Close</button>
+        <button class="sw-footBtn" type="button" @click="showSort = false">Apply</button>
+      </div>
+    </aside>
+
+    <!-- FILTER Drawer -->
+    <div v-if="showFilter" class="sw-overlay" @click="showFilter = false"></div>
+    <aside v-if="showFilter" class="sw-drawer" role="dialog" aria-modal="true">
+      <div class="sw-drawer__head">
+        <div class="sw-drawer__title">Filters</div>
+        <button class="sw-x" type="button" @click="showFilter = false">✕</button>
+      </div>
+
+      <div class="sw-drawer__body">
+        <div class="sw-row">
+          <div class="sw-row__label">Available online</div>
+          <button class="sw-toggle" :class="{ on: availableOnline }" type="button" @click="availableOnline = !availableOnline">
+            <span class="sw-toggle__dot"></span>
           </button>
         </div>
 
-        <div class="filters__card">
-          <h3 class="filters__title">Category</h3>
+        <div class="sw-sep2"></div>
 
-          <div class="filters__chips">
-            <button
-              v-for="c in categories"
-              :key="c"
-              class="chip"
-              :class="{ 'chip--active': selectedCategory === c }"
-              type="button"
-              @click="selectCategory(c)"
-            >
-              {{ c }}
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- right: results -->
-      <main class="results">
-        <div class="toolbar">
-          <div class="toolbar__left">
-            <button class="icon-btn" type="button" :disabled="currentPage === 1" @click="goPage(currentPage - 1)">
-              ‹
-            </button>
-
-            <button class="icon-btn" type="button" :disabled="currentPage === totalPages" @click="goPage(currentPage + 1)">
-              ›
-            </button>
-
-            <div class="toolbar__meta">
-              Showing <strong>{{ pagedProducts.length }}</strong> of <strong>{{ totalFiltered }}</strong>
-            </div>
-          </div>
-
-          <div class="toolbar__right">
-            <span class="toolbar__label">Sort</span>
-            <select v-model="sortBy" class="toolbar__select">
-              <option value="relevance">Relevance</option>
-              <option value="new">New</option>
-              <option value="priceLow">Price: Low → High</option>
-              <option value="priceHigh">Price: High → Low</option>
-            </select>
-          </div>
+        <div class="sw-secTitle">Category</div>
+        <div class="sw-chipWrap">
+          <button
+            v-for="c in categories"
+            :key="c"
+            class="sw-chip"
+            :class="{ active: selectedCategory === c }"
+            type="button"
+            @click="selectCategory(c)"
+          >
+            {{ c }}
+          </button>
         </div>
 
-        <div v-if="error" class="users-empty">{{ error }}</div>
-        <div v-else-if="loading" class="users-empty">Loading products…</div>
+        <div class="sw-sep2"></div>
 
-        <template v-else>
-          <div class="grid">
-            <article v-for="p in pagedProducts" :key="p.id" class="card">
-              <div class="card__img" role="button" tabindex="0" @click="openDetail(p)">
-                <img :src="p.imageUrl" :alt="p.name" />
-                <span v-if="p.badge" class="badge">{{ p.badge }}</span>
-              </div>
-
-              <div class="card__body">
-                <h3 class="card__name">{{ p.name }}</h3>
-                <p class="card__price">{{ formatPrice(p.price) }}</p>
-
-                <div class="card__meta">
-                  <span class="meta-pill">{{ p.category }}</span>
-                  <span v-if="p.subtitle" class="meta-pill meta-pill--muted">{{ p.subtitle }}</span>
-                </div>
-
-                <div class="card__actions">
-                  <button class="small-btn" type="button" @click="openDetail(p)">View</button>
-                  <button class="small-btn small-btn--ghost" type="button" @click="toggleWish(p)">♡</button>
-                </div>
-              </div>
-            </article>
+        <div class="sw-secTitle">Price Range</div>
+        <div class="sw-priceWrap">
+          <div class="sw-price__field">
+            <div class="sw-price__label">Min</div>
+            <input class="sw-price__input" type="number" v-model.number="priceMin" placeholder="0" />
           </div>
-
-          <div class="pagination" v-if="totalPages > 1">
-            <button class="pagination-btn" type="button" :disabled="currentPage === 1" @click="goPage(currentPage - 1)">
-              Prev
-            </button>
-
-            <button
-              v-for="page in totalPages"
-              :key="page"
-              class="pagination-btn"
-              :class="{ 'pagination-btn--active': page === currentPage }"
-              type="button"
-              @click="goPage(page)"
-            >
-              {{ page }}
-            </button>
-
-            <button class="pagination-btn" type="button" :disabled="currentPage === totalPages" @click="goPage(currentPage + 1)">
-              Next
-            </button>
+          <div class="sw-price__field">
+            <div class="sw-price__label">Max</div>
+            <input class="sw-price__input" type="number" v-model.number="priceMax" placeholder="9999" />
           </div>
-        </template>
-      </main>
-    </div>
+        </div>
+      </div>
+
+      <div class="sw-drawer__foot">
+        <button class="sw-footBtn sw-footBtn--ghost" type="button" @click="resetAllFilters">Reset all</button>
+        <button class="sw-footBtn" type="button" @click="applyFilters">Show {{ totalResults }} products</button>
+      </div>
+    </aside>
   </section>
 </template>
 
