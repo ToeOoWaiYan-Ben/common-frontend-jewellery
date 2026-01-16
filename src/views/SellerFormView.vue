@@ -1,185 +1,312 @@
 <template>
-  <section>
-    <div class="users-header">
-      <div>
-        <h2 class="page-title">Seller Form</h2>
-        <p class="users-meta">Register and manage sellers.</p>
-      </div>
-      <RouterLink to="/" class="users-search__back-link">← Back</RouterLink>
-    </div>
+  <TablePage
+    title="Sellers"
+    :total="totalSellers"
+    :filteredCount="filteredCount"
+    :items="paginatedSellers"
+    :pageSize="pageSize"
+    :currentPage="currentPage"
+    :isLoading="isLoading"
+    :errorMessage="errorMessage"
+    :showForm="showForm"
+    :primaryButtonLabel="showForm ? (isEditing ? 'Editing...' : 'Close Form') : 'Create New Seller'"
+    idKey="id"
+    :editingId="editingId"
+    @click-new="onClickNew"
+    @change-page="goToPage"
+  >
+    <!-- FORM -->
+    <template #form>
+      <form class="category-form" @submit.prevent="handleSubmitForm">
+        <h3 class="category-form__title">
+          {{ isEditing ? 'Edit Seller' : 'New Seller' }}
+        </h3>
 
-    <div class="card" style="margin-bottom: 14px">
-      <div v-if="error" class="users-empty users-empty--error" style="margin-bottom: 10px">
-        {{ error }}
-      </div>
+        <div v-if="formError" class="alert alert--error">
+          <span class="alert__icon">⚠</span>
+          <span>{{ formError }}</span>
+        </div>
 
-      <div class="category-form">
         <div class="category-form__row">
-          <label class="category-form__label">Name *</label>
+          <label class="category-form__label" for="name">Name *</label>
           <input
-            v-model.trim="form.name"
+            id="name"
+            v-model="formName"
             class="category-form__input"
+            type="text"
             placeholder="e.g. John Seller"
+            required
           />
         </div>
 
         <div class="category-form__row">
-          <label class="category-form__label">Phone</label>
+          <label class="category-form__label" for="phone">Phone</label>
           <input
-            v-model.trim="form.phone"
+            id="phone"
+            v-model="formPhone"
             class="category-form__input"
+            type="text"
             placeholder="e.g. 09xxxxxxx"
           />
         </div>
 
         <div class="category-form__row">
-          <label class="category-form__label">Email</label>
+          <label class="category-form__label" for="email">Email</label>
           <input
-            v-model.trim="form.email"
+            id="email"
+            v-model="formEmail"
             class="category-form__input"
+            type="email"
             placeholder="e.g. john@gmail.com"
           />
         </div>
 
         <div class="category-form__row">
-          <label class="category-form__label">Address</label>
+          <label class="category-form__label" for="address">Address</label>
           <input
-            v-model.trim="form.address"
+            id="address"
+            v-model="formAddress"
             class="category-form__input"
+            type="text"
             placeholder="e.g. Bangkok"
           />
         </div>
 
-        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px">
-          <button class="btn-secondary" type="button" @click="reset" :disabled="store.loading">
+        <div class="category-form__actions">
+          <button class="btn-secondary" type="button" @click="resetForm" :disabled="isSubmitting">
             Reset
           </button>
+
           <button
-            class="btn-primary"
+            v-if="isEditing"
+            class="btn-secondary"
             type="button"
-            @click="submit"
-            :disabled="store.loading || !form.name"
+            @click="closeEdit"
+            :disabled="isSubmitting"
           >
-            {{ store.loading ? 'Saving...' : editingId ? 'Update' : 'Create' }}
+            Close
+          </button>
+
+          <button class="btn-primary" type="submit" :disabled="isSubmitting || !formName.trim()">
+            {{
+              isSubmitting
+                ? isEditing
+                  ? 'Updating…'
+                  : 'Saving…'
+                : isEditing
+                  ? 'Update Seller'
+                  : 'Save Seller'
+            }}
           </button>
         </div>
-      </div>
-    </div>
+      </form>
+    </template>
 
-    <div class="card">
-      <div class="table-wrapper">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th style="width: 90px">ID</th>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Address</th>
-              <th style="width: 220px; text-align: center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="store.items.length === 0">
-              <td colspan="6">No data.</td>
-            </tr>
-            <tr
-              v-for="s in store.items"
-              :key="s.id"
-              :class="{ 'row--editing': s.id === editingId }"
-            >
-              <td>{{ s.id }}</td>
-              <td>{{ s.name }}</td>
-              <td>{{ s.phone ?? '-' }}</td>
-              <td>{{ s.email ?? '-' }}</td>
-              <td>{{ s.address ?? '-' }}</td>
-              <td style="text-align: center">
-                <button class="pagination-btn" @click="edit(s)">Edit</button>
-                <button
-                  class="pagination-btn"
-                  style="border-color: #fecdd3; background: #fff1f2; color: #9f1239"
-                  @click="del(s)"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- SEARCH -->
+    <template #search>
+      <div class="users-search">
+        <span class="users-search__icon">🔍</span>
+        <input
+          v-model="searchTerm"
+          class="users-search__input"
+          type="text"
+          placeholder="Search by name, phone, email, address…"
+        />
       </div>
-    </div>
-  </section>
+    </template>
+
+    <!-- COLUMNS -->
+    <template #columns>
+      <th style="width: 60px">#</th>
+      <th>Name</th>
+      <th>Phone</th>
+      <th>Email</th>
+      <th>Address</th>
+      <th style="width: 190px">Actions</th>
+    </template>
+
+    <!-- ROWS -->
+    <template #rows="{ item }">
+      <td>{{ item.id }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.phone ?? '-' }}</td>
+      <td>{{ item.email ?? '-' }}</td>
+      <td>{{ item.address ?? '-' }}</td>
+      <td>
+        <div style="display: flex; gap: 0.25rem">
+          <button class="btn-secondary" type="button" @click="onClickEdit(item)">Edit</button>
+          <button
+            class="btn-secondary btn-secondary--danger"
+            type="button"
+            @click="onClickDelete(item)"
+          >
+            Delete
+          </button>
+        </div>
+      </td>
+    </template>
+  </TablePage>
 </template>
 
 <script setup lang="ts">
-  import { onMounted, reactive, ref } from 'vue'
+  import { computed, onMounted, ref, watch } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import TablePage from '../components/TablePage.vue'
   import { useSellersStore } from '../stores/useSellersStore'
   import type { SellerDto } from '../dtos/SellerDto'
 
-  const store = useSellersStore()
-  const editingId = ref<number | null>(null)
-  const error = ref<string | null>(null)
+  const sellersStore = useSellersStore()
+  const { items: sellers, loading, error } = storeToRefs(sellersStore)
 
-  const form = reactive<Omit<SellerDto, 'id'>>({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
+  const searchTerm = ref('')
+
+  onMounted(() => {
+    sellersStore.loadAll()
   })
 
-  onMounted(async () => {
-    await store.loadAll()
+  const isLoading = computed(() => loading.value)
+  const errorMessage = computed(() => error.value)
+
+  // filter
+  const filteredSellers = computed(() => {
+    const term = searchTerm.value.trim().toLowerCase()
+    if (!term) return sellers.value
+
+    return sellers.value.filter((s) => {
+      return (
+        s.name.toLowerCase().includes(term) ||
+        (s.phone ?? '').toLowerCase().includes(term) ||
+        (s.email ?? '').toLowerCase().includes(term) ||
+        (s.address ?? '').toLowerCase().includes(term)
+      )
+    })
   })
 
-  function reset() {
-    editingId.value = null
-    error.value = null
-    form.name = ''
-    form.phone = ''
-    form.email = ''
-    form.address = ''
+  const totalSellers = computed(() => sellers.value.length)
+  const filteredCount = computed(() => filteredSellers.value.length)
+
+  // pagination
+  const pageSize = ref(20)
+  const currentPage = ref(1)
+
+  const totalPages = computed(() =>
+    filteredCount.value === 0 ? 1 : Math.max(1, Math.ceil(filteredCount.value / pageSize.value))
+  )
+
+  watch(filteredSellers, () => {
+    currentPage.value = 1
+  })
+
+  const paginatedSellers = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    return filteredSellers.value.slice(start, start + pageSize.value)
+  })
+
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages.value) return
+    currentPage.value = page
   }
 
-  async function submit() {
-    try {
-      error.value = null
-      const payload = {
-        name: form.name.trim(),
-        phone: form.phone?.trim() || null,
-        email: form.email?.trim() || null,
-        address: form.address?.trim() || null,
-      }
-      if (editingId.value) await store.update(editingId.value, payload)
-      else await store.create(payload)
+  // form states
+  const showForm = ref(false)
+  const isEditing = ref(false)
+  const editingId = ref<number | null>(null)
 
-      await store.loadAll()
-      reset()
+  const formName = ref('')
+  const formPhone = ref('')
+  const formEmail = ref('')
+  const formAddress = ref('')
+
+  const isSubmitting = ref(false)
+  const formError = ref<string | null>(null)
+
+  const resetForm = () => {
+    formName.value = ''
+    formPhone.value = ''
+    formEmail.value = ''
+    formAddress.value = ''
+    formError.value = null
+    isEditing.value = false
+    editingId.value = null
+  }
+
+  const onClickNew = () => {
+    if (showForm.value && !isEditing.value) {
+      resetForm()
+      showForm.value = false
+      return
+    }
+
+    resetForm()
+    showForm.value = true
+  }
+
+  const onClickEdit = (seller: SellerDto) => {
+    showForm.value = true
+    isEditing.value = true
+    editingId.value = seller.id
+
+    formName.value = seller.name
+    formPhone.value = seller.phone ?? ''
+    formEmail.value = seller.email ?? ''
+    formAddress.value = seller.address ?? ''
+
+    formError.value = null
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const closeEdit = () => {
+    resetForm()
+    showForm.value = false
+  }
+
+  const handleSubmitForm = async () => {
+    formError.value = null
+
+    if (!formName.value.trim()) {
+      formError.value = 'Name is required.'
+      return
+    }
+
+    const payload: Omit<SellerDto, 'id'> = {
+      name: formName.value.trim(),
+      phone: formPhone.value.trim() || null,
+      email: formEmail.value.trim() || null,
+      address: formAddress.value.trim() || null,
+    }
+
+    isSubmitting.value = true
+    try {
+      if (isEditing.value && editingId.value != null) {
+        await sellersStore.update(editingId.value, payload)
+      } else {
+        await sellersStore.create(payload)
+      }
+
+      await sellersStore.loadAll()
+      resetForm()
+      showForm.value = false
     } catch (e: any) {
-      error.value = e?.message ?? 'Save failed'
+      formError.value = e?.message ?? 'Save failed.'
+    } finally {
+      isSubmitting.value = false
     }
   }
 
-  function edit(s: SellerDto) {
-    editingId.value = s.id
-    form.name = s.name
-    form.phone = s.phone ?? ''
-    form.email = s.email ?? ''
-    form.address = s.address ?? ''
-  }
+  const onClickDelete = async (seller: SellerDto) => {
+    const ok = window.confirm(`Delete seller "${seller.name}"?`)
+    if (!ok) return
 
-  async function del(s: SellerDto) {
-    if (!confirm(`Delete seller "${s.name}"?`)) return
-    await store.remove(s.id)
-    await store.loadAll()
-    if (editingId.value === s.id) reset()
+    try {
+      await sellersStore.remove(seller.id)
+      await sellersStore.loadAll()
+
+      if (isEditing.value && editingId.value === seller.id) {
+        resetForm()
+        showForm.value = false
+      }
+    } catch (e: any) {
+      alert((e as any)?.message ?? 'Delete failed.')
+    }
   }
 </script>
-
-<style scoped src="@/styles/admin/admin-table.css"></style>
-<style scoped src="@/styles/admin/admin-form.css"></style>
-
-<style scoped>
-  .row--editing td {
-    background: #e6ffed;
-  }
-</style>

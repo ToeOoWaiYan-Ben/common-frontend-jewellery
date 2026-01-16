@@ -1,9 +1,9 @@
 <template>
   <aside class="side-nav">
     <div class="side-nav__brand">
-      <div class="side-nav__brand-logo">MA</div>
+      <div class="side-nav__brand-logo"></div>
       <div class="side-nav__brand-text">
-        <p class="side-nav__brand-title">My Admin</p>
+        <p class="side-nav__brand-title">{{ auth.userName }}</p>
         <p class="side-nav__brand-subtitle">Dashboard</p>
       </div>
     </div>
@@ -155,6 +155,12 @@
 <script setup lang="ts">
   import { ref, computed } from 'vue'
   import { useRoute } from 'vue-router'
+  import { useAuthStore } from '@/stores/useAuthStore'
+
+  const year = new Date().getFullYear()
+  const auth = useAuthStore()
+
+  const userName = computed(() => auth.userName)
 
   const route = useRoute()
 

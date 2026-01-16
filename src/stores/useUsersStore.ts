@@ -8,6 +8,29 @@ interface UsersState {
   error: string | null
 }
 
+type UserApi = {
+  id: number
+  name: string
+  email: string
+  nrc?: string | null
+  phone?: string | null
+  address?: string | null
+  role?: string | null
+}
+
+function mapToUserDto(x: UserApi): UserDto {
+  return {
+    id: x.id,
+    name: x.name,
+    email: x.email,
+    password: '', // never store real password in frontend state
+    nrc: x.nrc ?? '',
+    phone: x.phone ?? '',
+    address: x.address ?? '',
+    token: '',
+  }
+}
+
 export const useUsersStore = defineStore('users', {
   state: (): UsersState => ({
     items: [],
@@ -24,10 +47,84 @@ export const useUsersStore = defineStore('users', {
       this.loading = true
       this.error = null
       try {
-        // ✅ use http() for GET
-        this.items = await http<UserDto[]>('/customers')
+        const raw = await http<UserApi[]>('/users')
+        this.items = raw.map(mapToUserDto)
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading users.'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async createUser(payload: Omit<UserDto, 'id'>) {
+      this.loading = true
+      this.error = null
+      try {
+        const body = {
+          name: payload.name?.trim(),
+          email: payload.email?.trim(),
+          password: payload.password, // required on create
+          nrc: payload.nrc?.trim() || null,
+          phone: payload.phone?.trim() || null,
+          address: payload.address?.trim() || null,
+        }
+
+        const createdRaw = await http<UserApi>('/users', {
+          method: 'POST',
+          body: JSON.stringify(body),
+        })
+
+        const created = mapToUserDto(createdRaw)
+        this.items.push(created)
+        return created
+      } catch (e: any) {
+        this.error = e?.message ?? 'Something went wrong while creating user.'
+        throw e
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async updateUser(id: number, payload: Omit<UserDto, 'id'>) {
+      this.loading = true
+      this.error = null
+      try {
+        const body = {
+          name: payload.name?.trim(),
+          email: payload.email?.trim(),
+          password: payload.password || null, // optional
+          nrc: payload.nrc?.trim() || null,
+          phone: payload.phone?.trim() || null,
+          address: payload.address?.trim() || null,
+        }
+
+        const updatedRaw = await http<UserApi>(`/users/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        })
+
+        const updated = mapToUserDto(updatedRaw)
+
+        const idx = this.items.findIndex((u) => u.id === id)
+        if (idx !== -1) this.items[idx] = updated
+        else await this.loadUsers()
+      } catch (e: any) {
+        this.error = e?.message ?? 'Something went wrong while updating user.'
+        throw e
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async deleteUser(id: number) {
+      this.loading = true
+      this.error = null
+      try {
+        await http<void>(`/users/${id}`, { method: 'DELETE' })
+        this.items = this.items.filter((u) => u.id !== id)
+      } catch (e: any) {
+        this.error = e?.message ?? 'Something went wrong while deleting user.'
+        throw e
       } finally {
         this.loading = false
       }
