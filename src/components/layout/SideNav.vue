@@ -1,12 +1,5 @@
 <template>
   <aside class="side-nav">
-    <div class="side-nav__brand">
-      <div class="side-nav__brand-logo"></div>
-      <div class="side-nav__brand-text">
-        <p class="side-nav__brand-title">{{ auth.userName }}</p>
-        <p class="side-nav__brand-subtitle">Dashboard</p>
-      </div>
-    </div>
 
     <div class="side-nav__menu">
       <ul class="side-nav__list">

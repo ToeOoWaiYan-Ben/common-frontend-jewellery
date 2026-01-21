@@ -1,5 +1,6 @@
 <template>
   <header class="mh-header">
+    <!-- Top black bar -->
     <div class="mh-topbar">
       <div class="mh-topbar__left">
         <span class="mh-topbar__item">Stores</span>
@@ -17,46 +18,62 @@
       </div>
     </div>
 
+    <!-- Brand -->
     <div class="mh-brand">
       <div class="mh-brand__logo">MYIT THAR OO</div>
     </div>
 
+    <!-- Nav -->
     <nav class="mh-nav">
-      <!-- ✅ FIX: Home goes to catalog (you don't have /user/home route) -->
-      <button class="mh-nav__link" type="button" @click="go('/user/catalog')">Home</button>
-
+      <button class="mh-nav__link" type="button" @click="go('/user/home')">Home</button>
       <button class="mh-nav__link" type="button">SALE</button>
       <button class="mh-nav__link" type="button">New In</button>
 
-      <div class="mh-nav__dropdown" @mouseenter="open = true" @mouseleave="open = false">
-        <button class="mh-nav__link mh-nav__link--active" type="button" :aria-expanded="open">
+      <!-- ✅ Jewelry dropdown (fixed: click open + click outside close) -->
+      <div class="mh-nav__dropdown" ref="dropdownRef" @click.stop>
+        <button
+          class="mh-nav__link mh-nav__link--active"
+          type="button"
+          :aria-expanded="open"
+          @click.stop="open = !open"
+        >
           Jewelry
         </button>
 
-        <div v-if="open" class="mh-mega">
+        <div v-if="open" class="mh-mega" @click.stop>
           <div class="mh-mega__col">
             <div class="mh-mega__title">Necklaces and pendants</div>
-            <button class="mh-mega__item" @click="goCategory('Necklaces')">Necklaces</button>
-            <button class="mh-mega__item" @click="goCategory('Pendants')">Pendants</button>
-            <button class="mh-mega__item" @click="goCategory('Chokers')">Chokers</button>
+            <button class="mh-mega__item" type="button" @click="goCategory('Necklaces')">
+              Necklaces
+            </button>
+            <button class="mh-mega__item" type="button" @click="goCategory('Pendants')">
+              Pendants
+            </button>
+            <button class="mh-mega__item" type="button" @click="goCategory('Chokers')">
+              Chokers
+            </button>
           </div>
 
           <div class="mh-mega__col">
             <div class="mh-mega__title">Earrings</div>
-            <button class="mh-mega__item" @click="goCategory('Earrings')">Earrings</button>
-            <button class="mh-mega__item" @click="goCategory('Stud earrings')">
+            <button class="mh-mega__item" type="button" @click="goCategory('Earrings')">
+              Earrings
+            </button>
+            <button class="mh-mega__item" type="button" @click="goCategory('Stud earrings')">
               Stud earrings
             </button>
-            <button class="mh-mega__item" @click="goCategory('Hoop earrings')">
+            <button class="mh-mega__item" type="button" @click="goCategory('Hoop earrings')">
               Hoop earrings
             </button>
           </div>
 
           <div class="mh-mega__col">
             <div class="mh-mega__title">Rings</div>
-            <button class="mh-mega__item" @click="goCategory('Rings')">Rings</button>
-            <button class="mh-mega__item" @click="goCategory('Band rings')">Band rings</button>
-            <button class="mh-mega__item" @click="goCategory('Stackable rings')">
+            <button class="mh-mega__item" type="button" @click="goCategory('Rings')">Rings</button>
+            <button class="mh-mega__item" type="button" @click="goCategory('Band rings')">
+              Band rings
+            </button>
+            <button class="mh-mega__item" type="button" @click="goCategory('Stackable rings')">
               Stackable rings
             </button>
           </div>
@@ -84,20 +101,32 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-  const router = useRouter()
-  const open = ref(false)
+const router = useRouter()
+const open = ref(false)
+const dropdownRef = ref<HTMLElement | null>(null)
 
-  function go(path: string) {
-    router.push(path)
-  }
+function go(path: string) {
+  router.push(path)
+}
 
-  function goCategory(category: string) {
-    router.push({ path: '/user/catalog', query: { category } })
-    open.value = false
-  }
+function goCategory(category: string) {
+  router.push({ path: '/user/catalog', query: { category } })
+  open.value = false
+}
+
+/* ✅ Close only when clicking outside */
+function onDocClick(e: MouseEvent) {
+  const el = dropdownRef.value
+  const target = e.target as Node | null
+  if (!el || !target) return
+  if (!el.contains(target)) open.value = false
+}
+
+onMounted(() => document.addEventListener('click', onDocClick))
+onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 </script>
 
 <style scoped src="@/styles/user/store-header.css"></style>
