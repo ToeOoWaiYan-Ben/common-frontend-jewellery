@@ -6,7 +6,7 @@ import { http } from '../services/http'
 interface CraftsState {
   items: CraftDto[]
   loading: boolean
-  error: string | null
+  error: string | null // ✅ ONLY for loadCrafts()
 }
 
 type CraftApi = {
@@ -48,6 +48,7 @@ export const useCraftsStore = defineStore('crafts', {
         const raw = await http<CraftApi[]>('/crafts')
         this.items = raw.map(mapToCraftDto)
       } catch (e: any) {
+        // ✅ Only load error goes here (list panel error)
         this.error = e?.message ?? 'Something went wrong while loading crafts.'
       } finally {
         this.loading = false
@@ -56,7 +57,7 @@ export const useCraftsStore = defineStore('crafts', {
 
     async createCraft(payload: Omit<CraftDto, 'id'>) {
       this.loading = true
-      this.error = null
+      // ❌ do NOT clear this.error here (keep list visible)
       try {
         const body = {
           shopName: payload.shopName?.trim(),
@@ -74,7 +75,7 @@ export const useCraftsStore = defineStore('crafts', {
         this.items.push(created)
         return created
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while creating craft.'
+        // ✅ let the view show formError (do not touch store.error)
         throw e
       } finally {
         this.loading = false
@@ -83,7 +84,7 @@ export const useCraftsStore = defineStore('crafts', {
 
     async updateCraft(id: number, payload: Omit<CraftDto, 'id'>) {
       this.loading = true
-      this.error = null
+      // ❌ do NOT clear this.error here
       try {
         const body = {
           shopName: payload.shopName?.trim(),
@@ -92,21 +93,12 @@ export const useCraftsStore = defineStore('crafts', {
           address: payload.address?.trim(),
         }
 
-        // if backend returns JSON -> CraftApi
-        // if backend returns 204 -> http<void> is OK
-        let updatedItem: CraftDto | null = null
+        const updatedRaw = await http<CraftApi>(`/crafts/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(body),
+        })
 
-        try {
-          const updatedRaw = await http<CraftApi>(`/crafts/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify(body),
-          })
-          updatedItem = mapToCraftDto(updatedRaw)
-        } catch (err: any) {
-          // if your backend returns 204 No Content, http() won't throw.
-          // so we only reach here on real error.
-          throw err
-        }
+        const updated = mapToCraftDto(updatedRaw)
 
         const idx = this.items.findIndex((c) => c.id === id)
         if (idx === -1) {
@@ -114,9 +106,9 @@ export const useCraftsStore = defineStore('crafts', {
           return
         }
 
-        this.items[idx] = updatedItem ?? { id, ...payload }
+        this.items[idx] = updated
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while updating craft.'
+        // ✅ view handles it (formError), list stays
         throw e
       } finally {
         this.loading = false
@@ -125,12 +117,11 @@ export const useCraftsStore = defineStore('crafts', {
 
     async deleteCraft(id: number) {
       this.loading = true
-      this.error = null
+      // ❌ do NOT clear this.error here
       try {
         await http<void>(`/crafts/${id}`, { method: 'DELETE' })
         this.items = this.items.filter((c) => c.id !== id)
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while deleting craft.'
         throw e
       } finally {
         this.loading = false

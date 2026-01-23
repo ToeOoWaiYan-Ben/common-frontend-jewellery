@@ -1,3 +1,4 @@
+// useUsersStore.ts
 import { defineStore } from 'pinia'
 import type { UserDto } from '../dtos/UserDto'
 import { http } from '../services/http'
@@ -5,7 +6,7 @@ import { http } from '../services/http'
 interface UsersState {
   items: UserDto[]
   loading: boolean
-  error: string | null
+  error: string | null // ✅ only for loadUsers()
 }
 
 type UserApi = {
@@ -23,11 +24,10 @@ function mapToUserDto(x: UserApi): UserDto {
     id: x.id,
     name: x.name,
     email: x.email,
-    password: '', // never store real password in frontend state
-    nrc: x.nrc ?? '',
-    phone: x.phone ?? '',
-    address: x.address ?? '',
-    token: '',
+    password: undefined,
+    nrc: x.nrc ?? null,
+    phone: x.phone ?? null,
+    address: x.address ?? null,
   }
 }
 
@@ -58,12 +58,11 @@ export const useUsersStore = defineStore('users', {
 
     async createUser(payload: Omit<UserDto, 'id'>) {
       this.loading = true
-      this.error = null
       try {
         const body = {
           name: payload.name?.trim(),
           email: payload.email?.trim(),
-          password: payload.password, // required on create
+          password: payload.password,
           nrc: payload.nrc?.trim() || null,
           phone: payload.phone?.trim() || null,
           address: payload.address?.trim() || null,
@@ -78,7 +77,7 @@ export const useUsersStore = defineStore('users', {
         this.items.push(created)
         return created
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while creating user.'
+        // ✅ don’t touch this.error here
         throw e
       } finally {
         this.loading = false
@@ -87,12 +86,11 @@ export const useUsersStore = defineStore('users', {
 
     async updateUser(id: number, payload: Omit<UserDto, 'id'>) {
       this.loading = true
-      this.error = null
       try {
         const body = {
           name: payload.name?.trim(),
           email: payload.email?.trim(),
-          password: payload.password || null, // optional
+          password: payload.password || null,
           nrc: payload.nrc?.trim() || null,
           phone: payload.phone?.trim() || null,
           address: payload.address?.trim() || null,
@@ -108,8 +106,9 @@ export const useUsersStore = defineStore('users', {
         const idx = this.items.findIndex((u) => u.id === id)
         if (idx !== -1) this.items[idx] = updated
         else await this.loadUsers()
+
+        return updated
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while updating user.'
         throw e
       } finally {
         this.loading = false
@@ -118,12 +117,10 @@ export const useUsersStore = defineStore('users', {
 
     async deleteUser(id: number) {
       this.loading = true
-      this.error = null
       try {
         await http<void>(`/users/${id}`, { method: 'DELETE' })
         this.items = this.items.filter((u) => u.id !== id)
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while deleting user.'
         throw e
       } finally {
         this.loading = false

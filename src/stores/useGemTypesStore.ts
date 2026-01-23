@@ -38,6 +38,7 @@ export const useGemTypesStore = defineStore('gemTypes', {
       try {
         const created = await http<GemTypeDto>('/gem-types', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: name.trim() }),
         })
         this.items.push(created)
@@ -54,9 +55,9 @@ export const useGemTypesStore = defineStore('gemTypes', {
       this.loading = true
       this.error = null
       try {
-        // if backend returns 204:
         await http<void>(`/gem-types/${id}`, {
           method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: name.trim() }),
         })
 

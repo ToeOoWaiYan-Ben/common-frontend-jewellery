@@ -16,4 +16,9 @@ export interface GemsPackageDto {
   certificateId: number | null
   sellerId: number | null
   sellerName: string | null
+
+  // ✅ NEW
+  quantity: number | null
+  unitPrice: number | null
+  totalPrice: number | null
 }

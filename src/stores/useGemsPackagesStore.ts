@@ -1,3 +1,4 @@
+// src/stores/useGemsPackagesStore.ts
 import { defineStore } from 'pinia'
 import type { GemsPackageDto } from '../dtos/GemsPackageDto'
 import { http } from '../services/http'
@@ -38,7 +39,6 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
           color: payload.color?.trim(),
           cutting: payload.cutting?.trim(),
           description: payload.description?.trim(),
-          gemTypeId: payload.gemTypeId,
           sellerName: payload.sellerName?.trim(),
         }
 
@@ -67,26 +67,19 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
           color: payload.color?.trim(),
           cutting: payload.cutting?.trim(),
           description: payload.description?.trim(),
-          gemTypeId: payload.gemTypeId,
           sellerName: payload.sellerName?.trim(),
         }
 
-        // If backend returns JSON:
-        // const updated = await http<GemsPackageDto>(`/gems-packages/${id}`, { method:'PUT', body: JSON.stringify(body) })
-
-        // If backend returns 204:
-        await http<void>(`/gems-packages/${id}`, {
+        const updated = await http<GemsPackageDto>(`/gems-packages/${id}`, {
           method: 'PUT',
           body: JSON.stringify(body),
         })
 
         const idx = this.items.findIndex((x) => x.id === id)
-        if (idx === -1) {
-          await this.loadAll()
-          return
-        }
+        if (idx !== -1) this.items[idx] = updated
+        else await this.loadAll()
 
-        this.items[idx] = { id, ...body } as any
+        return updated
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to update.'
         throw e

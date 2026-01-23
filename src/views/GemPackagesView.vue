@@ -26,7 +26,7 @@
           <input
             v-model.trim="q"
             class="gp-input gp-input--search"
-            placeholder="Search name / gem type..."
+            placeholder="Search name / gem type / seller..."
           />
         </div>
       </div>
@@ -43,7 +43,11 @@
         :pageSize="8"
         :editingId="editId"
       >
-        <template #cell-originalPrice="{ value }">
+        <template #cell-totalPrice="{ value }">
+          {{ formatMoney(value as number | null | undefined) }}
+        </template>
+
+        <template #cell-unitPrice="{ value }">
           {{ formatMoney(value as number | null | undefined) }}
         </template>
 
@@ -71,11 +75,13 @@
         </div>
 
         <div class="gp-form">
+          <!-- Name -->
           <div class="gp-field">
             <label class="gp-label">Name *</label>
             <input v-model.trim="form.name" class="gp-input" placeholder="e.g. Diamond Set A" />
           </div>
 
+          <!-- Package No -->
           <div class="gp-field">
             <label class="gp-label">Package No.</label>
             <input
@@ -87,35 +93,119 @@
             />
           </div>
 
+          <!-- Unit Weight (per gem) -> gemsSize -->
           <div class="gp-field">
-            <label class="gp-label">Gems Size</label>
+            <label class="gp-label">Unit Weight (per gem)</label>
             <input
               :value="form.gemsSize ?? ''"
               class="gp-input"
               type="number"
-              step="0.01"
-              placeholder="e.g. 1.25"
+              step="0.0001"
+              placeholder="e.g. 0.02"
               @input="form.gemsSize = toNumOrNull(($event.target as HTMLInputElement).value)"
             />
           </div>
 
+          <!-- Package Weight (total) -> gemsWeight -->
           <div class="gp-field">
-            <label class="gp-label">Gems Weight</label>
+            <label class="gp-label">Package Weight (total)</label>
             <input
               :value="form.gemsWeight ?? ''"
               class="gp-input"
               type="number"
-              step="0.01"
+              step="0.0001"
               placeholder="e.g. 3.50"
               @input="form.gemsWeight = toNumOrNull(($event.target as HTMLInputElement).value)"
             />
           </div>
 
-          <!-- Gem Type dropdown -->
+          <!-- ✅ Qty block (Actual + Estimated + diff message) -->
+          <div class="gp-field gp-field--full">
+            <div class="ae-block">
+              <div class="ae-left">
+                <div class="ae-row">
+                  <label class="ae-label">Actual Qty</label>
+                  <input
+                    :value="form.quantity ?? ''"
+                    class="ae-input"
+                    type="number"
+                    placeholder="e.g. 100"
+                    @input="form.quantity = toIntOrNull(($event.target as HTMLInputElement).value)"
+                  />
+                </div>
+
+                <div class="ae-row">
+                  <label class="ae-label">Estimate Qty</label>
+                  <input
+                    :value="estimatedQtyDisplay"
+                    class="ae-input"
+                    type="text"
+                    readonly
+                    placeholder="auto"
+                  />
+                </div>
+              </div>
+
+              <div class="ae-right ae-diff" v-if="showQtyDiff">
+                Actual and Estimated Qty have difference
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ Price block (Unit Price input + totals auto + diff message) -->
+          <div class="gp-field gp-field--full">
+            <div class="ae-block">
+              <div class="ae-left">
+                <div class="ae-row">
+                  <label class="ae-label">Unit Price</label>
+                  <input
+                    :value="form.unitPrice ?? ''"
+                    class="ae-input"
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g. 1.20"
+                    @input="form.unitPrice = toNumOrNull(($event.target as HTMLInputElement).value)"
+                  />
+                </div>
+
+                <div class="gp-field">
+                  <label class="gp-label">Actual Total Price *</label>
+                  <input
+                    :value="form.totalPrice ?? ''"
+                    class="gp-input"
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g. 120"
+                    @input="
+                      form.totalPrice = toNumOrNull(($event.target as HTMLInputElement).value)
+                    "
+                  />
+                </div>
+
+                <div class="ae-row">
+                  <label class="ae-label">Estimated Total Price</label>
+                  <input
+                    :value="estimatedTotalPriceFormatted"
+                    class="ae-input"
+                    type="text"
+                    readonly
+                    placeholder="auto"
+                  />
+                </div>
+              </div>
+
+              <div class="ae-right ae-diff" v-if="showPriceDiff">
+                Actual and Estimated Price have difference
+              </div>
+            </div>
+          </div>
+
+          <!-- Gem Type -->
+          <!-- Gem Type -->
           <div class="gp-field">
             <label class="gp-label">Gem Type</label>
 
-            <select v-model="form.gemTypeId" class="gp-input">
+            <select v-model="form.gemTypeId" class="gp-input gp-select">
               <option :value="null">Select gem type</option>
               <option v-for="t in gemTypesStore.items" :key="t.id" :value="t.id">
                 {{ t.name }}
@@ -131,34 +221,38 @@
             </small>
           </div>
 
+          <!-- Buy Date -->
           <div class="gp-field">
             <label class="gp-label">Buy Date</label>
             <input v-model="form.buyDate" class="gp-input" type="date" />
           </div>
 
+          <!-- Color -->
           <div class="gp-field">
             <label class="gp-label">Color</label>
             <input v-model.trim="form.color" class="gp-input" placeholder="e.g. D" />
           </div>
 
-          <!-- Cutting (keep as normal input if you want, or change to select later) -->
+          <!-- Cutting -->
           <div class="gp-field">
             <label class="gp-label">Cutting</label>
-            <input v-model.trim="form.cutting" class="gp-input" placeholder="e.g. Round" />
+
+            <select v-model="form.cutting" class="gp-input gp-select">
+              <option value="">Select cutting</option>
+              <option value="Round">Round</option>
+              <option value="Princess">Princess</option>
+              <option value="Emerald">Emerald</option>
+              <option value="Oval">Oval</option>
+              <option value="Cushion">Cushion</option>
+              <option value="Pear">Pear</option>
+              <option value="Marquise">Marquise</option>
+              <option value="Asscher">Asscher</option>
+              <option value="Radiant">Radiant</option>
+              <option value="Heart">Heart</option>
+            </select>
           </div>
 
-          <div class="gp-field">
-            <label class="gp-label">Original Price</label>
-            <input
-              :value="form.originalPrice ?? ''"
-              class="gp-input"
-              type="number"
-              step="0.01"
-              placeholder="e.g. 1500"
-              @input="form.originalPrice = toNumOrNull(($event.target as HTMLInputElement).value)"
-            />
-          </div>
-
+          <!-- Certificate -->
           <div class="gp-field">
             <label class="gp-label">Certificate ID</label>
             <input
@@ -170,7 +264,7 @@
             />
           </div>
 
-          <!-- ✅ SELLER SEARCHABLE COMBO BOX (Your request) -->
+          <!-- Seller searchable -->
           <div class="gp-field">
             <label class="gp-label">Seller</label>
 
@@ -202,6 +296,7 @@
             </small>
           </div>
 
+          <!-- Description -->
           <div class="gp-field gp-field--full">
             <label class="gp-label">Description</label>
             <textarea
@@ -229,7 +324,7 @@
         </div>
       </div>
 
-      <!-- Side summary -->
+      <!-- Side preview -->
       <div class="gp-card gp-card--side">
         <div class="gp-side-top">
           <div class="gp-side-sku">
@@ -257,20 +352,40 @@
             </div>
 
             <div class="gp-preview-row">
-              <span class="gp-muted">Seller</span>
-              <span class="gp-strong">{{
-                form.sellerId ? `${form.sellerId} - ${form.sellerName ?? ''}` : '-'
-              }}</span>
-            </div>
-
-            <div class="gp-preview-row">
-              <span class="gp-muted">Size</span>
+              <span class="gp-muted">Unit Weight</span>
               <span class="gp-strong">{{ form.gemsSize ?? '-' }}</span>
             </div>
 
             <div class="gp-preview-row">
-              <span class="gp-muted">Weight</span>
+              <span class="gp-muted">Package Weight</span>
               <span class="gp-strong">{{ form.gemsWeight ?? '-' }}</span>
+            </div>
+
+            <div class="gp-preview-row">
+              <span class="gp-muted">Actual Qty</span>
+              <span class="gp-strong">{{ form.quantity ?? '-' }}</span>
+            </div>
+
+            <div class="gp-preview-row">
+              <span class="gp-muted">Estimated Qty</span>
+              <span class="gp-strong">{{ estimatedQtyDisplay || '-' }}</span>
+            </div>
+
+            <div class="gp-preview-row">
+              <span class="gp-muted">Unit Price</span>
+              <span class="gp-strong">{{
+                form.unitPrice == null ? '-' : formatMoney(form.unitPrice)
+              }}</span>
+            </div>
+
+            <div class="gp-preview-row">
+              <span class="gp-muted">Actual Total</span>
+              <span class="gp-strong">{{ actualTotalPriceDisplay || '-' }}</span>
+            </div>
+
+            <div class="gp-preview-row">
+              <span class="gp-muted">Estimated Total</span>
+              <span class="gp-strong">{{ estimatedTotalPriceDisplay || '-' }}</span>
             </div>
           </div>
         </div>
@@ -295,6 +410,7 @@
   const showForm = ref(false)
   const editId = ref<number | null>(null)
 
+  // ✅ Your backend dto now includes: quantity, unitPrice, totalPrice
   const blank = (): Omit<GemsPackageDto, 'id'> => ({
     name: '',
     packageNumber: null,
@@ -305,11 +421,18 @@
     description: null,
     originalPrice: null,
     buyDate: null,
-    gemTypeId: null,
-    gemTypeName: null,
+
     certificateId: null,
     sellerId: null,
     sellerName: null,
+
+    gemTypeId: null,
+    gemTypeName: null,
+
+    // ✅ new backend fields
+    quantity: null,
+    unitPrice: null,
+    totalPrice: null,
   })
 
   const form = reactive<Omit<GemsPackageDto, 'id'>>(blank())
@@ -323,11 +446,11 @@
     { key: 'name', label: 'Name', width: '220px' },
     { key: 'gemTypeName', label: 'Gem Type', width: '140px' },
     { key: 'packageNumber', label: 'Package No.' },
-    { key: 'gemsSize', label: 'Gems Size' },
-    { key: 'gemsWeight', label: 'Gems Weight' },
-    { key: 'color', label: 'Color' },
-    { key: 'cutting', label: 'Cutting' },
-    { key: 'originalPrice', label: 'Price', align: 'right' },
+    { key: 'gemsSize', label: 'Unit Wt' },
+    { key: 'gemsWeight', label: 'Pkg Wt' },
+    { key: 'quantity', label: 'Qty' },
+    { key: 'unitPrice', label: 'Unit Price', align: 'right' },
+    { key: 'totalPrice', label: 'Total', align: 'right' },
     { key: 'buyDate', label: 'Buy Date', width: '120px' },
     { key: 'sellerName', label: 'Seller', width: '160px' },
     { key: 'actions', label: 'Actions', width: '160px', align: 'center' },
@@ -344,25 +467,72 @@
     })
   })
 
-  // ✅ show selected gem type name in preview
   const selectedGemTypeName = computed(() => {
     if (!form.gemTypeId) return '-'
     return gemTypesStore.items.find((x) => x.id === form.gemTypeId)?.name ?? '-'
   })
 
-  /* ✅ SELLER SEARCHABLE COMBO (your code) */
+  // ✅ Estimated qty = packageWeight / unitWeight = gemsWeight / gemsSize
+  const estimatedQty = computed<number | null>(() => {
+    const pw = form.gemsWeight
+    const uw = form.gemsSize
+    if (pw == null || uw == null) return null
+    if (pw <= 0 || uw <= 0) return null
+    return Math.round(pw / uw)
+  })
+
+  const estimatedQtyDisplay = computed(() =>
+    estimatedQty.value == null ? '' : String(estimatedQty.value)
+  )
+  const showQtyDiff = computed(() => {
+    if (form.quantity == null || estimatedQty.value == null) return false
+    return form.quantity !== estimatedQty.value
+  })
+
+  // ✅ INPUT (Actual Total Price) — user types this (NOT derived)
+  const actualTotalPriceDisplay = computed(() =>
+    form.totalPrice == null ? '' : String(form.totalPrice)
+  )
+
+  // ✅ DERIVED (Estimated Total Price) = unitPrice * ACTUAL quantity
+  const estimatedTotalPrice = computed<number | null>(() => {
+    const unit = form.unitPrice
+    const qty = form.quantity // ✅ actual quantity
+    if (unit == null || qty == null) return null
+    if (unit < 0 || qty <= 0) return null
+    return Number((unit * qty).toFixed(2))
+  })
+
+  // ✅ FORMATTED strings for UI (nice money display)
+  const actualTotalPriceFormatted = computed(() =>
+    form.totalPrice == null ? '' : formatMoney(form.totalPrice)
+  )
+
+  const estimatedTotalPriceFormatted = computed(() =>
+    estimatedTotalPrice.value == null ? '' : formatMoney(estimatedTotalPrice.value)
+  )
+
+  // ✅ show “diff” only when both exist and actually different
+  const showPriceDiff = computed(() => {
+    const a = form.totalPrice
+    const e = estimatedTotalPrice.value
+    if (a == null || e == null) return false
+    return Math.abs(a - e) > 0.01
+  })
+
+  /* SELLER SEARCH */
   const sellerQuery = ref('')
   const showSellerDropdown = ref(false)
 
   const filteredSellers = computed(() => {
-    const q = sellerQuery.value.trim().toLowerCase()
-    if (!q) return sellersStore.items
-    return sellersStore.items.filter((s) => `${s.id} ${s.name}`.toLowerCase().includes(q))
+    const qq = sellerQuery.value.trim().toLowerCase()
+    if (!qq) return sellersStore.items
+    return sellersStore.items.filter((s) => `${s.id} ${s.name}`.toLowerCase().includes(qq))
   })
 
   function selectSeller(id: number, name: string) {
     form.sellerId = id
-    form.sellerName = name // optional; backend will also set correct name
+    form.sellerName = name
     sellerQuery.value = `${id} - ${name}`
     showSellerDropdown.value = false
   }
@@ -373,13 +543,11 @@
     await sellersStore.loadAll()
   })
 
-  // currency formatting
   function formatMoney(v?: number | null) {
     if (v == null || Number.isNaN(v)) return '-'
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
   }
 
-  // numeric helpers
   function toNumOrNull(v: string): number | null {
     const t = v.trim()
     if (!t) return null
@@ -397,7 +565,7 @@
     showForm.value = true
     editId.value = null
     Object.assign(form, blank())
-    sellerQuery.value = '' // ✅ clear seller search
+    sellerQuery.value = ''
     snapshot.value = JSON.stringify(form)
   }
 
@@ -408,12 +576,13 @@
     Object.assign(form, {
       ...row,
       gemTypeId: row.gemTypeId ?? null,
+      quantity: row.quantity ?? null,
+      unitPrice: row.unitPrice ?? null,
+      totalPrice: row.totalPrice ?? null,
     })
     ;(form as any).id = undefined
 
-    // ✅ show seller in search box
     sellerQuery.value = row.sellerId ? `${row.sellerId} - ${row.sellerName ?? ''}` : ''
-
     snapshot.value = JSON.stringify(form)
   }
 
@@ -442,6 +611,8 @@
   async function save() {
     if (!form.name.trim()) return
 
+    // ✅ Always store correct actual total to backend
+
     if (isEdit.value) {
       await store.update(editId.value!, { ...form })
     } else {
@@ -460,3 +631,101 @@
 </script>
 
 <style scoped src="@/styles/admin/gems-package-page.css"></style>
+
+<style scoped>
+  /* ✅ Actual vs Estimated block style (like your screenshot) */
+  .ae-block {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 18px;
+    align-items: center;
+  }
+  .ae-left {
+    display: grid;
+    gap: 12px;
+  }
+  .ae-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+  .ae-label {
+    font-weight: 600;
+    color: #1f2937;
+  }
+  .ae-input {
+    width: 100%;
+    border: 2px solid #111827;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background: #fff;
+  }
+  .ae-right {
+    color: #111827;
+    font-weight: 600;
+  }
+  /* ✅ unify border color + remove "bold/strong" look */
+  .gp-input,
+  .ae-input,
+  .gp-textarea,
+  .gp-dropdown {
+    border: 1px solid #cbd5e1; /* same border everywhere */
+  }
+
+  /* ✅ make the AE inputs look same weight as other inputs */
+  .ae-input {
+    font-weight: 400; /* remove bold feeling */
+    background: #fff;
+    box-shadow: none;
+  }
+
+  /* ✅ Bigger selects (Gem Type + Cutting) */
+  .gp-select {
+    height: 44px; /* bigger */
+    padding: 10px 12px;
+    line-height: 1.2;
+    appearance: none; /* cleaner dropdown */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+
+  /* ✅ prevent dropdown from being "cut" by parent containers */
+  .gp-form,
+  .gp-field {
+    overflow: visible;
+  }
+
+  /* (optional) add a simple dropdown arrow look */
+  .gp-field select.gp-select {
+    background-image:
+      linear-gradient(45deg, transparent 50%, #64748b 50%),
+      linear-gradient(135deg, #64748b 50%, transparent 50%),
+      linear-gradient(to right, transparent, transparent);
+    background-position:
+      calc(100% - 18px) calc(50% - 2px),
+      calc(100% - 12px) calc(50% - 2px),
+      calc(100% - 2.5em) 0.5em;
+    background-size:
+      6px 6px,
+      6px 6px,
+      1px 1.5em;
+    background-repeat: no-repeat;
+    padding-right: 36px;
+  }
+
+  /* ✅ Difference text should be RED (not black) */
+  .ae-diff {
+    color: #dc2626; /* red */
+    font-weight: 600;
+  }
+
+  /* optional: make diff area look like warning badge */
+  .ae-right.ae-diff {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+</style>

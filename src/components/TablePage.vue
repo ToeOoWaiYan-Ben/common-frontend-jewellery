@@ -14,6 +14,7 @@
     showForm: boolean
     primaryButtonLabel: string
     editingId?: number | null
+    errorRowId?: number | null
   }>()
 
   const emit = defineEmits<{
@@ -106,7 +107,7 @@
           <span>{{ errorMessage }}</span>
         </div>
 
-        <div v-else-if="isLoading" class="users-empty">Loading {{ title.toLowerCase() }}…</div>
+        <div v-if="isLoading" class="users-empty">Loading {{ title.toLowerCase() }}…</div>
 
         <template v-else>
           <div class="table-pagination" v-if="filteredCount > 0">
@@ -159,7 +160,11 @@
                 v-for="item in items"
                 :key="item[idKey]"
                 :class="{
-                  'row--editing': props.editingId != null && item[idKey] === props.editingId,
+                  'row--editing':
+                    props.editingId != null &&
+                    item[idKey] === props.editingId &&
+                    props.errorRowId !== props.editingId,
+                  'row--error': props.errorRowId != null && item[idKey] === props.errorRowId,
                 }"
               >
                 <slot name="rows" :item="item"></slot>
@@ -173,3 +178,12 @@
     </div>
   </section>
 </template>
+<style>
+  .row--editing td {
+    background: #e6ffed; /* green */
+  }
+
+  .row--error td {
+    background: #ffe4e6; /* red */
+  }
+</style>

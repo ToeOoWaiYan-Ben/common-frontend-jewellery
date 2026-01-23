@@ -7,6 +7,7 @@ import AdminLayout from '../components/layout/AdminLayout.vue'
 /* -------- Auth -------- */
 import LoginView from '../views/LoginView.vue'
 import { useAuthStore } from '../stores/useAuthStore'
+import GemTypeFormView from '../views/GemTypeFormView.vue'
 
 /* -------- Admin Views -------- */
 import HomeView from '../views/HomeView.vue'
@@ -17,11 +18,10 @@ import RegisterFormView from '../views/RegisterFormView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
 import CraftsView from '../views/CraftsView.vue'
 import GemsPackagesView from '../views/GemPackagesView.vue'
-import GemTypeFormView from '../views/GemTypeFormView.vue'
-import SellerFormView from '../views/SellerFormView.vue'
+import JewelryTypesView from '../views/JewelryTypesView.vue'
 import SettingsView from '../views/SettingsView.vue'
 
-/* -------- User Storefront Views -------- */
+/* -------- User Storefront -------- */
 import CatalogView from '../views/user/CatalogView.vue'
 import ProductDetailView from '../views/user/ProductDetailView.vue'
 
@@ -32,23 +32,25 @@ const routes: RouteRecordRaw[] = [
   /* ---------- Auth ---------- */
   { path: '/login', name: 'login', component: LoginView },
 
-  /* ---------- USER STOREFRONT (NO LOGIN REQUIRED) ---------- */
-  { path: '/user', redirect: '/user/catalog' },
-
+  /* ---------- USER STOREFRONT ---------- */
   {
-    path: '/user/catalog',
-    name: 'user-catalog',
-    component: CatalogView,
+    path: '/user',
+    children: [
+      {
+        path: 'catalog',
+        name: 'user-catalog',
+        component: CatalogView,
+      },
+      {
+        path: 'product/:id',
+        name: 'user-product-detail',
+        component: ProductDetailView,
+        props: true,
+      },
+    ],
   },
 
-  {
-    path: '/user/product/:id',
-    name: 'user-product-detail',
-    component: ProductDetailView,
-    props: true,
-  },
-
-  /* ---------- ADMIN AREA (LOGIN REQUIRED) ---------- */
+  /* ---------- ADMIN AREA ---------- */
   {
     path: '/admin',
     component: AdminLayout,
@@ -58,31 +60,25 @@ const routes: RouteRecordRaw[] = [
       { path: 'orders', name: 'orders', component: OrdersView },
       { path: 'products', name: 'products', component: ProductsView },
       { path: 'register-form', name: 'register-form', component: RegisterFormView },
+      { path: 'gem-type-form', name: 'gem-type-form', component: GemTypeFormView },
 
       { path: 'categories', name: 'categories', component: CategoriesView },
-      { path: 'category-form', redirect: '/admin/categories' },
-
       { path: 'crafts', name: 'crafts', component: CraftsView },
-      { path: 'craft-form', redirect: '/admin/crafts' },
 
       { path: 'gems-packages', name: 'gems-packages', component: GemsPackagesView },
-      { path: 'gem-type-form', name: 'gem-type-form', component: GemTypeFormView },
-      { path: 'seller-form', name: 'seller-form', component: SellerFormView },
+      { path: 'jewelry-types', name: 'jewelry-types', component: JewelryTypesView },
 
       { path: 'settings', name: 'admin-settings', component: SettingsView },
     ],
   },
 
   /* ---------- Fallback ---------- */
-  // ✅ If unknown URL, send to storefront instead of login
   { path: '/:pathMatch(.*)*', redirect: '/user/catalog' },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-
-  // ✅ Reset scroll when changing pages (catalog/detail)
   scrollBehavior() {
     return { top: 0 }
   },
@@ -90,16 +86,17 @@ const router = createRouter({
 
 /* ---------- Route Guard ---------- */
 router.beforeEach((to) => {
-  // ✅ allow all /user pages without login
   if (to.path.startsWith('/user')) return true
 
   const auth = useAuthStore()
 
-  // ✅ admin requires login
-  if (!auth.isLoggedIn && to.path.startsWith('/admin')) return '/login'
+  if (!auth.isLoggedIn && to.path.startsWith('/admin')) {
+    return '/login'
+  }
 
-  // ✅ if already logged in and tries to go /login
-  if (auth.isLoggedIn && to.path === '/login') return '/admin'
+  if (auth.isLoggedIn && to.path === '/login') {
+    return '/admin'
+  }
 
   return true
 })
