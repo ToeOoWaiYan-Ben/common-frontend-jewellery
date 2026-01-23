@@ -7,7 +7,6 @@
         <h2 class="page-title">New Product Tag</h2>
         <p class="users-meta">Create a new tag for products.</p>
       </div>
-
     </div>
 
     <!-- Form card -->

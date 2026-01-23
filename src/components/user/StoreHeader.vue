@@ -101,32 +101,32 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+  import { onBeforeUnmount, onMounted, ref } from 'vue'
+  import { useRouter } from 'vue-router'
 
-const router = useRouter()
-const open = ref(false)
-const dropdownRef = ref<HTMLElement | null>(null)
+  const router = useRouter()
+  const open = ref(false)
+  const dropdownRef = ref<HTMLElement | null>(null)
 
-function go(path: string) {
-  router.push(path)
-}
+  function go(path: string) {
+    router.push(path)
+  }
 
-function goCategory(category: string) {
-  router.push({ path: '/user/catalog', query: { category } })
-  open.value = false
-}
+  function goCategory(category: string) {
+    router.push({ path: '/user/catalog', query: { category } })
+    open.value = false
+  }
 
-/* ✅ Close only when clicking outside */
-function onDocClick(e: MouseEvent) {
-  const el = dropdownRef.value
-  const target = e.target as Node | null
-  if (!el || !target) return
-  if (!el.contains(target)) open.value = false
-}
+  /* ✅ Close only when clicking outside */
+  function onDocClick(e: MouseEvent) {
+    const el = dropdownRef.value
+    const target = e.target as Node | null
+    if (!el || !target) return
+    if (!el.contains(target)) open.value = false
+  }
 
-onMounted(() => document.addEventListener('click', onDocClick))
-onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
+  onMounted(() => document.addEventListener('click', onDocClick))
+  onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 </script>
 
 <style scoped src="@/styles/user/store-header.css"></style>
