@@ -19,6 +19,9 @@ import CategoriesView from '../views/CategoriesView.vue'
 import CraftsView from '../views/CraftsView.vue'
 import GemsPackagesView from '../views/GemPackagesView.vue'
 import JewelryTypesView from '../views/JewelryTypesView.vue'
+import SellerFormView from '../views/SellerFormView.vue'
+import ProductTagsView from '../views/ProductTagsView.vue'
+
 import SettingsView from '../views/SettingsView.vue'
 
 /* -------- User Storefront -------- */
@@ -67,6 +70,8 @@ const routes: RouteRecordRaw[] = [
 
       { path: 'gems-packages', name: 'gems-packages', component: GemsPackagesView },
       { path: 'jewelry-types', name: 'jewelry-types', component: JewelryTypesView },
+
+      { path: 'product-tags', name: 'product-tags', component: ProductTagsView },
 
       { path: 'settings', name: 'admin-settings', component: SettingsView },
     ],
