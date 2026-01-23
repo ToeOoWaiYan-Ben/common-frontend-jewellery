@@ -19,6 +19,8 @@ import CraftsView from '../views/CraftsView.vue'
 import GemsPackagesView from '../views/GemPackagesView.vue'
 import GemTypeFormView from '../views/GemTypeFormView.vue'
 import SellerFormView from '../views/SellerFormView.vue'
+import ProductTagsView from '../views/ProductTagsView.vue'
+
 import SettingsView from '../views/SettingsView.vue'
 
 /* -------- User Storefront Views -------- */
@@ -68,6 +70,9 @@ const routes: RouteRecordRaw[] = [
       { path: 'gems-packages', name: 'gems-packages', component: GemsPackagesView },
       { path: 'gem-type-form', name: 'gem-type-form', component: GemTypeFormView },
       { path: 'seller-form', name: 'seller-form', component: SellerFormView },
+
+      { path: 'product-tags', name: 'product-tags', component: ProductTagsView },
+ 
 
       { path: 'settings', name: 'admin-settings', component: SettingsView },
     ],
