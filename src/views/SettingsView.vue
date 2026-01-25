@@ -9,12 +9,12 @@
         <p>Create new admin/user</p>
       </RouterLink>
 
-      <RouterLink to="/admin/category-form" class="card">
+      <RouterLink to="/admin/categories" class="card">
         <h3>Category Form</h3>
         <p>Manage categories</p>
       </RouterLink>
 
-      <RouterLink to="/admin/craft-form" class="card">
+      <RouterLink to="/admin/crafts" class="card">
         <h3>Craft Form</h3>
         <p>Manage crafts</p>
       </RouterLink>
@@ -30,7 +30,7 @@
       </RouterLink>
 
       <!-- ✅ NEW: Product Tag Form -->
-      <RouterLink to="/admin/product-tag-form" class="card">
+      <RouterLink to="/admin/product-tags" class="card">
         <h3>Product Tag Form</h3>
         <p>Create a new product tag</p>
       </RouterLink>
