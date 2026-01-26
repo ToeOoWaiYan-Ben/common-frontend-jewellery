@@ -1,11 +1,29 @@
 import { defineStore } from 'pinia'
-import type { ProductTagDto } from '../dtos/ProductTagDto'
-import { http } from '../services/http'
+import type { ProductTagDto } from '@/dtos/ProductTagDto'
+import { http } from '@/services/http'
 
 interface ProductTagsState {
   items: ProductTagDto[]
   loading: boolean
-  error: string | null
+  error: string | null // ✅ only for loadTags()
+}
+
+type ProductTagApi = {
+  id: number
+  name?: string | null
+  description?: string | null
+
+  // (optional) in case backend returns different keys
+  tagName?: string | null
+  tag_name?: string | null
+}
+
+function mapToProductTagDto(x: ProductTagApi): ProductTagDto {
+  return {
+    id: x.id,
+    name: (x.name ?? x.tagName ?? x.tag_name ?? '') as string,
+    description: (x.description ?? null) as string | null,
+  }
 }
 
 export const useProductTagsStore = defineStore('productTags', {
@@ -16,15 +34,16 @@ export const useProductTagsStore = defineStore('productTags', {
   }),
 
   getters: {
-    totalProductTags: (state) => state.items.length,
+    totalTags: (s) => s.items.length,
   },
 
   actions: {
-    async loadProductTags() {
+    async loadTags() {
       this.loading = true
       this.error = null
       try {
-        this.items = await http<ProductTagDto[]>('/product-tags')
+        const raw = await http<ProductTagApi[]>('/product-tags')
+        this.items = raw.map(mapToProductTagDto)
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading product tags.'
       } finally {
@@ -32,52 +51,63 @@ export const useProductTagsStore = defineStore('productTags', {
       }
     },
 
-    async createProductTag(payload: { name: string; description?: string | null }) {
+    async createTag(payload: Omit<ProductTagDto, 'id'>) {
       this.loading = true
-      this.error = null
       try {
-        const created = await http<ProductTagDto>('/product-tags', {
+        const body = {
+          name: payload.name?.trim(),
+          description: payload.description?.trim() || null,
+        }
+
+        const createdRaw = await http<ProductTagApi>('/product-tags', {
           method: 'POST',
-          body: JSON.stringify(payload),
+          body: JSON.stringify(body),
         })
+
+        const created = mapToProductTagDto(createdRaw)
         this.items.push(created)
         return created
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while creating product tag.'
         throw e
       } finally {
         this.loading = false
       }
     },
 
-    async updateProductTag(id: number, payload: { name: string; description?: string | null }) {
+    async updateTag(id: number, payload: Omit<ProductTagDto, 'id'>) {
       this.loading = true
-      this.error = null
       try {
-        const updated = await http<ProductTagDto>(`/product-tags/${id}`, {
+        const body = {
+          name: payload.name?.trim(),
+          description: payload.description?.trim() || null,
+        }
+
+        const updatedRaw = await http<ProductTagApi>(`/product-tags/${id}`, {
           method: 'PUT',
-          body: JSON.stringify(payload),
+          body: JSON.stringify(body),
         })
 
+        const updated = mapToProductTagDto(updatedRaw)
+
         const idx = this.items.findIndex((t) => t.id === id)
-        if (idx !== -1) this.items[idx] = updated
-        return updated
+        if (idx === -1) {
+          await this.loadTags()
+          return
+        }
+        this.items[idx] = updated
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while updating product tag.'
         throw e
       } finally {
         this.loading = false
       }
     },
 
-    async deleteProductTag(id: number) {
+    async deleteTag(id: number) {
       this.loading = true
-      this.error = null
       try {
         await http<void>(`/product-tags/${id}`, { method: 'DELETE' })
         this.items = this.items.filter((t) => t.id !== id)
       } catch (e: any) {
-        this.error = e?.message ?? 'Something went wrong while deleting product tag.'
         throw e
       } finally {
         this.loading = false
