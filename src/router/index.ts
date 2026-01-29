@@ -11,7 +11,8 @@ import { useAuthStore } from '../stores/useAuthStore'
 import HomeView from '../views/HomeView.vue'
 import UsersView from '../views/UsersView.vue'
 import OrdersView from '../views/OrdersView.vue'
-import ProductsView from '../views/ProductsView.vue'
+import ProductListView from '../views/ProductListView.vue'
+import ProductRegisterView from '../views/ProductRegisterView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
 import CraftsView from '../views/CraftsView.vue'
 import GemsPackagesView from '../views/GemPackagesView.vue'
@@ -21,6 +22,7 @@ import SettingsView from '../views/SettingsView.vue'
 import RegisterFormView from '../views/RegisterFormView.vue'
 import GemTypeFormView from '../views/GemTypeFormView.vue'
 import SellerFormView from '../views/SellerFormView.vue'
+
 
 
 /* -------- User Storefront -------- */
@@ -62,7 +64,9 @@ const routes: RouteRecordRaw[] = [
 
       { path: 'users', name: 'users', component: UsersView },
       { path: 'orders', name: 'orders', component: OrdersView },
-      { path: 'products', name: 'products', component: ProductsView },
+      { path: 'products', name: 'products', component: ProductListView },
+      { path: 'products/new', name: 'product-new', component: ProductRegisterView },
+      { path: 'products/:id/edit', name: 'product-edit', component: ProductRegisterView, props: true },
 
       { path: 'categories', name: 'categories', component: CategoriesView },
       { path: 'crafts', name: 'crafts', component: CraftsView },

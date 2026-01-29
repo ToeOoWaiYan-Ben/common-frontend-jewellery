@@ -1,13 +1,6 @@
 <template>
   <aside class="side-nav">
-    <!-- Brand -->
-    <div class="side-nav__brand">
-      <div class="side-nav__brand-logo">J</div>
-      <div class="side-nav__brand-text">
-        <p class="side-nav__brand-title">{{ auth.userName }}</p>
-        <p class="side-nav__brand-subtitle">Dashboard</p>
-      </div>
-    </div>
+  
 
     <!-- Menu -->
     <div class="side-nav__menu">
@@ -44,7 +37,7 @@
             class="side-nav__link"
             active-class="side-nav__link--active"
           >
-            Products
+           Add Products
           </RouterLink>
         </li>
 
@@ -55,16 +48,6 @@
             active-class="side-nav__link--active"
           >
             Gems Packages
-          </RouterLink>
-        </li>
-
-        <li class="side-nav__item">
-          <RouterLink
-            to="/admin/jewelry-types"
-            class="side-nav__link"
-            active-class="side-nav__link--active"
-          >
-            Jewelry Types
           </RouterLink>
         </li>
 

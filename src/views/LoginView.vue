@@ -55,7 +55,7 @@
     console.log('arrive onSubmit!!!')
     try {
       await auth.login(form)
-      router.push('/')
+      router.push('/admin')
     } catch {}
   }
 </script>

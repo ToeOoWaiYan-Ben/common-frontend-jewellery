@@ -13,7 +13,6 @@
       <button class="app-header__icon-btn" type="button" aria-label="Search">🔍</button>
       <button class="app-header__icon-btn" type="button" aria-label="Notifications">🔔</button>
       <div class="app-header__user">
-        <div class="app-header__avatar">A</div>
         <div class="app-header__user-meta">
           <span class="app-header__user-name">{{ auth.userName }}</span>
           <span class="app-header__user-role">{{ auth.userRole }}</span>
