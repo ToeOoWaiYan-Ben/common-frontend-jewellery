@@ -34,11 +34,10 @@
         <p>Manage jewelry materials</p>
       </RouterLink>
 
-<RouterLink to="/admin/product-tags" class="card">
-  <h3>Product Tag Form</h3>
-  <p>Create a new product tag</p>
-</RouterLink>
-
+      <RouterLink to="/admin/product-tags" class="card">
+        <h3>Product Tag Form</h3>
+        <p>Create a new product tag</p>
+      </RouterLink>
     </div>
   </div>
 </template>

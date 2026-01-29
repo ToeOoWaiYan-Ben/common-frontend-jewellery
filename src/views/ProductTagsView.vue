@@ -122,144 +122,144 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
-import TablePage from '@/components/TablePage.vue'
-import { useProductTagsStore } from '@/stores/useProductTagsStore'
-import type { ProductTagDto } from '@/dtos/ProductTagDto'
+  import { computed, onMounted, ref, watch } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import TablePage from '@/components/TablePage.vue'
+  import { useProductTagsStore } from '@/stores/useProductTagsStore'
+  import type { ProductTagDto } from '@/dtos/ProductTagDto'
 
-const tagsStore = useProductTagsStore()
-const { items: tags, loading, error } = storeToRefs(tagsStore)
+  const tagsStore = useProductTagsStore()
+  const { items: tags, loading, error } = storeToRefs(tagsStore)
 
-const searchTerm = ref('')
+  const searchTerm = ref('')
 
-onMounted(() => {
-  tagsStore.loadTags()
-})
-
-const isLoading = computed(() => loading.value)
-const errorMessage = computed(() => error.value)
-
-// filter
-const filteredTags = computed(() => {
-  const term = searchTerm.value.trim().toLowerCase()
-  if (!term) return tags.value
-
-  return tags.value.filter((t) => {
-    const name = (t.name ?? '').toLowerCase()
-    const desc = (t.description ?? '').toLowerCase()
-    return name.includes(term) || desc.includes(term)
+  onMounted(() => {
+    tagsStore.loadTags()
   })
-})
 
-const totalTags = computed(() => tags.value.length)
-const filteredCount = computed(() => filteredTags.value.length)
+  const isLoading = computed(() => loading.value)
+  const errorMessage = computed(() => error.value)
 
-// pagination
-const pageSize = ref(20)
-const currentPage = ref(1)
+  // filter
+  const filteredTags = computed(() => {
+    const term = searchTerm.value.trim().toLowerCase()
+    if (!term) return tags.value
 
-watch(filteredTags, () => {
-  currentPage.value = 1
-})
+    return tags.value.filter((t) => {
+      const name = (t.name ?? '').toLowerCase()
+      const desc = (t.description ?? '').toLowerCase()
+      return name.includes(term) || desc.includes(term)
+    })
+  })
 
-const paginatedTags = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  return filteredTags.value.slice(start, start + pageSize.value)
-})
+  const totalTags = computed(() => tags.value.length)
+  const filteredCount = computed(() => filteredTags.value.length)
 
-const goToPage = (page: number) => {
-  currentPage.value = page
-}
+  // pagination
+  const pageSize = ref(20)
+  const currentPage = ref(1)
 
-// form states
-const showForm = ref(false)
-const isEditing = ref(false)
-const editingId = ref<number | null>(null)
+  watch(filteredTags, () => {
+    currentPage.value = 1
+  })
 
-const formName = ref('')
-const formDescription = ref('')
+  const paginatedTags = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value
+    return filteredTags.value.slice(start, start + pageSize.value)
+  })
 
-const isSubmitting = ref(false)
-const formError = ref<string | null>(null)
-
-const resetForm = () => {
-  formName.value = ''
-  formDescription.value = ''
-  formError.value = null
-  isEditing.value = false
-  editingId.value = null
-}
-
-const onClickNew = () => {
-  if (showForm.value) {
-    resetForm()
-    showForm.value = false
-    return
-  }
-  resetForm()
-  showForm.value = true
-}
-
-const onClickEdit = (tag: ProductTagDto) => {
-  showForm.value = true
-  isEditing.value = true
-  editingId.value = tag.id
-
-  formName.value = tag.name
-  formDescription.value = tag.description ?? ''
-
-  formError.value = null
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-const closeEdit = () => {
-  resetForm()
-  showForm.value = false
-}
-
-const handleSubmitForm = async () => {
-  formError.value = null
-
-  if (!formName.value.trim()) {
-    formError.value = 'Tag name is required.'
-    return
+  const goToPage = (page: number) => {
+    currentPage.value = page
   }
 
-  const payload = {
-    name: formName.value.trim(),
-    description: formDescription.value.trim() || null,
+  // form states
+  const showForm = ref(false)
+  const isEditing = ref(false)
+  const editingId = ref<number | null>(null)
+
+  const formName = ref('')
+  const formDescription = ref('')
+
+  const isSubmitting = ref(false)
+  const formError = ref<string | null>(null)
+
+  const resetForm = () => {
+    formName.value = ''
+    formDescription.value = ''
+    formError.value = null
+    isEditing.value = false
+    editingId.value = null
   }
 
-  isSubmitting.value = true
-  try {
-    if (isEditing.value && editingId.value != null) {
-      await tagsStore.updateTag(editingId.value, payload)
-    } else {
-      await tagsStore.createTag(payload)
-    }
-
-    resetForm()
-    showForm.value = false
-  } catch (e: any) {
-    formError.value = e?.message ?? 'Failed to save product tag.'
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-const onClickDelete = async (id: number) => {
-  const ok = window.confirm('Are you sure you want to delete this product tag?')
-  if (!ok) return
-
-  try {
-    await tagsStore.deleteTag(id)
-    if (isEditing.value && editingId.value === id) {
+  const onClickNew = () => {
+    if (showForm.value) {
       resetForm()
       showForm.value = false
+      return
     }
-  } catch (e: any) {
-    alert(e?.message ?? 'Failed to delete product tag.')
+    resetForm()
+    showForm.value = true
   }
-}
+
+  const onClickEdit = (tag: ProductTagDto) => {
+    showForm.value = true
+    isEditing.value = true
+    editingId.value = tag.id
+
+    formName.value = tag.name
+    formDescription.value = tag.description ?? ''
+
+    formError.value = null
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const closeEdit = () => {
+    resetForm()
+    showForm.value = false
+  }
+
+  const handleSubmitForm = async () => {
+    formError.value = null
+
+    if (!formName.value.trim()) {
+      formError.value = 'Tag name is required.'
+      return
+    }
+
+    const payload = {
+      name: formName.value.trim(),
+      description: formDescription.value.trim() || null,
+    }
+
+    isSubmitting.value = true
+    try {
+      if (isEditing.value && editingId.value != null) {
+        await tagsStore.updateTag(editingId.value, payload)
+      } else {
+        await tagsStore.createTag(payload)
+      }
+
+      resetForm()
+      showForm.value = false
+    } catch (e: any) {
+      formError.value = e?.message ?? 'Failed to save product tag.'
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  const onClickDelete = async (id: number) => {
+    const ok = window.confirm('Are you sure you want to delete this product tag?')
+    if (!ok) return
+
+    try {
+      await tagsStore.deleteTag(id)
+      if (isEditing.value && editingId.value === id) {
+        resetForm()
+        showForm.value = false
+      }
+    } catch (e: any) {
+      alert(e?.message ?? 'Failed to delete product tag.')
+    }
+  }
 </script>

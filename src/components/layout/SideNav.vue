@@ -1,7 +1,5 @@
 <template>
   <aside class="side-nav">
-  
-
     <!-- Menu -->
     <div class="side-nav__menu">
       <ul class="side-nav__list">
@@ -37,7 +35,7 @@
             class="side-nav__link"
             active-class="side-nav__link--active"
           >
-           Add Products
+            Add Products
           </RouterLink>
         </li>
 
@@ -60,7 +58,6 @@
             Settings
           </RouterLink>
         </li>
-        
       </ul>
     </div>
   </aside>

@@ -23,8 +23,6 @@ import RegisterFormView from '../views/RegisterFormView.vue'
 import GemTypeFormView from '../views/GemTypeFormView.vue'
 import SellerFormView from '../views/SellerFormView.vue'
 
-
-
 /* -------- User Storefront -------- */
 import CatalogView from '../views/user/CatalogView.vue'
 import ProductDetailView from '../views/user/ProductDetailView.vue'
@@ -66,7 +64,12 @@ const routes: RouteRecordRaw[] = [
       { path: 'orders', name: 'orders', component: OrdersView },
       { path: 'products', name: 'products', component: ProductListView },
       { path: 'products/new', name: 'product-new', component: ProductRegisterView },
-      { path: 'products/:id/edit', name: 'product-edit', component: ProductRegisterView, props: true },
+      {
+        path: 'products/:id/edit',
+        name: 'product-edit',
+        component: ProductRegisterView,
+        props: true,
+      },
 
       { path: 'categories', name: 'categories', component: CategoriesView },
       { path: 'crafts', name: 'crafts', component: CraftsView },

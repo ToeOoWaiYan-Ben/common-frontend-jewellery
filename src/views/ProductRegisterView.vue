@@ -77,7 +77,13 @@
             <!-- qty -->
             <div class="preg__field">
               <label class="preg__label">Qty</label>
-              <input v-model.number="form.qty" class="preg__input" type="number" min="0" placeholder="e.g. 10" />
+              <input
+                v-model.number="form.qty"
+                class="preg__input"
+                type="number"
+                min="0"
+                placeholder="e.g. 10"
+              />
             </div>
 
             <!-- collection -->
@@ -191,14 +197,12 @@
                 placeholder="e.g. 120.00"
               />
             </div>
-
-            
           </div>
 
           <div class="preg__actions">
             <button class="preg__btn preg__btn--ghost" type="button" @click="goBack">Cancel</button>
             <button class="preg__btn preg__btn--primary" type="submit" :disabled="isSubmitting">
-              {{ isSubmitting ? 'Saving…' : (isEdit ? 'Save changes' : 'Save product') }}
+              {{ isSubmitting ? 'Saving…' : isEdit ? 'Save changes' : 'Save product' }}
             </button>
           </div>
         </form>

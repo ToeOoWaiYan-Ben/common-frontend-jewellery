@@ -6,9 +6,7 @@
         <p class="plist__subtitle">Manage all products available in the system.</p>
       </div>
 
-      <button class="plist__add" type="button" @click="goAdd">
-        + Add product
-      </button>
+      <button class="plist__add" type="button" @click="goAdd">+ Add product</button>
     </div>
 
     <div class="plist__filters">
@@ -30,14 +28,14 @@
       <table v-else class="plist__table">
         <thead>
           <tr>
-            <th style="width: 70px;">ID</th>
+            <th style="width: 70px">ID</th>
             <th>Name</th>
             <th>Code</th>
             <th>Stock</th>
-            <th style="width: 90px;">Qty</th>
+            <th style="width: 90px">Qty</th>
             <th>Collection</th>
-            <th style="width: 120px;">Type</th>
-            <th style="width: 170px; text-align:right;">Actions</th>
+            <th style="width: 120px">Type</th>
+            <th style="width: 170px; text-align: right">Actions</th>
           </tr>
         </thead>
 
@@ -54,7 +52,7 @@
             <td>{{ p.qty }}</td>
             <td>{{ p.collection }}</td>
             <td>{{ p.productTypeId }}</td>
-            <td style="text-align:right;">
+            <td style="text-align: right">
               <button class="plist__btn" type="button" @click="goEdit(p.id)">Edit</button>
               <button class="plist__btn plist__btn--danger" type="button" @click="onDelete(p.id)">
                 Delete
