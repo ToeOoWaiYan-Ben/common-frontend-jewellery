@@ -95,7 +95,7 @@
 
           <!-- Unit Weight (per gem) -> gemsSize -->
           <div class="gp-field">
-            <label class="gp-label">Unit Weight (per gem)</label>
+            <label class="gp-label">Unit Weight (Carat)</label>
             <input
               :value="form.gemsSize ?? ''"
               class="gp-input"
@@ -108,7 +108,7 @@
 
           <!-- Package Weight (total) -> gemsWeight -->
           <div class="gp-field">
-            <label class="gp-label">Package Weight (total)</label>
+            <label class="gp-label">Package Weight (Carat)</label>
             <input
               :value="form.gemsWeight ?? ''"
               class="gp-input"
@@ -385,7 +385,7 @@
 
             <div class="gp-preview-row">
               <span class="gp-muted">Estimated Total</span>
-              <span class="gp-strong">{{ estimatedTotalPriceDisplay || '-' }}</span>
+              <span class="gp-strong">{{ estimatedTotalPrice || '-' }}</span>
             </div>
           </div>
         </div>
@@ -545,7 +545,12 @@
 
   function formatMoney(v?: number | null) {
     if (v == null || Number.isNaN(v)) return '-'
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
+    return (
+      new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(v) + ' MMKs'
+    )
   }
 
   function toNumOrNull(v: string): number | null {

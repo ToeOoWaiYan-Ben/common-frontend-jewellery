@@ -1,6 +1,6 @@
 <template>
   <TablePage
-    title="Sellers"
+    title="Merchants"
     :total="totalSellers"
     :filteredCount="filteredCount"
     :items="paginatedSellers"
@@ -9,7 +9,9 @@
     :isLoading="isLoading"
     :errorMessage="errorMessage"
     :showForm="showForm"
-    :primaryButtonLabel="showForm ? (isEditing ? 'Editing...' : 'Close Form') : 'Create New Seller'"
+    :primaryButtonLabel="
+      showForm ? (isEditing ? 'Editing...' : 'Close Form') : 'Create New Merchant'
+    "
     idKey="id"
     :editingId="editingId"
     @click-new="onClickNew"
@@ -19,7 +21,7 @@
     <template #form>
       <form class="category-form" @submit.prevent="handleSubmitForm">
         <h3 class="category-form__title">
-          {{ isEditing ? 'Edit Seller' : 'New Seller' }}
+          {{ isEditing ? 'Edit Merchant' : 'New Merchant' }}
         </h3>
 
         <div v-if="formError" class="alert alert--error">
@@ -94,8 +96,8 @@
                   ? 'Updating…'
                   : 'Saving…'
                 : isEditing
-                  ? 'Update Seller'
-                  : 'Save Seller'
+                  ? 'Update Merchant'
+                  : 'Save Merchant'
             }}
           </button>
         </div>
