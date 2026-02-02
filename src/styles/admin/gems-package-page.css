@@ -131,14 +131,14 @@
 }
 
 .gp-btn--primary {
-  background: #f59e0b; /* amber like your screenshot */
-  border-color: #f59e0b;
-  color: #111827;
+  background: #152eea; /* amber like your screenshot */
+  border-color: #152eea;
+  color: #ffffff;
 }
 
 .gp-btn--primary:hover {
-  background: #fbbf24;
-  border-color: #fbbf24;
+  background: #2032a7cc;
+  border-color: #2032a7cc;
 }
 
 .gp-btn:disabled {

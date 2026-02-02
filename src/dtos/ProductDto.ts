@@ -12,5 +12,6 @@ export interface ProductDto {
   metarialLoss: number
   makingCost: number
   colorCount: number
-  productTypeId: number
+  depreciation: number
+  productTypeId: number | null
 }

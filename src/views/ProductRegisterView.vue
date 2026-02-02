@@ -60,24 +60,30 @@
               />
             </div>
 
-            <!-- stock_status (select) -->
+            <!-- stock_status (select like screenshot) -->
             <div class="preg__field">
-              <label class="preg__label">Stock Status</label>
+              <label class="preg__label" for="stockStatus">Stock Status</label>
+
               <div class="preg__selectWrap">
-                <select v-model="form.stockStatus" class="preg__select">
-                  <option value="">Select status</option>
-                  <option value="IN_STOCK">IN_STOCK</option>
-                  <option value="LOW_STOCK">LOW_STOCK</option>
-                  <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
+                <select id="stockStatus" v-model="form.stockStatus" class="preg__select">
+                  <option value="" disabled>Select status</option>
+                  <option v-for="s in stockStatusOptions" :key="s.value" :value="s.value">
+                    {{ s.label }}
+                  </option>
                 </select>
-                <span class="preg__selectIcon">▾</span>
               </div>
             </div>
 
             <!-- qty -->
             <div class="preg__field">
               <label class="preg__label">Qty</label>
-              <input v-model.number="form.qty" class="preg__input" type="number" min="0" placeholder="e.g. 10" />
+              <input
+                v-model.number="form.qty"
+                class="preg__input"
+                type="number"
+                min="0"
+                placeholder="e.g. 10"
+              />
             </div>
 
             <!-- collection -->
@@ -192,7 +198,19 @@
               />
             </div>
 
-            
+            <!-- depreciation (float) -->
+            <div class="preg__field">
+              <label class="preg__label">Depreciation *</label>
+              <input
+                v-model.number="form.depreciation"
+                class="preg__input"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                placeholder="e.g. 0.10"
+              />
+            </div>
           </div>
 
           <div class="preg__actions">
@@ -221,6 +239,12 @@
   const isSubmitting = ref(false)
   const formError = ref<string | null>(null)
 
+  const stockStatusOptions = [
+    { value: 'IN_STOCK', label: 'Stock' },
+    { value: 'LOW_STOCK', label: 'Low Stock' },
+    { value: 'OUT_OF_STOCK', label: 'Out of stock' },
+  ]
+
   const form = reactive({
     name: '',
     code: '',
@@ -234,18 +258,8 @@
     metarialLoss: 0,
     makingCost: 0,
     colorCount: 0,
+    depreciation: 0,
     productTypeId: 1,
-  })
-
-  const tagState = reactive({
-    blended: false,
-    coldBrew: false,
-    dairyFree: false,
-    hot: false,
-    iced: false,
-    oatMilk: false,
-    signature: false,
-    soyMilk: false,
   })
 
   const goBack = () => {
@@ -263,7 +277,7 @@
     const payload = {
       name: form.name.trim(),
       code: form.code.trim(),
-      stockStatus: form.stockStatus.trim(),
+      stockStatus: form.stockStatus,
       desc: form.desc.trim(),
       qty: Number(form.qty ?? 0),
       collection: form.collection.trim(),
@@ -273,8 +287,8 @@
       metarialLoss: Number(form.metarialLoss ?? 0),
       makingCost: Number(form.makingCost ?? 0),
       colorCount: Number(form.colorCount ?? 0),
+      depreciation: Number(form.depreciation ?? 0),
       productTypeId: Number(form.productTypeId),
-      // tags: Object.keys(tagState).filter(k => (tagState as any)[k]),
     }
 
     isSubmitting.value = true
@@ -441,11 +455,13 @@
     outline: none;
     font-size: 14px;
     background: #ffffff;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
   }
 
   .preg__input:focus,
   .preg__textarea:focus {
-    border-color: #2563eb;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
   }
 
   .preg__textarea {
@@ -454,6 +470,7 @@
 
   .preg__selectWrap {
     position: relative;
+    width: 100%;
   }
 
   .preg__select {
@@ -463,24 +480,29 @@
     width: 100%;
     border: 1px solid #d1d5db;
     border-radius: 12px;
-    padding: 10px 38px 10px 12px;
+    padding: 10px 40px 10px 12px;
     outline: none;
     font-size: 14px;
     background: #ffffff;
     cursor: pointer;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
   }
 
   .preg__select:focus {
-    border-color: #2563eb;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
   }
 
-  .preg__selectIcon {
+  .preg__selectWrap::after {
+    content: '';
     position: absolute;
-    right: 12px;
+    right: 14px;
     top: 50%;
-    transform: translateY(-50%);
-    font-size: 12px;
-    opacity: 0.7;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #6b7280;
+    border-bottom: 2px solid #6b7280;
+    transform: translateY(-60%) rotate(45deg);
     pointer-events: none;
   }
 
@@ -508,62 +530,6 @@
   .preg__btn--primary {
     background: #f59e0b;
     color: #111827;
-  }
-
-  /* Tag pills */
-  .tag-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-top: 4px;
-  }
-
-  .tag-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-    border-radius: 999px;
-    padding: 7px 12px;
-    cursor: pointer;
-    user-select: none;
-    font-size: 13px;
-    font-weight: 700;
-    color: #111827;
-  }
-
-  .tag-pill__input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .tag-pill__box {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    border: 1.5px solid #cbd5e1;
-    display: inline-block;
-    background: #fff;
-  }
-
-  .tag-pill__input:checked + .tag-pill__box {
-    background: #111827;
-    border-color: #111827;
-  }
-
-  .tag-pill__input:checked + .tag-pill__box::after {
-    content: '✓';
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    font-size: 12px;
-    line-height: 1;
-  }
-
-  .tag-pill:hover {
-    background: #f8fafc;
   }
 
   @media (max-width: 900px) {

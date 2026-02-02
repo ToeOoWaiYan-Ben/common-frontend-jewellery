@@ -18,6 +18,8 @@ import CraftsView from '../views/CraftsView.vue'
 import GemsPackagesView from '../views/GemPackagesView.vue'
 import JewelryTypesView from '../views/JewelryTypesView.vue'
 import ProductTagsView from '../views/ProductTagsView.vue'
+import GoldSourceView from '../views/GoldSourceView.vue'
+import ProductGoldView from '../views/ProductGoldView.vue'
 import SettingsView from '../views/SettingsView.vue'
 import RegisterFormView from '../views/RegisterFormView.vue'
 import GemTypeFormView from '../views/GemTypeFormView.vue'
@@ -73,6 +75,9 @@ const routes: RouteRecordRaw[] = [
       { path: 'gems-packages', name: 'gems-packages', component: GemsPackagesView },
       { path: 'jewelry-types', name: 'jewelry-types', component: JewelryTypesView },
       { path: 'product-tags', name: 'product-tags', component: ProductTagsView },
+      { path: 'gold-source', name: 'gold-source', component: GoldSourceView },
+      { path: 'product-gold', name: 'product-gold', component: ProductGoldView },
+
 
       /* --- forms that are standalone pages --- */
       { path: 'register-form', name: 'register-form', component: RegisterFormView },

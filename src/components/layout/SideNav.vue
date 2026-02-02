@@ -6,7 +6,7 @@
     <div class="side-nav__menu">
       <ul class="side-nav__list">
         <li class="side-nav__item">
-          <RouterLink to="/admin" class="side-nav__link" active-class="side-nav__link--active">
+          <RouterLink to="/admin" class="side-nav__link">
             Dashboard
           </RouterLink>
         </li>
@@ -37,7 +37,7 @@
             class="side-nav__link"
             active-class="side-nav__link--active"
           >
-           Add Products
+           Products List
           </RouterLink>
         </li>
 
@@ -50,7 +50,7 @@
             Gems Packages
           </RouterLink>
         </li>
-
+        
         <li class="side-nav__item">
           <RouterLink
             to="/admin/settings"
@@ -132,7 +132,7 @@
     background: #eef2ff;
   }
   .side-nav__link--active {
-    background: #8b90c9;
-    color: #fff;
+    background: #000000a1;
+    color: #ffffff;
   }
 </style>
