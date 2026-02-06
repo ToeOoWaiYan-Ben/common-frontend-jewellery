@@ -1,211 +1,442 @@
 <template>
-  <div class="preg">
-    <div class="preg__header">
-      <button class="preg__back" type="button" @click="goBack">← Back to products</button>
+  <div class="pwrap" @click="closeAllDd">
+    <!-- header -->
+    <div class="phead">
+      <button class="phead__back" type="button" @click="goBack">← Back to products</button>
     </div>
 
-    <div class="preg__titleWrap">
-      <h2 class="preg__title">{{ isEdit ? 'Edit product' : 'Add product' }}</h2>
-      <p class="preg__subtitle">Fill product information based on the Product table columns.</p>
+    <div class="ptitle">
+      <h2 class="ptitle__h">{{ isEdit ? 'Edit product' : 'Add product' }}</h2>
+      <p class="ptitle__p">
+        Create product + add gold sources + add jewellery sources (mock now, DB later).
+      </p>
     </div>
 
-    <div class="preg__layout">
-      <div class="preg__left">
-        <!-- Image area -->
-        <div class="preg__card">
-          <div class="preg__imagesRow">
-            <div class="preg__imagePreview">
-              <div class="preg__imagePreviewText">
-                <div class="preg__imagePreviewTitle">No image yet</div>
-                <div class="preg__imagePreviewSub">Upload 1–4 images. First is used as cover.</div>
-              </div>
-            </div>
+    <!-- MAIN PRODUCT CARD -->
+    <div class="pcard">
+      <div class="pgrid">
+        <div class="pfield">
+          <label class="plabel">Name *</label>
+          <input
+            v-model="product.name"
+            class="pinput"
+            type="text"
+            placeholder="e.g. Gold Ring 18K"
+          />
+        </div>
 
-            <div class="preg__upload">
-              <div class="preg__uploadTitle">Images</div>
-              <div class="preg__uploadSub">Click to choose or drop images (JPG / PNG)</div>
-            </div>
+        <div class="pfield">
+          <label class="plabel">Code</label>
+          <input v-model="product.code" class="pinput" type="text" placeholder="e.g. GR-001" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Stock Status</label>
+          <div class="pselectWrap">
+            <select v-model="product.stockStatus" class="pselect">
+              <option value="">Select status</option>
+              <option value="IN_STOCK">IN_STOCK</option>
+              <option value="LOW_STOCK">LOW_STOCK</option>
+              <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
+            </select>
+            <span class="pselectIcon">▾</span>
           </div>
         </div>
 
-        <!-- Form -->
-        <form class="preg__card" @submit.prevent="onSubmit">
-          <div v-if="formError" class="preg__alert">
-            <span class="preg__alertIcon">⚠</span>
-            <span>{{ formError }}</span>
+        <div class="pfield">
+          <label class="plabel">Qty</label>
+          <input
+            v-model.number="product.qty"
+            class="pinput"
+            type="number"
+            min="0"
+            placeholder="e.g. 10"
+          />
+        </div>
+
+        <!-- ✅ NEW: Collection -->
+        <div class="pfield">
+          <label class="plabel">Collection</label>
+          <input
+            v-model="product.collection"
+            class="pinput"
+            type="text"
+            placeholder="e.g. Classic"
+          />
+        </div>
+
+        <!-- ✅ NEW: Color -->
+        <div class="pfield">
+          <label class="plabel">Color</label>
+          <input
+            v-model="product.color"
+            class="pinput"
+            type="text"
+            placeholder="e.g. Yellow Gold"
+          />
+        </div>
+
+        <!-- ✅ NEW: Weight -->
+        <div class="pfield">
+          <label class="plabel">Weight</label>
+          <input
+            v-model.number="product.weight"
+            class="pinput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="e.g. 5.20"
+          />
+        </div>
+
+        <!-- ✅ NEW: Metarial Loss -->
+        <div class="pfield">
+          <label class="plabel">Metarial Loss</label>
+          <input
+            v-model.number="product.metarialLoss"
+            class="pinput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="e.g. 0.30"
+          />
+        </div>
+
+        <!-- ✅ NEW: Making Cost -->
+        <div class="pfield">
+          <label class="plabel">Making Cost</label>
+          <input
+            v-model.number="product.makingCost"
+            class="pinput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="e.g. 120"
+          />
+        </div>
+
+        <!-- ✅ NEW: Color Count -->
+        <div class="pfield">
+          <label class="plabel">Color Count</label>
+          <input
+            v-model.number="product.colorCount"
+            class="pinput"
+            type="number"
+            min="0"
+            placeholder="e.g. 2"
+          />
+        </div>
+
+        <!-- ✅ NEW: Depreciation -->
+        <div class="pfield">
+          <label class="plabel">Depreciation *</label>
+          <input
+            v-model.number="product.depreciation"
+            class="pinput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="e.g. 0.10"
+          />
+        </div>
+
+        <!-- ✅ NEW: Product Type ID -->
+        <div class="pfield">
+          <label class="plabel">Product Type ID *</label>
+          <input
+            v-model.number="product.productTypeId"
+            class="pinput"
+            type="number"
+            min="1"
+            placeholder="e.g. 1"
+          />
+        </div>
+
+        <div class="pfield pfield--full">
+          <label class="plabel">Short Desc</label>
+          <input
+            v-model="product.shortDesc"
+            class="pinput"
+            type="text"
+            placeholder="e.g. 18K ring with clean design"
+          />
+        </div>
+
+        <div class="pfield pfield--full">
+          <label class="plabel">Desc (varchar300)</label>
+          <textarea
+            v-model="product.desc"
+            class="ptextarea"
+            rows="3"
+            placeholder="Write product description..."
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD GOLD FOR PRODUCT -->
+    <div class="pcard">
+      <div class="secHead">
+        <div>
+          <h3 class="secHead__h">Add Gold For Product</h3>
+          <p class="secHead__p">
+            Choose purchased gold package (Gold Source), enter used weight + current price.
+          </p>
+        </div>
+
+        <div class="purityPill" :class="purityClass">
+          <span class="purityPill__dot"></span>
+          <span class="purityPill__text">{{ goldPurityLabel }}</span>
+        </div>
+      </div>
+
+      <div v-if="goldError" class="errBox">
+        <span class="errBox__icon">⚠</span>
+        <span>{{ goldError }}</span>
+      </div>
+
+      <div class="miniTable">
+        <div class="miniTable__head">
+          <div class="miniTable__th">Gold Source *</div>
+          <div class="miniTable__th">Weight Used (kyat/g) *</div>
+          <div class="miniTable__th">Current Price (MMK) *</div>
+          <div class="miniTable__th miniTable__th--actions">
+            <button class="btnAdd" type="button" @click.stop="addGoldRow">+ Add</button>
           </div>
+        </div>
 
-          <div class="preg__grid">
-            <!-- name -->
-            <div class="preg__field">
-              <label class="preg__label">Name *</label>
-              <input
-                v-model="form.name"
-                class="preg__input"
-                type="text"
-                required
-                maxlength="50"
-                placeholder="e.g. Gold Ring"
-              />
-            </div>
+        <div v-for="(row, idx) in goldRows" :key="row.key" class="miniTable__row">
+          <div class="miniTable__td">
+            <div class="combo" @click.stop>
+              <button class="combo__btn" type="button" @click="toggleGoldDd(idx)">
+                <span class="combo__text">{{ row.sourceLabel || 'Select gold package' }}</span>
+                <span class="combo__icon">▾</span>
+              </button>
 
-            <!-- code -->
-            <div class="preg__field">
-              <label class="preg__label">Code</label>
-              <input
-                v-model="form.code"
-                class="preg__input"
-                type="text"
-                placeholder="e.g. GR-001"
-              />
-            </div>
+              <div v-if="row.ddOpen" class="dd">
+                <div class="dd__search">
+                  <span class="dd__searchIcon">🔍</span>
+                  <input
+                    v-model="row.query"
+                    class="dd__searchInput"
+                    type="text"
+                    placeholder="Search package id / merchant..."
+                  />
+                </div>
 
-            <!-- stock_status (select) -->
-            <div class="preg__field">
-              <label class="preg__label">Stock Status</label>
-              <div class="preg__selectWrap">
-                <select v-model="form.stockStatus" class="preg__select">
-                  <option value="">Select status</option>
-                  <option value="IN_STOCK">IN_STOCK</option>
-                  <option value="LOW_STOCK">LOW_STOCK</option>
-                  <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
-                </select>
-                <span class="preg__selectIcon">▾</span>
+                <div class="dd__list">
+                  <button
+                    v-for="g in filteredGoldPackages(row.query)"
+                    :key="g.id"
+                    class="dd__item"
+                    type="button"
+                    @click="selectGoldPackage(idx, g)"
+                  >
+                    <div class="dd__main">{{ g.packageId }}</div>
+                    <div class="dd__sub">
+                      {{ g.merchantName }} • Available: {{ g.availableWeight }} • Purity:
+                      {{ g.purity }}
+                    </div>
+                  </button>
+
+                  <div v-if="filteredGoldPackages(row.query).length === 0" class="dd__empty">
+                    No gold packages found
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
 
-            <!-- qty -->
-            <div class="preg__field">
-              <label class="preg__label">Qty</label>
-              <input
-                v-model.number="form.qty"
-                class="preg__input"
-                type="number"
-                min="0"
-                placeholder="e.g. 10"
-              />
-            </div>
+          <div class="miniTable__td">
+            <input
+              v-model.number="row.weightUsed"
+              class="pinput pinput--tight"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="e.g. 4.0"
+              @input="validateGoldRows"
+            />
+            <div v-if="row.weightError" class="tinyErr">{{ row.weightError }}</div>
+          </div>
 
-            <!-- collection -->
-            <div class="preg__field">
-              <label class="preg__label">Collection</label>
-              <input
-                v-model="form.collection"
-                class="preg__input"
-                type="text"
-                maxlength="50"
-                placeholder="e.g. Classic"
-              />
-            </div>
+          <div class="miniTable__td">
+            <input
+              v-model.number="row.currentPrice"
+              class="pinput pinput--tight"
+              type="number"
+              step="1"
+              min="0"
+              placeholder="e.g. 4000"
+              @input="validateGoldRows"
+            />
+            <div v-if="row.priceError" class="tinyErr">{{ row.priceError }}</div>
+          </div>
 
-            <!-- product_type_id -->
-            <div class="preg__field">
-              <label class="preg__label">Product Type ID *</label>
-              <input
-                v-model.number="form.productTypeId"
-                class="preg__input"
-                type="number"
-                min="1"
-                required
-                placeholder="e.g. 1"
-              />
-            </div>
+          <div class="miniTable__td miniTable__td--actions">
+            <button class="btnDel" type="button" @click="removeGoldRow(idx)">Delete</button>
+          </div>
+        </div>
+      </div>
 
-            <!-- short_desc -->
-            <div class="preg__field preg__field--full">
-              <label class="preg__label">Short Desc</label>
-              <input
-                v-model="form.shortDesc"
-                class="preg__input"
-                type="text"
-                maxlength="100"
-                placeholder="e.g. 18K gold ring"
-              />
-            </div>
+      <div class="totals">
+        <div class="totals__box">
+          <div class="totals__label">Total Weight Used</div>
+          <div class="totals__value">{{ totalGoldWeight.toFixed(2) }}</div>
+        </div>
 
-            <!-- desc (varchar300) -->
-            <div class="preg__field preg__field--full">
-              <label class="preg__label">Desc (varchar300)</label>
-              <textarea
-                v-model="form.desc"
-                class="preg__textarea"
-                rows="3"
-                maxlength="300"
-                placeholder="Write product description (max 300 chars)…"
-              ></textarea>
-            </div>
+        <div class="totals__box">
+          <div class="totals__label">Total Current Price</div>
+          <div class="totals__value">{{ totalGoldPrice.toLocaleString() }} MMK</div>
+        </div>
+      </div>
+    </div>
 
-            <!-- color (bigint) -->
-            <div class="preg__field">
-              <label class="preg__label">Color (ID)</label>
-              <input
-                v-model.number="form.color"
-                class="preg__input"
-                type="number"
-                min="0"
-                placeholder="e.g. 1"
-              />
-            </div>
+    <!-- ADD JEWELLERY FOR PRODUCT -->
+    <div class="pcard">
+      <div class="secHead">
+        <div>
+          <h3 class="secHead__h">Add Jewellery For Product</h3>
+          <p class="secHead__p">
+            Choose jewellery source, enter qty + selling price. Original price comes from DB.
+          </p>
+        </div>
+      </div>
 
-            <!-- color_count (int) -->
-            <div class="preg__field">
-              <label class="preg__label">Color Count</label>
-              <input
-                v-model.number="form.colorCount"
-                class="preg__input"
-                type="number"
-                min="0"
-                placeholder="e.g. 2"
-              />
-            </div>
+      <div v-if="jewelryError" class="errBox">
+        <span class="errBox__icon">⚠</span>
+        <span>{{ jewelryError }}</span>
+      </div>
 
-            <!-- weight (float) -->
-            <div class="preg__field">
-              <label class="preg__label">Weight</label>
-              <input
-                v-model.number="form.weight"
-                class="preg__input"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="e.g. 5.20"
-              />
-            </div>
+      <div class="miniTable">
+        <div class="miniTable__head miniTable__head--wide">
+          <div class="miniTable__th">Jewellery Source *</div>
+          <div class="miniTable__th">Qty *</div>
+          <div class="miniTable__th">Unit Weight</div>
+          <div class="miniTable__th">Total Weight</div>
+          <div class="miniTable__th">Selling Price *</div>
+          <div class="miniTable__th">Original Price</div>
+          <div class="miniTable__th miniTable__th--actions">
+            <button class="btnAdd" type="button" @click.stop="addJewelryRow">+ Add</button>
+          </div>
+        </div>
 
-            <!-- metarial_loss (float) -->
-            <div class="preg__field">
-              <label class="preg__label">Metarial Loss</label>
-              <input
-                v-model.number="form.metarialLoss"
-                class="preg__input"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="e.g. 0.30"
-              />
-            </div>
+        <div
+          v-for="(row, idx) in jewelryRows"
+          :key="row.key"
+          class="miniTable__row miniTable__row--wide"
+        >
+          <div class="miniTable__td">
+            <div class="combo" @click.stop>
+              <button class="combo__btn" type="button" @click="toggleJewelryDd(idx)">
+                <span class="combo__text">{{ row.sourceLabel || 'Select jewellery package' }}</span>
+                <span class="combo__icon">▾</span>
+              </button>
 
-            <!-- making_cost (float) -->
-            <div class="preg__field">
-              <label class="preg__label">Making Cost</label>
-              <input
-                v-model.number="form.makingCost"
-                class="preg__input"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="e.g. 120.00"
-              />
+              <div v-if="row.ddOpen" class="dd">
+                <div class="dd__search">
+                  <span class="dd__searchIcon">🔍</span>
+                  <input
+                    v-model="row.query"
+                    class="dd__searchInput"
+                    type="text"
+                    placeholder="Search package id / type..."
+                  />
+                </div>
+
+                <div class="dd__list">
+                  <button
+                    v-for="j in filteredJewelryPackages(row.query)"
+                    :key="j.id"
+                    class="dd__item"
+                    type="button"
+                    @click="selectJewelryPackage(idx, j)"
+                  >
+                    <div class="dd__main">{{ j.packageId }}</div>
+                    <div class="dd__sub">
+                      {{ j.type }} • Available Qty: {{ j.availableQty }} • Unit Wt:
+                      {{ j.unitWeight }} • Original:
+                      {{ j.originalPrice.toLocaleString() }}
+                    </div>
+                  </button>
+
+                  <div v-if="filteredJewelryPackages(row.query).length === 0" class="dd__empty">
+                    No jewellery packages found
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="preg__actions">
-            <button class="preg__btn preg__btn--ghost" type="button" @click="goBack">Cancel</button>
-            <button class="preg__btn preg__btn--primary" type="submit" :disabled="isSubmitting">
-              {{ isSubmitting ? 'Saving…' : isEdit ? 'Save changes' : 'Save product' }}
-            </button>
+          <div class="miniTable__td">
+            <input
+              v-model.number="row.qty"
+              class="pinput pinput--tight"
+              type="number"
+              min="0"
+              placeholder="e.g. 3"
+              @input="validateJewelryRows"
+            />
+            <div v-if="row.qtyError" class="tinyErr">{{ row.qtyError }}</div>
           </div>
-        </form>
+
+          <div class="miniTable__td">
+            <div class="readPill">{{ row.unitWeight || 0 }}</div>
+          </div>
+
+          <div class="miniTable__td">
+            <div class="readPill">{{ (row.unitWeight * row.qty).toFixed(2) }}</div>
+          </div>
+
+          <div class="miniTable__td">
+            <input
+              v-model.number="row.sellingPrice"
+              class="pinput pinput--tight"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="e.g. 350000"
+              @input="validateJewelryRows"
+            />
+            <div v-if="row.sellError" class="tinyErr">{{ row.sellError }}</div>
+          </div>
+
+          <div class="miniTable__td">
+            <div class="readPill readPill--muted">
+              {{ row.originalPrice ? row.originalPrice.toLocaleString() : '—' }}
+            </div>
+          </div>
+
+          <div class="miniTable__td miniTable__td--actions">
+            <button class="btnDel" type="button" @click="removeJewelryRow(idx)">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="totals">
+        <div class="totals__box">
+          <div class="totals__label">Total Jewellery Qty</div>
+          <div class="totals__value">{{ totalJewelryQty }}</div>
+        </div>
+
+        <div class="totals__box">
+          <div class="totals__label">Total Jewellery Weight</div>
+          <div class="totals__value">{{ totalJewelryWeight.toFixed(2) }}</div>
+        </div>
+
+        <div class="totals__box">
+          <div class="totals__label">Total Selling Price</div>
+          <div class="totals__value">{{ totalSellingPrice.toLocaleString() }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVE -->
+    <div class="saveBar">
+      <div class="saveBar__left"></div>
+      <div class="saveBar__right">
+        <button class="btnGhost" type="button" @click="goBack">Cancel</button>
+        <button class="btnPrimary" type="button" @click="onSaveAll">Save</button>
       </div>
     </div>
   </div>
@@ -214,18 +445,13 @@
 <script setup lang="ts">
   import { computed, reactive, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { useProductsStore } from '../stores/useProductsStore'
 
   const router = useRouter()
   const route = useRoute()
-  const productsStore = useProductsStore()
-
   const isEdit = computed(() => !!route.params.id)
 
-  const isSubmitting = ref(false)
-  const formError = ref<string | null>(null)
-
-  const form = reactive({
+  const product = reactive({
+    id: 0,
     name: '',
     code: '',
     stockStatus: '',
@@ -233,85 +459,439 @@
     qty: 0,
     collection: '',
     shortDesc: '',
-    color: 0,
+    color: '',
     weight: 0,
     metarialLoss: 0,
     makingCost: 0,
     colorCount: 0,
-    productTypeId: 1,
+    depreciation: 0,
+    productTypeId: null as number | null,
   })
 
-  const tagState = reactive({
-    blended: false,
-    coldBrew: false,
-    dairyFree: false,
-    hot: false,
-    iced: false,
-    oatMilk: false,
-    signature: false,
-    soyMilk: false,
-  })
-
-  const goBack = () => {
-    router.push('/admin/products')
+  // ----- MOCK DB LISTS (replace later with real API) -----
+  type GoldPkg = {
+    id: number
+    packageId: string
+    merchantName: string
+    availableWeight: number
+    purity: '18K' | '24K'
+    currentPricePerUnit: number
   }
 
-  const onSubmit = async () => {
-    formError.value = null
+  const goldPackages: GoldPkg[] = [
+    {
+      id: 1,
+      packageId: 'Pac 1101',
+      merchantName: 'Gold Merchant A',
+      availableWeight: 20,
+      purity: '18K',
+      currentPricePerUnit: 4000,
+    },
+    {
+      id: 2,
+      packageId: 'Pac 1102',
+      merchantName: 'Gold Merchant A',
+      availableWeight: 50,
+      purity: '18K',
+      currentPricePerUnit: 4000,
+    },
+    {
+      id: 3,
+      packageId: 'Pac 1103',
+      merchantName: 'Gold Merchant B',
+      availableWeight: 60,
+      purity: '24K',
+      currentPricePerUnit: 5200,
+    },
+    {
+      id: 4,
+      packageId: 'Pac 1104',
+      merchantName: 'Gold Merchant C',
+      availableWeight: 70,
+      purity: '18K',
+      currentPricePerUnit: 4100,
+    },
+  ]
 
-    if (!form.name.trim()) {
-      formError.value = 'Name is required.'
+  type JewelryPkg = {
+    id: number
+    packageId: string
+    type: string
+    availableQty: number
+    unitWeight: number
+    originalPrice: number
+  }
+
+  const jewelryPackages: JewelryPkg[] = [
+    {
+      id: 11,
+      packageId: 'Pac J-103',
+      type: 'Ring',
+      availableQty: 50,
+      unitWeight: 3.9,
+      originalPrice: 290000,
+    },
+    {
+      id: 12,
+      packageId: 'Pac J-210',
+      type: 'Necklace',
+      availableQty: 30,
+      unitWeight: 6.5,
+      originalPrice: 480000,
+    },
+    {
+      id: 13,
+      packageId: 'Pac J-305',
+      type: 'Bracelet',
+      availableQty: 20,
+      unitWeight: 4.2,
+      originalPrice: 360000,
+    },
+  ]
+
+  // ----- GOLD ROWS -----
+  type GoldRow = {
+    key: string
+    ddOpen: boolean
+    query: string
+    goldPackageId: number | null
+    sourceLabel: string
+    purity: '18K' | '24K' | ''
+    availableWeight: number
+    weightUsed: number
+    currentPrice: number
+    weightError: string
+    priceError: string
+  }
+
+  const goldRows = ref<GoldRow[]>([
+    {
+      key: crypto.randomUUID(),
+      ddOpen: false,
+      query: '',
+      goldPackageId: null,
+      sourceLabel: '',
+      purity: '',
+      availableWeight: 0,
+      weightUsed: 0,
+      currentPrice: 0,
+      weightError: '',
+      priceError: '',
+    },
+  ])
+
+  const goldError = ref<string | null>(null)
+
+  const totalGoldWeight = computed(() =>
+    goldRows.value.reduce((sum, r) => sum + (Number(r.weightUsed) || 0), 0)
+  )
+
+  const totalGoldPrice = computed(() =>
+    goldRows.value.reduce((sum, r) => sum + (Number(r.currentPrice) || 0), 0)
+  )
+
+  const goldPurityLabel = computed(() => {
+    const purities = goldRows.value.map((r) => r.purity).filter((x) => !!x)
+    if (purities.length === 0) return 'Purity: not set'
+    const unique = Array.from(new Set(purities))
+    if (unique.length === 1) return `Purity: ${unique[0]}`
+    return 'Purity: MIXED'
+  })
+
+  const purityClass = computed(() => {
+    if (goldPurityLabel.value.includes('18K')) return 'purityPill--18'
+    if (goldPurityLabel.value.includes('24K')) return 'purityPill--24'
+    if (goldPurityLabel.value.includes('MIXED')) return 'purityPill--mix'
+    return 'purityPill--none'
+  })
+
+  const filteredGoldPackages = (q: string) => {
+    const term = (q || '').trim().toLowerCase()
+    if (!term) return goldPackages
+    return goldPackages.filter(
+      (g) =>
+        g.packageId.toLowerCase().includes(term) ||
+        g.merchantName.toLowerCase().includes(term) ||
+        String(g.id).includes(term)
+    )
+  }
+
+  const toggleGoldDd = (idx: number) => {
+    goldRows.value = goldRows.value.map((r, i) => ({ ...r, ddOpen: i === idx ? !r.ddOpen : false }))
+    jewelryRows.value = jewelryRows.value.map((r) => ({ ...r, ddOpen: false }))
+  }
+
+  const selectGoldPackage = (idx: number, g: GoldPkg) => {
+    const row = goldRows.value[idx]
+    row.goldPackageId = g.id
+    row.sourceLabel = g.packageId
+    row.purity = g.purity
+    row.availableWeight = g.availableWeight
+    if (!row.currentPrice || row.currentPrice === 0) row.currentPrice = g.currentPricePerUnit
+    row.ddOpen = false
+    row.query = ''
+    validateGoldRows()
+  }
+
+  const addGoldRow = () => {
+    goldRows.value.push({
+      key: crypto.randomUUID(),
+      ddOpen: false,
+      query: '',
+      goldPackageId: null,
+      sourceLabel: '',
+      purity: '',
+      availableWeight: 0,
+      weightUsed: 0,
+      currentPrice: 0,
+      weightError: '',
+      priceError: '',
+    })
+    validateGoldRows()
+  }
+
+  const removeGoldRow = (idx: number) => {
+    if (goldRows.value.length === 1) return
+    goldRows.value.splice(idx, 1)
+    validateGoldRows()
+  }
+
+  const validateGoldRows = () => {
+    goldError.value = null
+    let hasAnyError = false
+
+    goldRows.value.forEach((r) => {
+      r.weightError = ''
+      r.priceError = ''
+
+      if (r.goldPackageId) {
+        if ((r.weightUsed ?? 0) <= 0) {
+          r.weightError = 'Weight is required.'
+          hasAnyError = true
+        } else if (r.weightUsed > r.availableWeight) {
+          r.weightError = `Exceeds available weight (${r.availableWeight}).`
+          hasAnyError = true
+        }
+
+        if ((r.currentPrice ?? 0) <= 0) {
+          r.priceError = 'Current price is required.'
+          hasAnyError = true
+        }
+      }
+    })
+
+    if (hasAnyError) goldError.value = 'Please fix errors in Gold rows (weight/price mismatch).'
+  }
+
+  // ----- JEWELLERY ROWS -----
+  type JewelryRow = {
+    key: string
+    ddOpen: boolean
+    query: string
+    jewelryPackageId: number | null
+    sourceLabel: string
+    availableQty: number
+    unitWeight: number
+    originalPrice: number
+    qty: number
+    sellingPrice: number
+    qtyError: string
+    sellError: string
+  }
+
+  const jewelryRows = ref<JewelryRow[]>([
+    {
+      key: crypto.randomUUID(),
+      ddOpen: false,
+      query: '',
+      jewelryPackageId: null,
+      sourceLabel: '',
+      availableQty: 0,
+      unitWeight: 0,
+      originalPrice: 0,
+      qty: 0,
+      sellingPrice: 0,
+      qtyError: '',
+      sellError: '',
+    },
+  ])
+
+  const jewelryError = ref<string | null>(null)
+
+  const filteredJewelryPackages = (q: string) => {
+    const term = (q || '').trim().toLowerCase()
+    if (!term) return jewelryPackages
+    return jewelryPackages.filter(
+      (j) =>
+        j.packageId.toLowerCase().includes(term) ||
+        j.type.toLowerCase().includes(term) ||
+        String(j.id).includes(term)
+    )
+  }
+
+  const toggleJewelryDd = (idx: number) => {
+    jewelryRows.value = jewelryRows.value.map((r, i) => ({
+      ...r,
+      ddOpen: i === idx ? !r.ddOpen : false,
+    }))
+    goldRows.value = goldRows.value.map((r) => ({ ...r, ddOpen: false }))
+  }
+
+  const selectJewelryPackage = (idx: number, j: JewelryPkg) => {
+    const row = jewelryRows.value[idx]
+    row.jewelryPackageId = j.id
+    row.sourceLabel = j.packageId
+    row.availableQty = j.availableQty
+    row.unitWeight = j.unitWeight
+    row.originalPrice = j.originalPrice
+    row.ddOpen = false
+    row.query = ''
+    validateJewelryRows()
+  }
+
+  const addJewelryRow = () => {
+    jewelryRows.value.push({
+      key: crypto.randomUUID(),
+      ddOpen: false,
+      query: '',
+      jewelryPackageId: null,
+      sourceLabel: '',
+      availableQty: 0,
+      unitWeight: 0,
+      originalPrice: 0,
+      qty: 0,
+      sellingPrice: 0,
+      qtyError: '',
+      sellError: '',
+    })
+    validateJewelryRows()
+  }
+
+  const removeJewelryRow = (idx: number) => {
+    if (jewelryRows.value.length === 1) return
+    jewelryRows.value.splice(idx, 1)
+    validateJewelryRows()
+  }
+
+  const validateJewelryRows = () => {
+    jewelryError.value = null
+    let hasAnyError = false
+
+    jewelryRows.value.forEach((r) => {
+      r.qtyError = ''
+      r.sellError = ''
+
+      if (r.jewelryPackageId) {
+        if ((r.qty ?? 0) <= 0) {
+          r.qtyError = 'Qty is required.'
+          hasAnyError = true
+        } else if (r.qty > r.availableQty) {
+          r.qtyError = `Exceeds available qty (${r.availableQty}).`
+          hasAnyError = true
+        }
+
+        if ((r.sellingPrice ?? 0) <= 0) {
+          r.sellError = 'Selling price is required.'
+          hasAnyError = true
+        }
+      }
+    })
+
+    if (hasAnyError)
+      jewelryError.value = 'Please fix errors in Jewellery rows (qty/price mismatch).'
+  }
+
+  const totalJewelryQty = computed(() =>
+    jewelryRows.value.reduce((sum, r) => sum + (Number(r.qty) || 0), 0)
+  )
+
+  const totalJewelryWeight = computed(() =>
+    jewelryRows.value.reduce(
+      (sum, r) => sum + (Number(r.qty) || 0) * (Number(r.unitWeight) || 0),
+      0
+    )
+  )
+
+  const totalSellingPrice = computed(() =>
+    jewelryRows.value.reduce((sum, r) => sum + (Number(r.sellingPrice) || 0), 0)
+  )
+
+  const closeAllDd = () => {
+    goldRows.value = goldRows.value.map((r) => ({ ...r, ddOpen: false }))
+    jewelryRows.value = jewelryRows.value.map((r) => ({ ...r, ddOpen: false }))
+  }
+
+  const goBack = () => router.push('/admin/products')
+
+  const onSaveAll = () => {
+    if (!String(product.name || '').trim()) {
+      alert('Product name is required.')
+      return
+    }
+    if (!product.productTypeId || Number(product.productTypeId) <= 0) {
+      alert('Product Type ID is required.')
+      return
+    }
+    if (product.depreciation == null || Number(product.depreciation) <= 0) {
+      alert('Depreciation is required.')
       return
     }
 
+    validateGoldRows()
+    validateJewelryRows()
+
+    const goldMissing = goldRows.value.some((r) => !r.goldPackageId)
+    const jewMissing = jewelryRows.value.some((r) => !r.jewelryPackageId)
+
+    if (goldMissing) {
+      goldError.value = 'Please choose Gold Source for every row.'
+      return
+    }
+    if (jewMissing) {
+      jewelryError.value = 'Please choose Jewellery Source for every row.'
+      return
+    }
+    if (goldError.value || jewelryError.value) return
+
     const payload = {
-      name: form.name.trim(),
-      code: form.code.trim(),
-      stockStatus: form.stockStatus.trim(),
-      desc: form.desc.trim(),
-      qty: Number(form.qty ?? 0),
-      collection: form.collection.trim(),
-      shortDesc: form.shortDesc.trim(),
-      color: Number(form.color ?? 0),
-      weight: Number(form.weight ?? 0),
-      metarialLoss: Number(form.metarialLoss ?? 0),
-      makingCost: Number(form.makingCost ?? 0),
-      colorCount: Number(form.colorCount ?? 0),
-      productTypeId: Number(form.productTypeId),
-      // tags: Object.keys(tagState).filter(k => (tagState as any)[k]),
+      product: { ...product },
+      goldForProduct: goldRows.value.map((r) => ({
+        goldPackageId: r.goldPackageId,
+        weightUsed: r.weightUsed,
+        currentPrice: r.currentPrice,
+        purity: r.purity,
+      })),
+      jewelleryForProduct: jewelryRows.value.map((r) => ({
+        jewelryPackageId: r.jewelryPackageId,
+        qty: r.qty,
+        unitWeight: r.unitWeight,
+        totalWeight: r.unitWeight * r.qty,
+        sellingPrice: r.sellingPrice,
+        originalPrice: r.originalPrice,
+      })),
     }
 
-    isSubmitting.value = true
-    try {
-      if (isEdit.value) {
-        await productsStore.updateProduct(Number(route.params.id), payload)
-      } else {
-        await productsStore.createProduct(payload)
-      }
-      goBack()
-    } catch (e: any) {
-      formError.value = e?.message ?? 'Failed to save product.'
-    } finally {
-      isSubmitting.value = false
-    }
+    console.log('SAVE payload (mock):', payload)
+    alert('Saved (mock). Check console payload.')
+    goBack()
   }
 </script>
 
 <style scoped>
-  .preg {
-    padding: 18px 18px 30px;
+  .pwrap {
     background: #f3f4f6;
-    min-height: calc(100vh - 20px);
+    min-height: 100vh;
+    padding: 18px 18px 30px;
   }
 
-  .preg__header {
+  .phead {
     background: #f3f4f6;
     border: 1px solid #e5e7eb;
     border-radius: 16px;
     padding: 14px;
   }
 
-  .preg__back {
+  .phead__back {
     border: none;
     background: transparent;
     cursor: pointer;
@@ -319,125 +899,54 @@
     color: #2563eb;
   }
 
-  .preg__titleWrap {
+  .ptitle {
     margin: 12px 2px 14px;
   }
 
-  .preg__title {
+  .ptitle__h {
     margin: 0;
     font-size: 22px;
     font-weight: 900;
     color: #111827;
   }
 
-  .preg__subtitle {
+  .ptitle__p {
     margin: 4px 0 0;
     font-size: 13px;
     color: #6b7280;
   }
 
-  .preg__layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .preg__card {
+  .pcard {
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 18px;
-    padding: 14px;
+    padding: 16px;
+    margin-top: 12px;
   }
 
-  .preg__imagesRow {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 12px;
-  }
-
-  .preg__imagePreview {
-    background: #0b1220;
-    border-radius: 14px;
-    min-height: 110px;
-    display: grid;
-    place-items: center;
-    color: #e5e7eb;
-  }
-
-  .preg__imagePreviewText {
-    text-align: center;
-    padding: 8px;
-  }
-
-  .preg__imagePreviewTitle {
-    font-weight: 900;
-    margin-bottom: 4px;
-  }
-
-  .preg__imagePreviewSub {
-    font-size: 12px;
-    opacity: 0.85;
-  }
-
-  .preg__upload {
-    border: 1px dashed #cbd5e1;
-    border-radius: 14px;
-    padding: 12px;
-    display: grid;
-    align-content: center;
-    gap: 4px;
-  }
-
-  .preg__uploadTitle {
-    font-weight: 900;
-    color: #111827;
-  }
-
-  .preg__uploadSub {
-    font-size: 12px;
-    color: #6b7280;
-  }
-
-  .preg__alert {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    background: #fff1f2;
-    border: 1px solid #fecdd3;
-    color: #9f1239;
-    padding: 10px 12px;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    font-size: 13px;
-  }
-
-  .preg__alertIcon {
-    font-size: 16px;
-  }
-
-  .preg__grid {
+  .pgrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px 16px;
   }
 
-  .preg__field {
+  .pfield {
     display: grid;
     gap: 6px;
   }
 
-  .preg__field--full {
+  .pfield--full {
     grid-column: 1 / -1;
   }
 
-  .preg__label {
+  .plabel {
     font-size: 13px;
     font-weight: 900;
     color: #374151;
   }
 
-  .preg__input,
-  .preg__textarea {
+  .pinput,
+  .ptextarea {
     width: 100%;
     border: 1px solid #d1d5db;
     border-radius: 12px;
@@ -447,23 +956,26 @@
     background: #ffffff;
   }
 
-  .preg__input:focus,
-  .preg__textarea:focus {
+  .pinput--tight {
+    padding: 9px 10px;
+    border-radius: 10px;
+  }
+
+  .pinput:focus,
+  .ptextarea:focus {
     border-color: #2563eb;
   }
 
-  .preg__textarea {
+  .ptextarea {
     resize: vertical;
   }
 
-  .preg__selectWrap {
+  .pselectWrap {
     position: relative;
   }
 
-  .preg__select {
+  .pselect {
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     width: 100%;
     border: 1px solid #d1d5db;
     border-radius: 12px;
@@ -474,107 +986,409 @@
     cursor: pointer;
   }
 
-  .preg__select:focus {
+  .pselect:focus {
     border-color: #2563eb;
   }
 
-  .preg__selectIcon {
+  .pselectIcon {
     position: absolute;
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 12px;
     opacity: 0.7;
     pointer-events: none;
   }
 
-  .preg__actions {
+  .secHead {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 14px;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 10px;
   }
 
-  .preg__btn {
+  .secHead__h {
+    margin: 0;
+    font-weight: 900;
+    font-size: 16px;
+    color: #111827;
+  }
+
+  .secHead__p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  /* purity pill */
+  .purityPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 13px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #111827;
+    white-space: nowrap;
+  }
+
+  .purityPill__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #9ca3af;
+  }
+
+  .purityPill--18 {
+    border-color: #fde68a;
+    background: #fffbeb;
+  }
+  .purityPill--18 .purityPill__dot {
+    background: #f59e0b;
+  }
+
+  .purityPill--24 {
+    border-color: #c7d2fe;
+    background: #eef2ff;
+  }
+  .purityPill--24 .purityPill__dot {
+    background: #4f46e5;
+  }
+
+  .purityPill--mix {
+    border-color: #fecaca;
+    background: #fff1f2;
+  }
+  .purityPill--mix .purityPill__dot {
+    background: #ef4444;
+  }
+
+  .purityPill--none {
+    opacity: 0.9;
+  }
+
+  /* error box */
+  .errBox {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #9f1239;
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin: 10px 0 12px;
+    font-size: 13px;
+  }
+
+  .errBox__icon {
+    font-size: 16px;
+  }
+
+  .tinyErr {
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #b91c1c;
+  }
+
+  /* mini table */
+  .miniTable {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .miniTable__head,
+  .miniTable__row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 120px;
+    gap: 0;
+    align-items: start;
+  }
+
+  .miniTable__head--wide,
+  .miniTable__row--wide {
+    grid-template-columns: 1.4fr 0.6fr 0.7fr 0.7fr 0.9fr 0.9fr 120px;
+  }
+
+  .miniTable__head {
+    background: #f9fafb;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .miniTable__th,
+  .miniTable__td {
+    padding: 12px;
+  }
+
+  .miniTable__th {
+    font-size: 12px;
+    font-weight: 900;
+    color: #374151;
+  }
+
+  .miniTable__th--actions,
+  .miniTable__td--actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .miniTable__row {
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .miniTable__row:last-child {
+    border-bottom: none;
+  }
+
+  .btnAdd {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .btnDel {
+    border: none;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  /* totals */
+  .totals {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .totals__box {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #ffffff;
+    padding: 12px;
+  }
+
+  .totals__label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 900;
+  }
+
+  .totals__value {
+    margin-top: 6px;
+    font-size: 16px;
+    font-weight: 900;
+    color: #111827;
+  }
+
+  /* readonly pill */
+  .readPill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    font-weight: 900;
+    color: #111827;
+    width: 100%;
+  }
+
+  .readPill--muted {
+    color: #374151;
+  }
+
+  /* searchable dropdown */
+  .combo {
+    position: relative;
+  }
+
+  .combo__btn {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 9px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .combo__text {
+    font-size: 13px;
+    font-weight: 900;
+    color: #111827;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
+
+  .combo__icon {
+    opacity: 0.7;
+    font-size: 12px;
+  }
+
+  .dd {
+    position: absolute;
+    z-index: 60;
+    left: 0;
+    right: 0;
+    margin-top: 8px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 18px 45px rgba(17, 24, 39, 0.12);
+    overflow: hidden;
+  }
+
+  .dd__search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f7;
+    background: #fafafa;
+  }
+
+  .dd__searchIcon {
+    opacity: 0.6;
+  }
+
+  .dd__searchInput {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    padding: 8px 10px;
+    outline: none;
+    font-size: 14px;
+    background: #ffffff;
+  }
+
+  .dd__searchInput:focus {
+    border-color: #2563eb;
+  }
+
+  .dd__list {
+    max-height: 240px;
+    overflow: auto;
+    padding: 6px;
+  }
+
+  .dd__item {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 10px 10px;
+    border-radius: 12px;
+  }
+
+  .dd__item:hover {
+    background: #eef2ff;
+  }
+
+  .dd__main {
+    font-weight: 900;
+    color: #111827;
+    font-size: 14px;
+  }
+
+  .dd__sub {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+
+  .dd__empty {
+    padding: 14px 10px;
+    color: #6b7280;
+    font-size: 13px;
+  }
+
+  /* save bar */
+  .saveBar {
+    margin-top: 14px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .saveBar__hint {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .saveBar__right {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btnGhost {
     border: none;
     border-radius: 999px;
     padding: 10px 16px;
     font-weight: 900;
     cursor: pointer;
     font-size: 14px;
-  }
-
-  .preg__btn--ghost {
     background: #f3f4f6;
     color: #111827;
   }
 
-  .preg__btn--primary {
+  .btnPrimary {
+    border: none;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-weight: 900;
+    cursor: pointer;
+    font-size: 14px;
     background: #f59e0b;
     color: #111827;
   }
 
-  /* Tag pills */
-  .tag-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-top: 4px;
-  }
-
-  .tag-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-    border-radius: 999px;
-    padding: 7px 12px;
-    cursor: pointer;
-    user-select: none;
-    font-size: 13px;
-    font-weight: 700;
-    color: #111827;
-  }
-
-  .tag-pill__input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .tag-pill__box {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    border: 1.5px solid #cbd5e1;
-    display: inline-block;
-    background: #fff;
-  }
-
-  .tag-pill__input:checked + .tag-pill__box {
-    background: #111827;
-    border-color: #111827;
-  }
-
-  .tag-pill__input:checked + .tag-pill__box::after {
-    content: '✓';
-    display: grid;
-    place-items: center;
-    color: #ffffff;
-    font-size: 12px;
-    line-height: 1;
-  }
-
-  .tag-pill:hover {
-    background: #f8fafc;
-  }
-
-  @media (max-width: 900px) {
-    .preg__grid {
+  @media (max-width: 980px) {
+    .pgrid {
       grid-template-columns: 1fr;
     }
-    .preg__imagesRow {
+    .miniTable__head,
+    .miniTable__row {
+      grid-template-columns: 1fr;
+    }
+    .miniTable__head--wide,
+    .miniTable__row--wide {
+      grid-template-columns: 1fr;
+    }
+    .miniTable__th--actions,
+    .miniTable__td--actions {
+      justify-content: flex-start;
+    }
+    .totals {
       grid-template-columns: 1fr;
     }
   }

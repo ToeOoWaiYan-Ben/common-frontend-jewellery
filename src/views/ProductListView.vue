@@ -191,8 +191,13 @@
     padding: 10px 14px;
     font-weight: 800;
     cursor: pointer;
-    background: #f59e0b;
-    color: #111827;
+    background: #1952e1;
+    color: #ffffff;
+  }
+
+  .plist__add:hover {
+    background: #201dd5b3;
+    border-color: #201dd5b3;
   }
 
   .plist__filters {

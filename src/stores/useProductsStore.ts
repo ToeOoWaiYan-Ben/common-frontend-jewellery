@@ -1,6 +1,24 @@
+// src/stores/useProductsStore.ts
 import { defineStore } from 'pinia'
-import type { ProductDto } from '../dtos/ProductDto'
 import { http } from '../services/http'
+
+export interface ProductDto {
+  id: number
+  name: string
+  code: string
+  stockStatus: string
+  desc: string
+  qty: number
+  collection: string
+  shortDesc: string
+  color: number
+  weight: number
+  metarialLoss: number
+  makingCost: number
+  colorCount: number
+  depreciation: number
+  productTypeId: number
+}
 
 interface ProductsState {
   items: ProductDto[]
@@ -15,11 +33,11 @@ type ProductApi = {
   stockStatus?: string | null
   stock_status?: string | null
   desc?: string | null
-  qty?: number | null
-  collection?: string | null
   shortDesc?: string | null
   short_desc?: string | null
-  color?: string | null
+  qty?: number | null
+  collection?: string | null
+  color?: number | null
   weight?: number | null
   metarialLoss?: number | null
   metarial_loss?: number | null
@@ -27,6 +45,7 @@ type ProductApi = {
   making_cost?: number | null
   colorCount?: number | null
   color_count?: number | null
+  depreciation?: number | null
   productTypeId?: number | null
   product_type_id?: number | null
 }
@@ -38,15 +57,16 @@ function mapToProductDto(x: ProductApi): ProductDto {
     code: (x.code ?? '') as string,
     stockStatus: (x.stockStatus ?? x.stock_status ?? '') as string,
     desc: (x.desc ?? '') as string,
-    qty: (x.qty ?? 0) as number,
+    qty: Number(x.qty ?? 0),
     collection: (x.collection ?? '') as string,
     shortDesc: (x.shortDesc ?? x.short_desc ?? '') as string,
-    color: (x.color ?? '') as string,
-    weight: (x.weight ?? 0) as number,
-    metarialLoss: (x.metarialLoss ?? x.metarial_loss ?? 0) as number,
-    makingCost: (x.makingCost ?? x.making_cost ?? 0) as number,
-    colorCount: (x.colorCount ?? x.color_count ?? 0) as number,
-    productTypeId: (x.productTypeId ?? x.product_type_id ?? 0) as number,
+    color: Number(x.color ?? 0),
+    weight: Number(x.weight ?? 0),
+    metarialLoss: Number(x.metarialLoss ?? x.metarial_loss ?? 0),
+    makingCost: Number(x.makingCost ?? x.making_cost ?? 0),
+    colorCount: Number(x.colorCount ?? x.color_count ?? 0),
+    depreciation: Number(x.depreciation ?? 0),
+    productTypeId: Number(x.productTypeId ?? x.product_type_id ?? 1),
   }
 }
 
@@ -83,15 +103,18 @@ export const useProductsStore = defineStore('products', {
           code: payload.code?.trim(),
           stockStatus: payload.stockStatus?.trim(),
           desc: payload.desc?.trim(),
-          qty: payload.qty,
           collection: payload.collection?.trim(),
           shortDesc: payload.shortDesc?.trim(),
-          color: payload.color?.trim(),
-          weight: payload.weight,
-          metarialLoss: payload.metarialLoss,
-          makingCost: payload.makingCost,
-          colorCount: payload.colorCount,
-          productTypeId: payload.productTypeId,
+
+          // ✅ numbers - NO trim
+          qty: Number(payload.qty ?? 0),
+          color: Number(payload.color ?? 0),
+          colorCount: Number(payload.colorCount ?? 0),
+          weight: Number(payload.weight ?? 0),
+          metarialLoss: Number(payload.metarialLoss ?? 0),
+          makingCost: Number(payload.makingCost ?? 0),
+          depreciation: Number(payload.depreciation ?? 0),
+          productTypeId: Number(payload.productTypeId ?? 1),
         }
 
         const createdRaw = await http<ProductApi>('/products', {
@@ -117,15 +140,18 @@ export const useProductsStore = defineStore('products', {
           code: payload.code?.trim(),
           stockStatus: payload.stockStatus?.trim(),
           desc: payload.desc?.trim(),
-          qty: payload.qty,
           collection: payload.collection?.trim(),
           shortDesc: payload.shortDesc?.trim(),
-          color: payload.color?.trim(),
-          weight: payload.weight,
-          metarialLoss: payload.metarialLoss,
-          makingCost: payload.makingCost,
-          colorCount: payload.colorCount,
-          productTypeId: payload.productTypeId,
+
+          // ✅ numbers - NO trim
+          qty: Number(payload.qty ?? 0),
+          color: Number(payload.color ?? 0),
+          colorCount: Number(payload.colorCount ?? 0),
+          weight: Number(payload.weight ?? 0),
+          metarialLoss: Number(payload.metarialLoss ?? 0),
+          makingCost: Number(payload.makingCost ?? 0),
+          depreciation: Number(payload.depreciation ?? 0),
+          productTypeId: Number(payload.productTypeId ?? 1),
         }
 
         const updatedRaw = await http<ProductApi>(`/products/${id}`, {
