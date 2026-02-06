@@ -1,32 +1,32 @@
 <template>
   <div class="settings-page">
     <h1 class="settings-title">Setting</h1>
-    <p class="settings-sub">Choose a form to open</p>
+    <p class="settings-sub">Choose to Manage</p>
 
     <div class="grid">
       <RouterLink to="/admin/register-form" class="card">
-        <h3>Register Form</h3>
+        <h3>Register</h3>
         <p>Create new admin/user</p>
       </RouterLink>
 
       <RouterLink to="/admin/categories" class="card">
-        <h3>Category Form</h3>
+        <h3>Category Master</h3>
         <p>Manage categories</p>
       </RouterLink>
 
       <RouterLink to="/admin/crafts" class="card">
-        <h3>Craft Form</h3>
+        <h3>Craft Master</h3>
         <p>Manage crafts</p>
       </RouterLink>
 
       <RouterLink to="/admin/gem-type-form" class="card">
-        <h3>Gems Type Form</h3>
+        <h3>Gems Type Master</h3>
         <p>Manage gem types</p>
       </RouterLink>
 
       <RouterLink to="/admin/seller-form" class="card">
-        <h3>Seller Form</h3>
-        <p>Manage sellers</p>
+        <h3>Merchant Master</h3>
+        <p>Manage merchants</p>
       </RouterLink>
 
       <RouterLink to="/admin/gold-source" class="card">
@@ -45,8 +45,23 @@
       </RouterLink>
 
       <RouterLink to="/admin/product-tags" class="card">
-        <h3>Product Tag Form</h3>
+        <h3>Product Tag Master</h3>
         <p>Create a new product tag</p>
+      </RouterLink>
+
+      <RouterLink to="/admin/customers" class="card">
+        <h3>Customer Master</h3>
+        <p>Manage customers</p>
+      </RouterLink>
+
+      <RouterLink to="/admin/promotions" class="card">
+        <h3>Promotions</h3>
+        <p>Manage discount campaigns</p>
+      </RouterLink>
+
+      <RouterLink to="/admin/gold-price-history" class="card">
+        <h3>Gold Price History</h3>
+        <p>Track daily gold prices</p>
       </RouterLink>
     </div>
   </div>

@@ -28,6 +28,17 @@ export const useGemsPackagesStore = defineStore('gemsPackages', {
         this.loading = false
       }
     },
+    async loadAvailable() {
+      this.loading = true
+      this.error = null
+      try {
+        this.items = await http<GemsPackageDto[]>('/gems-packages/available')
+      } catch (e: any) {
+        this.error = e?.message ?? 'Failed to load available packages.'
+      } finally {
+        this.loading = false
+      }
+    },
 
     async create(payload: Omit<GemsPackageDto, 'id'>) {
       this.loading = true
