@@ -79,6 +79,7 @@
           <div class="gp-field">
             <label class="gp-label">Name *</label>
             <input v-model.trim="form.name" class="gp-input" placeholder="e.g. Diamond Set A" />
+            <small v-if="fieldErrors.name" class="gp-error">{{ fieldErrors.name }}</small>
           </div>
 
           <!-- Package No -->
@@ -91,6 +92,9 @@
               placeholder="e.g. 1001"
               @input="form.packageNumber = toIntOrNull(($event.target as HTMLInputElement).value)"
             />
+            <small v-if="fieldErrors.packageNumber" class="gp-error">{{
+              fieldErrors.packageNumber
+            }}</small>
           </div>
 
           <!-- Unit Weight (per gem) -> gemsSize -->
@@ -104,53 +108,40 @@
               placeholder="e.g. 0.02"
               @input="form.gemsSize = toNumOrNull(($event.target as HTMLInputElement).value)"
             />
+            <small v-if="fieldErrors.gemsSize" class="gp-error">
+              {{ fieldErrors.gemsSize }}
+            </small>
           </div>
 
-          <!-- Package Weight (total) -> gemsWeight -->
+          <!-- Quantity (INPUT) -->
+          <div class="gp-field">
+            <label class="gp-label">Quantity *</label>
+            <input
+              :value="form.quantity ?? ''"
+              class="gp-input"
+              type="number"
+              placeholder="e.g. 100"
+              @input="form.quantity = toIntOrNull(($event.target as HTMLInputElement).value)"
+            />
+            <small v-if="fieldErrors.quantity" class="gp-error">{{ fieldErrors.quantity }}</small>
+          </div>
+
+          <!-- Package Weight (Carat) (AUTO) -->
           <div class="gp-field">
             <label class="gp-label">Package Weight (Carat)</label>
             <input
-              :value="form.gemsWeight ?? ''"
+              :value="packageWeightDisplay"
               class="gp-input"
-              type="number"
-              step="0.0001"
-              placeholder="e.g. 3.50"
-              @input="form.gemsWeight = toNumOrNull(($event.target as HTMLInputElement).value)"
+              type="text"
+              readonly
+              placeholder="auto"
             />
+            <small v-if="fieldErrors.gemsWeight" class="gp-error">
+              {{ fieldErrors.gemsWeight }}
+            </small>
           </div>
 
-          <!-- ✅ Qty block (Actual + Estimated + diff message) -->
-          <div class="gp-field gp-field--full">
-            <div class="ae-block">
-              <div class="ae-left">
-                <div class="ae-row">
-                  <label class="ae-label">Actual Qty</label>
-                  <input
-                    :value="form.quantity ?? ''"
-                    class="ae-input"
-                    type="number"
-                    placeholder="e.g. 100"
-                    @input="form.quantity = toIntOrNull(($event.target as HTMLInputElement).value)"
-                  />
-                </div>
-
-                <div class="ae-row">
-                  <label class="ae-label">Estimate Qty</label>
-                  <input
-                    :value="estimatedQtyDisplay"
-                    class="ae-input"
-                    type="text"
-                    readonly
-                    placeholder="auto"
-                  />
-                </div>
-              </div>
-
-              <div class="ae-right ae-diff" v-if="showQtyDiff">
-                Actual and Estimated Qty have difference
-              </div>
-            </div>
-          </div>
+        
 
           <!-- ✅ Price block (Unit Price input + totals auto + diff message) -->
           <div class="gp-field gp-field--full">
@@ -166,6 +157,9 @@
                     placeholder="e.g. 1.20"
                     @input="form.unitPrice = toNumOrNull(($event.target as HTMLInputElement).value)"
                   />
+                  <small v-if="fieldErrors.unitPrice" class="gp-error">
+                    {{ fieldErrors.unitPrice }}
+                  </small>
                 </div>
 
                 <div class="gp-field">
@@ -180,6 +174,9 @@
                       form.totalPrice = toNumOrNull(($event.target as HTMLInputElement).value)
                     "
                   />
+                  <small v-if="fieldErrors.totalPrice" class="gp-error">
+                    {{ fieldErrors.totalPrice }}
+                  </small>
                 </div>
 
                 <div class="ae-row">
@@ -219,18 +216,27 @@
             >
               No gem types found. Please register gem types first.
             </small>
+            <small v-if="fieldErrors.gemTypeId" class="gp-error">
+              {{ fieldErrors.gemTypeId }}
+            </small>
           </div>
 
           <!-- Buy Date -->
           <div class="gp-field">
             <label class="gp-label">Buy Date</label>
             <input v-model="form.buyDate" class="gp-input" type="date" />
+            <small v-if="fieldErrors.buyDate" class="gp-error">
+              {{ fieldErrors.buyDate }}
+            </small>
           </div>
 
           <!-- Color -->
           <div class="gp-field">
             <label class="gp-label">Color</label>
             <input v-model.trim="form.color" class="gp-input" placeholder="e.g. D" />
+            <small v-if="fieldErrors.color" class="gp-error">
+              {{ fieldErrors.color }}
+            </small>
           </div>
 
           <!-- Cutting -->
@@ -250,6 +256,9 @@
               <option value="Radiant">Radiant</option>
               <option value="Heart">Heart</option>
             </select>
+            <small v-if="fieldErrors.cutting" class="gp-error">
+              {{ fieldErrors.cutting }}
+            </small>
           </div>
 
           <!-- Certificate -->
@@ -293,6 +302,9 @@
             <small class="gp-muted" style="display: block; margin-top: 6px">
               Selected:
               <b>{{ form.sellerId ? `${form.sellerId} - ${form.sellerName ?? ''}` : '-' }}</b>
+            </small>
+            <small v-if="fieldErrors.sellerId" class="gp-error">
+              {{ fieldErrors.sellerId }}
             </small>
           </div>
 
@@ -358,7 +370,7 @@
 
             <div class="gp-preview-row">
               <span class="gp-muted">Package Weight</span>
-              <span class="gp-strong">{{ form.gemsWeight ?? '-' }}</span>
+              <span class="gp-strong">{{ packageWeightDisplay ?? '-' }}</span>
             </div>
 
             <div class="gp-preview-row">
@@ -367,8 +379,13 @@
             </div>
 
             <div class="gp-preview-row">
-              <span class="gp-muted">Estimated Qty</span>
-              <span class="gp-strong">{{ estimatedQtyDisplay || '-' }}</span>
+              <span class="gp-muted">Quantity</span>
+              <span class="gp-strong">{{ form.quantity ?? '-' }}</span>
+            </div>
+
+            <div class="gp-preview-row">
+              <span class="gp-muted">Package Weight</span>
+              <span class="gp-strong">{{ packageWeightDisplay || '-' }}</span>
             </div>
 
             <div class="gp-preview-row">
@@ -438,6 +455,9 @@
   const form = reactive<Omit<GemsPackageDto, 'id'>>(blank())
   const snapshot = ref(JSON.stringify(form))
 
+  const formError = ref<string | null>(null)
+  const fieldErrors = reactive<Partial<Record<string, string>>>({})
+
   const isEdit = computed(() => editId.value != null)
   const dirty = computed(() => JSON.stringify(form) !== snapshot.value)
 
@@ -472,22 +492,17 @@
     return gemTypesStore.items.find((x) => x.id === form.gemTypeId)?.name ?? '-'
   })
 
-  // ✅ Estimated qty = packageWeight / unitWeight = gemsWeight / gemsSize
-  const estimatedQty = computed<number | null>(() => {
-    const pw = form.gemsWeight
+  const packageWeight = computed<number | null>(() => {
     const uw = form.gemsSize
-    if (pw == null || uw == null) return null
-    if (pw <= 0 || uw <= 0) return null
-    return Math.round(pw / uw)
+    const qty = form.quantity
+    if (uw == null || qty == null) return null
+    if (uw <= 0 || qty <= 0) return null
+    return Number((uw * qty).toFixed(4))
   })
 
-  const estimatedQtyDisplay = computed(() =>
-    estimatedQty.value == null ? '' : String(estimatedQty.value)
+  const packageWeightDisplay = computed(() =>
+    packageWeight.value == null ? '' : String(packageWeight.value)
   )
-  const showQtyDiff = computed(() => {
-    if (form.quantity == null || estimatedQty.value == null) return false
-    return form.quantity !== estimatedQty.value
-  })
 
   // ✅ INPUT (Actual Total Price) — user types this (NOT derived)
   const actualTotalPriceDisplay = computed(() =>
@@ -536,6 +551,46 @@
     sellerQuery.value = `${id} - ${name}`
     showSellerDropdown.value = false
   }
+  function clearErrors() {
+    formError.value = null
+    for (const k in fieldErrors) {
+      fieldErrors[k] = ''
+    }
+  }
+
+  function applyBackendErrors(e: any) {
+    const errors = e?.data?.errors
+    if (errors && typeof errors === 'object') {
+      clearErrors()
+      Object.assign(fieldErrors, errors)
+      return true
+    }
+    return false
+  }
+  function openCreate() {
+    showForm.value = true
+    editId.value = null
+    Object.assign(form, blank())
+    sellerQuery.value = ''
+    snapshot.value = JSON.stringify(form)
+
+    setTimeout(() => {
+      document.querySelector('.gp-grid--below')?.scrollIntoView({ behavior: 'smooth' })
+    }, 0)
+  }
+  function openEdit(row: GemsPackageDto) {
+    showForm.value = true
+    editId.value = row.id
+    Object.assign(form, { ...row })
+    snapshot.value = JSON.stringify(form)
+    clearErrors()
+  }
+
+  function resetForm() {
+    Object.assign(form, blank())
+    snapshot.value = JSON.stringify(form)
+    clearErrors()
+  }
 
   onMounted(async () => {
     await store.loadAll()
@@ -566,66 +621,36 @@
     return Number.isFinite(n) ? n : null
   }
 
-  function openCreate() {
-    showForm.value = true
-    editId.value = null
-    Object.assign(form, blank())
-    sellerQuery.value = ''
-    snapshot.value = JSON.stringify(form)
-  }
-
-  function openEdit(row: GemsPackageDto) {
-    showForm.value = true
-    editId.value = row.id
-
-    Object.assign(form, {
-      ...row,
-      gemTypeId: row.gemTypeId ?? null,
-      quantity: row.quantity ?? null,
-      unitPrice: row.unitPrice ?? null,
-      totalPrice: row.totalPrice ?? null,
-    })
-    ;(form as any).id = undefined
-
-    sellerQuery.value = row.sellerId ? `${row.sellerId} - ${row.sellerName ?? ''}` : ''
-    snapshot.value = JSON.stringify(form)
-  }
-
   function closeForm() {
     showForm.value = false
     editId.value = null
   }
 
-  function resetForm() {
-    if (isEdit.value) {
-      const row = store.items.find((x) => x.id === editId.value)
-      if (row) {
-        Object.assign(form, { ...row, gemTypeId: row.gemTypeId ?? null })
-        ;(form as any).id = undefined
-        sellerQuery.value = row.sellerId ? `${row.sellerId} - ${row.sellerName ?? ''}` : ''
-        snapshot.value = JSON.stringify(form)
-      }
+  async function save() {
+    clearErrors()
+    form.gemsWeight = packageWeight.value
+
+    if (!form.name.trim()) {
+      fieldErrors.name = 'Name is required'
       return
     }
 
-    Object.assign(form, blank())
-    sellerQuery.value = ''
-    snapshot.value = JSON.stringify(form)
-  }
+    try {
+      if (isEdit.value) {
+        await store.update(editId.value!, { ...form })
+      } else {
+        await store.create({ ...form })
+      }
 
-  async function save() {
-    if (!form.name.trim()) return
+      await store.loadAll()
+      closeForm()
+    } catch (e: any) {
+      // ✅ show field errors under inputs
+      if (applyBackendErrors(e)) return
 
-    // ✅ Always store correct actual total to backend
-
-    if (isEdit.value) {
-      await store.update(editId.value!, { ...form })
-    } else {
-      await store.create({ ...form })
+      // ✅ fallback top error
+      formError.value = e?.message ?? 'Failed to save.'
     }
-
-    await store.loadAll()
-    closeForm()
   }
 
   async function onDelete(row: GemsPackageDto) {
@@ -732,5 +757,15 @@
     border: 1px solid #fecaca;
     padding: 10px 12px;
     border-radius: 10px;
+  }
+  .gp-input--error {
+    border-color: #dc2626 !important;
+  }
+
+  .gp-error {
+    color: #dc2626;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
   }
 </style>

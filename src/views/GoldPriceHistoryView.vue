@@ -50,15 +50,6 @@
           </select>
         </div>
 
-        <!-- Unit -->
-        <div class="category-form__row">
-          <label class="category-form__label" for="unit">Unit *</label>
-          <select id="unit" v-model="form.unit" class="category-form__input" required>
-            <option value="PER_KYAT">MMK / Kyat</option>
-            <option value="PER_GRAM">MMK / Gram</option>
-          </select>
-        </div>
-
         <!-- Buy Price -->
         <div class="category-form__row">
           <label class="category-form__label" for="buyPrice">Buy Price (MMK) *</label>
@@ -150,7 +141,6 @@
       <th style="width: 60px">#</th>
       <th>Date</th>
       <th>Purity</th>
-      <th>Unit</th>
       <th>Buy Price</th>
       <th>Sell Price</th>
       <th>Status</th>
@@ -162,7 +152,6 @@
       <td>{{ item.id }}</td>
       <td>{{ item.recordDate }}</td>
       <td>{{ item.purity }}</td>
-      <td>{{ item.unit }}</td>
       <td>{{ formatMMK(item.buyPrice) }}</td>
       <td>{{ formatMMK(item.sellPrice) }}</td>
       <td>{{ item.status }}</td>
@@ -210,7 +199,6 @@
       return (
         x.recordDate.toLowerCase().includes(term) ||
         x.purity.toLowerCase().includes(term) ||
-        x.unit.toLowerCase().includes(term) ||
         x.status.toLowerCase().includes(term)
       )
     })
@@ -252,7 +240,6 @@
   const form = reactive<Omit<GoldPriceHistoryDto, 'id' | 'createdAt' | 'updatedAt'>>({
     recordDate: '',
     purity: 'K24',
-    unit: 'MMK_PER_KYAT',
     buyPrice: 0,
     sellPrice: 0,
     status: 'ACTIVE',
@@ -261,7 +248,6 @@
   const resetForm = () => {
     form.recordDate = ''
     form.purity = 'K24'
-    form.unit = 'MMK_PER_KYAT'
     form.buyPrice = 0
     form.sellPrice = 0
     form.status = 'ACTIVE'
@@ -293,7 +279,6 @@
 
     form.recordDate = x.recordDate
     form.purity = x.purity
-    form.unit = x.unit
     form.buyPrice = x.buyPrice
     form.sellPrice = x.sellPrice
     form.status = x.status

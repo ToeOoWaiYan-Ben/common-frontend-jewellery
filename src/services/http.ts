@@ -10,7 +10,6 @@ function clearAuth() {
 }
 
 function redirectToLogin() {
-  // simplest (no router import needed)
   const next = encodeURIComponent(window.location.pathname + window.location.search)
   window.location.href = `/login?next=${next}`
 }
@@ -23,10 +22,10 @@ function isPublicEndpoint(path: string) {
   )
 }
 
-async function parseError(res: Response) {
+// ✅ read JSON safely (only ONCE)
+async function parseErrorJson(res: Response) {
   try {
-    const data = await res.json()
-    return data?.message || data?.error || data?.detail || JSON.stringify(data)
+    return await res.json()
   } catch {
     return null
   }
@@ -35,12 +34,12 @@ async function parseError(res: Response) {
 export async function http<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers || {})
 
+  // ✅ set JSON content-type automatically
   if (!(options.body instanceof FormData)) {
-    if (!headers.has('Content-Type')) {
-      headers.set('Content-Type', 'application/json')
-    }
+    if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
   }
 
+  // ✅ attach token for protected APIs
   if (!isPublicEndpoint(path)) {
     const token = getToken()
     if (token) headers.set('Authorization', `Bearer ${token}`)
@@ -51,15 +50,28 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
     headers,
   })
 
+  // ✅ auth handling
   if ((res.status === 401 || res.status === 403) && !isPublicEndpoint(path)) {
     clearAuth()
     redirectToLogin()
     throw new Error('Unauthorized: redirecting to login')
   }
 
+  // ✅ error handling with backend json preserved
   if (!res.ok) {
-    const msg = (await parseError(res)) || `${res.status} ${res.statusText}`
-    throw new Error(msg)
+    const data = await parseErrorJson(res)
+
+    const msg =
+      data?.message ||
+      data?.error ||
+      data?.detail ||
+      (typeof data === 'string' ? data : null) ||
+      `${res.status} ${res.statusText}`
+
+    const err: any = new Error(msg)
+    err.status = res.status
+    err.data = data // ✅ important: now UI can do e.data.errors
+    throw err
   }
 
   if (res.status === 204) return undefined as T
