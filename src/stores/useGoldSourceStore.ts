@@ -26,11 +26,11 @@ type GoldSourceApi = {
 function mapToGoldSourceDto(x: GoldSourceApi): GoldSourceDto {
   return {
     id: x.id,
-    goldPurity: ((x.goldPurity ?? x.gold_purity) ?? '') as string,
+    goldPurity: (x.goldPurity ?? x.gold_purity ?? '') as string,
     weight: Number(x.weight ?? 0),
     color: (x.color ?? '') as string,
-    sourceCountry: ((x.sourceCountry ?? x.source_country) ?? '') as string,
-    originalPrice: Number((x.originalPrice ?? x.original_price) ?? 0),
+    sourceCountry: (x.sourceCountry ?? x.source_country ?? '') as string,
+    originalPrice: Number(x.originalPrice ?? x.original_price ?? 0),
     sellerId: (x.sellerId ?? x.seller_id ?? null) as number | null,
     name: (x.name ?? '') as string,
   }

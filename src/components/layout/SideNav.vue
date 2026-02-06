@@ -1,14 +1,10 @@
 <template>
   <aside class="side-nav">
-  
-
     <!-- Menu -->
     <div class="side-nav__menu">
       <ul class="side-nav__list">
         <li class="side-nav__item">
-          <RouterLink to="/admin" class="side-nav__link">
-            Dashboard
-          </RouterLink>
+          <RouterLink to="/admin" class="side-nav__link"> Dashboard </RouterLink>
         </li>
 
         <li class="side-nav__item">
@@ -37,7 +33,7 @@
             class="side-nav__link"
             active-class="side-nav__link--active"
           >
-           Products List
+            Products List
           </RouterLink>
         </li>
 
@@ -50,7 +46,7 @@
             Gems Packages
           </RouterLink>
         </li>
-        
+
         <li class="side-nav__item">
           <RouterLink
             to="/admin/settings"
@@ -60,7 +56,6 @@
             Settings
           </RouterLink>
         </li>
-        
       </ul>
     </div>
   </aside>

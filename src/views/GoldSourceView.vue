@@ -41,7 +41,13 @@
 
           <div class="gs-field">
             <label class="gs-label" for="weight">Weight</label>
-            <input id="weight" v-model.number="formWeight" class="gs-input" type="number" step="0.01" />
+            <input
+              id="weight"
+              v-model.number="formWeight"
+              class="gs-input"
+              type="number"
+              step="0.01"
+            />
           </div>
 
           <div class="gs-field">
@@ -72,7 +78,12 @@
         </div>
 
         <div class="gs-actions">
-          <button class="gs-btn gs-btn--ghost" type="button" @click="resetForm" :disabled="isSubmitting">
+          <button
+            class="gs-btn gs-btn--ghost"
+            type="button"
+            @click="resetForm"
+            :disabled="isSubmitting"
+          >
             Reset
           </button>
 

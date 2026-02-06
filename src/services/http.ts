@@ -51,34 +51,32 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
     headers,
   })
 
-// ✅ Only 401 means "not logged in" (token missing/expired)
-if (res.status === 401 && !isPublicEndpoint(path)) {
-  clearAuth()
-  redirectToLogin()
-  throw new Error('Unauthorized: redirecting to login')
-}
+  // ✅ Only 401 means "not logged in" (token missing/expired)
+  if (res.status === 401 && !isPublicEndpoint(path)) {
+    clearAuth()
+    redirectToLogin()
+    throw new Error('Unauthorized: redirecting to login')
+  }
 
-// ✅ 403 means "logged in but not allowed" (DON'T logout)
-if (res.status === 403 && !isPublicEndpoint(path)) {
-  const msg = (await parseError(res)) || 'Forbidden'
-  throw new Error(msg)
-}
+  // ✅ 403 means "logged in but not allowed" (DON'T logout)
+  if (res.status === 403 && !isPublicEndpoint(path)) {
+    const msg = (await parseError(res)) || 'Forbidden'
+    throw new Error(msg)
+  }
 
+  if (!res.ok) {
+    const msg = (await parseError(res)) || `${res.status} ${res.statusText}`
+    throw new Error(msg)
+  }
 
-if (!res.ok) {
-  const msg = (await parseError(res)) || `${res.status} ${res.statusText}`
-  throw new Error(msg)
-}
+  // ✅ handle empty responses safely (DELETE often returns 200 with empty body)
+  if (res.status === 204) return undefined as T
 
-// ✅ handle empty responses safely (DELETE often returns 200 with empty body)
-if (res.status === 204) return undefined as T
+  const contentType = res.headers.get('content-type') || ''
+  const text = await res.text()
 
-const contentType = res.headers.get('content-type') || ''
-const text = await res.text()
+  if (!text) return undefined as T
+  if (!contentType.includes('application/json')) return text as unknown as T
 
-if (!text) return undefined as T
-if (!contentType.includes('application/json')) return text as unknown as T
-
-return JSON.parse(text) as T
-
+  return JSON.parse(text) as T
 }

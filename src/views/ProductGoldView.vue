@@ -101,7 +101,9 @@
                     @click="selectGoldSource(g)"
                   >
                     <div class="pgx__ddMain">{{ g.name }}</div>
-                    <div class="pgx__ddSub">#{{ g.id }} • {{ g.goldPurity || '-' }} • {{ g.sourceCountry || '-' }}</div>
+                    <div class="pgx__ddSub">
+                      #{{ g.id }} • {{ g.goldPurity || '-' }} • {{ g.sourceCountry || '-' }}
+                    </div>
                   </button>
 
                   <div v-if="filteredGoldSources.length === 0" class="pgx__ddEmpty">
@@ -147,9 +149,7 @@
                     <div class="pgx__ddSub">#{{ c.id }} • {{ c.phone || '-' }}</div>
                   </button>
 
-                  <div v-if="filteredCrafts.length === 0" class="pgx__ddEmpty">
-                    No crafts found
-                  </div>
+                  <div v-if="filteredCrafts.length === 0" class="pgx__ddEmpty">No crafts found</div>
                 </div>
               </div>
             </div>
@@ -185,16 +185,29 @@
         </div>
 
         <div class="pgx__actions">
-          <button class="pgx__btn pgx__btn--ghost" type="button" @click="resetForm" :disabled="isSubmitting">
+          <button
+            class="pgx__btn pgx__btn--ghost"
+            type="button"
+            @click="resetForm"
+            :disabled="isSubmitting"
+          >
             Reset
           </button>
 
-          <button v-if="isEditing" class="pgx__btn pgx__btn--ghost" type="button" @click="closeEdit" :disabled="isSubmitting">
+          <button
+            v-if="isEditing"
+            class="pgx__btn pgx__btn--ghost"
+            type="button"
+            @click="closeEdit"
+            :disabled="isSubmitting"
+          >
             Close
           </button>
 
           <button class="pgx__btn pgx__btn--primary" type="submit" :disabled="isSubmitting">
-            {{ isSubmitting ? (isEditing ? 'Updating…' : 'Saving…') : (isEditing ? 'Update' : 'Save') }}
+            {{
+              isSubmitting ? (isEditing ? 'Updating…' : 'Saving…') : isEditing ? 'Update' : 'Save'
+            }}
           </button>
         </div>
       </form>
@@ -254,7 +267,12 @@
 
   // ✅ lookup types
   type ProductMini = { id: number; name: string; code?: string | null }
-  type GoldSourceMini = { id: number; name: string; goldPurity?: number | null; sourceCountry?: string | null }
+  type GoldSourceMini = {
+    id: number
+    name: string
+    goldPurity?: number | null
+    sourceCountry?: string | null
+  }
   type CraftMini = { id: number; shopName: string; phone?: string | null }
 
   const store = useProductGoldStore()
@@ -312,10 +330,11 @@
     const term = searchTerm.value.trim().toLowerCase()
     if (!term) return items.value
 
-    return items.value.filter((x) =>
-      (x.productName ?? '').toLowerCase().includes(term) ||
-      (x.goldSourceName ?? '').toLowerCase().includes(term) ||
-      (x.craftShopName ?? '').toLowerCase().includes(term)
+    return items.value.filter(
+      (x) =>
+        (x.productName ?? '').toLowerCase().includes(term) ||
+        (x.goldSourceName ?? '').toLowerCase().includes(term) ||
+        (x.craftShopName ?? '').toLowerCase().includes(term)
     )
   })
 
@@ -359,19 +378,25 @@
   const filteredProducts = computed(() => {
     const term = productQuery.value.trim().toLowerCase()
     if (!term) return products.value
-    return products.value.filter((p) => (p.name ?? '').toLowerCase().includes(term) || String(p.id).includes(term))
+    return products.value.filter(
+      (p) => (p.name ?? '').toLowerCase().includes(term) || String(p.id).includes(term)
+    )
   })
 
   const filteredGoldSources = computed(() => {
     const term = goldSourceQuery.value.trim().toLowerCase()
     if (!term) return goldSources.value
-    return goldSources.value.filter((g) => (g.name ?? '').toLowerCase().includes(term) || String(g.id).includes(term))
+    return goldSources.value.filter(
+      (g) => (g.name ?? '').toLowerCase().includes(term) || String(g.id).includes(term)
+    )
   })
 
   const filteredCrafts = computed(() => {
     const term = craftQuery.value.trim().toLowerCase()
     if (!term) return crafts.value
-    return crafts.value.filter((c) => (c.shopName ?? '').toLowerCase().includes(term) || String(c.id).includes(term))
+    return crafts.value.filter(
+      (c) => (c.shopName ?? '').toLowerCase().includes(term) || String(c.id).includes(term)
+    )
   })
 
   // ✅ toggle dropdowns

@@ -29,26 +29,25 @@
         <p>Manage sellers</p>
       </RouterLink>
 
-        <RouterLink to="/admin/gold-source" class="card">
-         <h3>Gold Source Form</h3>
-         <p>Manage gold sources</p>
-        </RouterLink>
+      <RouterLink to="/admin/gold-source" class="card">
+        <h3>Gold Source Form</h3>
+        <p>Manage gold sources</p>
+      </RouterLink>
 
       <RouterLink to="/admin/jewelry-types" class="card">
         <h3>Jewelry Material Form</h3>
         <p>Manage jewelry materials</p>
       </RouterLink>
 
-        <RouterLink to="/admin/product-gold" class="card">
-         <h3>Product Gold Form</h3>
-         <p>Manage product gold</p>
-        </RouterLink>
+      <RouterLink to="/admin/product-gold" class="card">
+        <h3>Product Gold Form</h3>
+        <p>Manage product gold</p>
+      </RouterLink>
 
-<RouterLink to="/admin/product-tags" class="card">
-  <h3>Product Tag Form</h3>
-  <p>Create a new product tag</p>
-</RouterLink>
-
+      <RouterLink to="/admin/product-tags" class="card">
+        <h3>Product Tag Form</h3>
+        <p>Create a new product tag</p>
+      </RouterLink>
     </div>
   </div>
 </template>

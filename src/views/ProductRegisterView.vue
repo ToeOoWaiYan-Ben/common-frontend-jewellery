@@ -7,7 +7,9 @@
 
     <div class="ptitle">
       <h2 class="ptitle__h">{{ isEdit ? 'Edit product' : 'Add product' }}</h2>
-      <p class="ptitle__p">Create product + add gold sources + add jewellery sources (mock now, DB later).</p>
+      <p class="ptitle__p">
+        Create product + add gold sources + add jewellery sources (mock now, DB later).
+      </p>
     </div>
 
     <!-- MAIN PRODUCT CARD -->
@@ -15,7 +17,12 @@
       <div class="pgrid">
         <div class="pfield">
           <label class="plabel">Name *</label>
-          <input v-model="product.name" class="pinput" type="text" placeholder="e.g. Gold Ring 18K" />
+          <input
+            v-model="product.name"
+            class="pinput"
+            type="text"
+            placeholder="e.g. Gold Ring 18K"
+          />
         </div>
 
         <div class="pfield">
@@ -38,19 +45,35 @@
 
         <div class="pfield">
           <label class="plabel">Qty</label>
-          <input v-model.number="product.qty" class="pinput" type="number" min="0" placeholder="e.g. 10" />
+          <input
+            v-model.number="product.qty"
+            class="pinput"
+            type="number"
+            min="0"
+            placeholder="e.g. 10"
+          />
         </div>
 
         <!-- ✅ NEW: Collection -->
         <div class="pfield">
           <label class="plabel">Collection</label>
-          <input v-model="product.collection" class="pinput" type="text" placeholder="e.g. Classic" />
+          <input
+            v-model="product.collection"
+            class="pinput"
+            type="text"
+            placeholder="e.g. Classic"
+          />
         </div>
 
         <!-- ✅ NEW: Color -->
         <div class="pfield">
           <label class="plabel">Color</label>
-          <input v-model="product.color" class="pinput" type="text" placeholder="e.g. Yellow Gold" />
+          <input
+            v-model="product.color"
+            class="pinput"
+            type="text"
+            placeholder="e.g. Yellow Gold"
+          />
         </div>
 
         <!-- ✅ NEW: Weight -->
@@ -95,7 +118,13 @@
         <!-- ✅ NEW: Color Count -->
         <div class="pfield">
           <label class="plabel">Color Count</label>
-          <input v-model.number="product.colorCount" class="pinput" type="number" min="0" placeholder="e.g. 2" />
+          <input
+            v-model.number="product.colorCount"
+            class="pinput"
+            type="number"
+            min="0"
+            placeholder="e.g. 2"
+          />
         </div>
 
         <!-- ✅ NEW: Depreciation -->
@@ -125,12 +154,22 @@
 
         <div class="pfield pfield--full">
           <label class="plabel">Short Desc</label>
-          <input v-model="product.shortDesc" class="pinput" type="text" placeholder="e.g. 18K ring with clean design" />
+          <input
+            v-model="product.shortDesc"
+            class="pinput"
+            type="text"
+            placeholder="e.g. 18K ring with clean design"
+          />
         </div>
 
         <div class="pfield pfield--full">
           <label class="plabel">Desc (varchar300)</label>
-          <textarea v-model="product.desc" class="ptextarea" rows="3" placeholder="Write product description..."></textarea>
+          <textarea
+            v-model="product.desc"
+            class="ptextarea"
+            rows="3"
+            placeholder="Write product description..."
+          ></textarea>
         </div>
       </div>
     </div>
@@ -140,7 +179,9 @@
       <div class="secHead">
         <div>
           <h3 class="secHead__h">Add Gold For Product</h3>
-          <p class="secHead__p">Choose purchased gold package (Gold Source), enter used weight + current price.</p>
+          <p class="secHead__p">
+            Choose purchased gold package (Gold Source), enter used weight + current price.
+          </p>
         </div>
 
         <div class="purityPill" :class="purityClass">
@@ -193,7 +234,8 @@
                   >
                     <div class="dd__main">{{ g.packageId }}</div>
                     <div class="dd__sub">
-                      {{ g.merchantName }} • Available: {{ g.availableWeight }} • Purity: {{ g.purity }}
+                      {{ g.merchantName }} • Available: {{ g.availableWeight }} • Purity:
+                      {{ g.purity }}
                     </div>
                   </button>
 
@@ -255,7 +297,9 @@
       <div class="secHead">
         <div>
           <h3 class="secHead__h">Add Jewellery For Product</h3>
-          <p class="secHead__p">Choose jewellery source, enter qty + selling price. Original price comes from DB.</p>
+          <p class="secHead__p">
+            Choose jewellery source, enter qty + selling price. Original price comes from DB.
+          </p>
         </div>
       </div>
 
@@ -277,7 +321,11 @@
           </div>
         </div>
 
-        <div v-for="(row, idx) in jewelryRows" :key="row.key" class="miniTable__row miniTable__row--wide">
+        <div
+          v-for="(row, idx) in jewelryRows"
+          :key="row.key"
+          class="miniTable__row miniTable__row--wide"
+        >
           <div class="miniTable__td">
             <div class="combo" @click.stop>
               <button class="combo__btn" type="button" @click="toggleJewelryDd(idx)">
@@ -306,7 +354,8 @@
                   >
                     <div class="dd__main">{{ j.packageId }}</div>
                     <div class="dd__sub">
-                      {{ j.type }} • Available Qty: {{ j.availableQty }} • Unit Wt: {{ j.unitWeight }} • Original:
+                      {{ j.type }} • Available Qty: {{ j.availableQty }} • Unit Wt:
+                      {{ j.unitWeight }} • Original:
                       {{ j.originalPrice.toLocaleString() }}
                     </div>
                   </button>
@@ -384,8 +433,7 @@
 
     <!-- SAVE -->
     <div class="saveBar">
-      <div class="saveBar__left">
-      </div>
+      <div class="saveBar__left"></div>
       <div class="saveBar__right">
         <button class="btnGhost" type="button" @click="goBack">Cancel</button>
         <button class="btnPrimary" type="button" @click="onSaveAll">Save</button>
@@ -402,7 +450,6 @@
   const route = useRoute()
   const isEdit = computed(() => !!route.params.id)
 
-  // ✅ ProductDto full
   const product = reactive({
     id: 0,
     name: '',
@@ -432,10 +479,38 @@
   }
 
   const goldPackages: GoldPkg[] = [
-    { id: 1, packageId: 'Pac 1101', merchantName: 'Gold Merchant A', availableWeight: 20, purity: '18K', currentPricePerUnit: 4000 },
-    { id: 2, packageId: 'Pac 1102', merchantName: 'Gold Merchant A', availableWeight: 50, purity: '18K', currentPricePerUnit: 4000 },
-    { id: 3, packageId: 'Pac 1103', merchantName: 'Gold Merchant B', availableWeight: 60, purity: '24K', currentPricePerUnit: 5200 },
-    { id: 4, packageId: 'Pac 1104', merchantName: 'Gold Merchant C', availableWeight: 70, purity: '18K', currentPricePerUnit: 4100 },
+    {
+      id: 1,
+      packageId: 'Pac 1101',
+      merchantName: 'Gold Merchant A',
+      availableWeight: 20,
+      purity: '18K',
+      currentPricePerUnit: 4000,
+    },
+    {
+      id: 2,
+      packageId: 'Pac 1102',
+      merchantName: 'Gold Merchant A',
+      availableWeight: 50,
+      purity: '18K',
+      currentPricePerUnit: 4000,
+    },
+    {
+      id: 3,
+      packageId: 'Pac 1103',
+      merchantName: 'Gold Merchant B',
+      availableWeight: 60,
+      purity: '24K',
+      currentPricePerUnit: 5200,
+    },
+    {
+      id: 4,
+      packageId: 'Pac 1104',
+      merchantName: 'Gold Merchant C',
+      availableWeight: 70,
+      purity: '18K',
+      currentPricePerUnit: 4100,
+    },
   ]
 
   type JewelryPkg = {
@@ -448,9 +523,30 @@
   }
 
   const jewelryPackages: JewelryPkg[] = [
-    { id: 11, packageId: 'Pac J-103', type: 'Ring', availableQty: 50, unitWeight: 3.9, originalPrice: 290000 },
-    { id: 12, packageId: 'Pac J-210', type: 'Necklace', availableQty: 30, unitWeight: 6.5, originalPrice: 480000 },
-    { id: 13, packageId: 'Pac J-305', type: 'Bracelet', availableQty: 20, unitWeight: 4.2, originalPrice: 360000 },
+    {
+      id: 11,
+      packageId: 'Pac J-103',
+      type: 'Ring',
+      availableQty: 50,
+      unitWeight: 3.9,
+      originalPrice: 290000,
+    },
+    {
+      id: 12,
+      packageId: 'Pac J-210',
+      type: 'Necklace',
+      availableQty: 30,
+      unitWeight: 6.5,
+      originalPrice: 480000,
+    },
+    {
+      id: 13,
+      packageId: 'Pac J-305',
+      type: 'Bracelet',
+      availableQty: 20,
+      unitWeight: 4.2,
+      originalPrice: 360000,
+    },
   ]
 
   // ----- GOLD ROWS -----
@@ -634,7 +730,10 @@
   }
 
   const toggleJewelryDd = (idx: number) => {
-    jewelryRows.value = jewelryRows.value.map((r, i) => ({ ...r, ddOpen: i === idx ? !r.ddOpen : false }))
+    jewelryRows.value = jewelryRows.value.map((r, i) => ({
+      ...r,
+      ddOpen: i === idx ? !r.ddOpen : false,
+    }))
     goldRows.value = goldRows.value.map((r) => ({ ...r, ddOpen: false }))
   }
 
@@ -698,7 +797,8 @@
       }
     })
 
-    if (hasAnyError) jewelryError.value = 'Please fix errors in Jewellery rows (qty/price mismatch).'
+    if (hasAnyError)
+      jewelryError.value = 'Please fix errors in Jewellery rows (qty/price mismatch).'
   }
 
   const totalJewelryQty = computed(() =>
@@ -706,7 +806,10 @@
   )
 
   const totalJewelryWeight = computed(() =>
-    jewelryRows.value.reduce((sum, r) => sum + (Number(r.qty) || 0) * (Number(r.unitWeight) || 0), 0)
+    jewelryRows.value.reduce(
+      (sum, r) => sum + (Number(r.qty) || 0) * (Number(r.unitWeight) || 0),
+      0
+    )
   )
 
   const totalSellingPrice = computed(() =>
@@ -721,7 +824,6 @@
   const goBack = () => router.push('/admin/products')
 
   const onSaveAll = () => {
-    // ✅ validate required product fields
     if (!String(product.name || '').trim()) {
       alert('Product name is required.')
       return

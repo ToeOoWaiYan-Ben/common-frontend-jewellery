@@ -60,7 +60,9 @@ export const useProductGoldStore = defineStore('productGold', {
       }
     },
 
-    async create(payload: Omit<ProductGoldDto, 'id' | 'productName' | 'goldSourceName' | 'craftShopName'>) {
+    async create(
+      payload: Omit<ProductGoldDto, 'id' | 'productName' | 'goldSourceName' | 'craftShopName'>
+    ) {
       this.loading = true
       try {
         const body = {
@@ -86,7 +88,10 @@ export const useProductGoldStore = defineStore('productGold', {
       }
     },
 
-    async update(id: number, payload: Omit<ProductGoldDto, 'id' | 'productName' | 'goldSourceName' | 'craftShopName'>) {
+    async update(
+      id: number,
+      payload: Omit<ProductGoldDto, 'id' | 'productName' | 'goldSourceName' | 'craftShopName'>
+    ) {
       this.loading = true
       try {
         const body = {

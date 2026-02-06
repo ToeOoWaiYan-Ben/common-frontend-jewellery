@@ -25,8 +25,6 @@ import RegisterFormView from '../views/RegisterFormView.vue'
 import GemTypeFormView from '../views/GemTypeFormView.vue'
 import SellerFormView from '../views/SellerFormView.vue'
 
-
-
 /* -------- User Storefront -------- */
 import CatalogView from '../views/user/CatalogView.vue'
 import ProductDetailView from '../views/user/ProductDetailView.vue'
@@ -68,7 +66,12 @@ const routes: RouteRecordRaw[] = [
       { path: 'orders', name: 'orders', component: OrdersView },
       { path: 'products', name: 'products', component: ProductListView },
       { path: 'products/new', name: 'product-new', component: ProductRegisterView },
-      { path: 'products/:id/edit', name: 'product-edit', component: ProductRegisterView, props: true },
+      {
+        path: 'products/:id/edit',
+        name: 'product-edit',
+        component: ProductRegisterView,
+        props: true,
+      },
 
       { path: 'categories', name: 'categories', component: CategoriesView },
       { path: 'crafts', name: 'crafts', component: CraftsView },
@@ -77,7 +80,6 @@ const routes: RouteRecordRaw[] = [
       { path: 'product-tags', name: 'product-tags', component: ProductTagsView },
       { path: 'gold-source', name: 'gold-source', component: GoldSourceView },
       { path: 'product-gold', name: 'product-gold', component: ProductGoldView },
-
 
       /* --- forms that are standalone pages --- */
       { path: 'register-form', name: 'register-form', component: RegisterFormView },
