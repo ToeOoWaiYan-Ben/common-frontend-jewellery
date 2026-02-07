@@ -27,7 +27,7 @@ import SellerFormView from '../views/SellerFormView.vue'
 import CustomersView from '../views/CustomersView.vue'
 import GoldPriceHistoryView from '../views/GoldPriceHistoryView.vue'
 import PromotionsView from '../views/PromotionsView.vue'
-
+import ImageUploadView from '../views/AdminImagesView.vue'
 /* -------- User Storefront -------- */
 import CatalogView from '../views/user/CatalogView.vue'
 import ProductDetailView from '../views/user/ProductDetailView.vue'
@@ -86,6 +86,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'customers', name: 'customers', component: CustomersView },
       { path: 'gold-price-history', name: 'gold-price-history', component: GoldPriceHistoryView },
       { path: 'promotions', name: 'promotions', component: PromotionsView },
+      { path: 'images', name: 'images', component: ImageUploadView },
 
       /* --- forms that are standalone pages --- */
       { path: 'register-form', name: 'register-form', component: RegisterFormView },
