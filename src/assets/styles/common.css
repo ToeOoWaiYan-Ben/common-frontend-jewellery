@@ -784,7 +784,7 @@ body {
 
 .side-nav {
   width: 260px;
-  background: #f5f8ff; /* ✅ sidebar background */
+  background: #ffffff; /* ✅ sidebar background */
   color: #0f172a;
   flex-shrink: 0;
   min-height: calc(100vh - 52px);
