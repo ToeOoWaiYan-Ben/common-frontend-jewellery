@@ -1,3 +1,23 @@
+export interface ProductGoldItemDto {
+  id?: number
+  goldSourceId: number
+  craftId: number
+  weight: number
+  goldPurity: string
+  goldSourceName?: string
+  craftShopName?: string
+}
+
+export interface ProductJewelleryItemDto {
+  id?: number
+  gemsPackageId: number
+  qty: number
+  sellingPrice: number
+  gemsPackageName?: string
+  originalPrice?: number
+  unitWeight?: number
+}
+
 export interface ProductDto {
   id: number
   name: string
@@ -13,5 +33,9 @@ export interface ProductDto {
   makingCost: number
   colorCount: number
   depreciation: number
-  productTypeId: number | null
+  productTypeId: number
+
+  // ✅ matches backend fields
+  productGolds: ProductGoldItemDto[]
+  productJewellerys: ProductJewelleryItemDto[]
 }

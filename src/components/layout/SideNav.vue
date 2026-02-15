@@ -46,6 +46,16 @@
             Gems Packages
           </RouterLink>
         </li>
+        
+        <li class="side-nav__item">
+  <RouterLink
+    to="/admin/purchases"
+    class="side-nav__link"
+    active-class="side-nav__link--active"
+  >
+    Purchases
+  </RouterLink>
+</li>
 
         <li class="side-nav__item">
           <RouterLink

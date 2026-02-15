@@ -22,7 +22,6 @@ function isPublicEndpoint(path: string) {
   )
 }
 
-// ✅ read JSON safely (only ONCE)
 async function parseErrorJson(res: Response) {
   try {
     return await res.json()
@@ -34,12 +33,10 @@ async function parseErrorJson(res: Response) {
 export async function http<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = new Headers(options.headers || {})
 
-  // ✅ set JSON content-type automatically
   if (!(options.body instanceof FormData)) {
     if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
   }
 
-  // ✅ attach token for protected APIs
   if (!isPublicEndpoint(path)) {
     const token = getToken()
     if (token) headers.set('Authorization', `Bearer ${token}`)
@@ -50,14 +47,12 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
     headers,
   })
 
-  // ✅ auth handling
   if ((res.status === 401 || res.status === 403) && !isPublicEndpoint(path)) {
     clearAuth()
     redirectToLogin()
     throw new Error('Unauthorized: redirecting to login')
   }
 
-  // ✅ error handling with backend json preserved
   if (!res.ok) {
     const data = await parseErrorJson(res)
 
@@ -70,11 +65,10 @@ export async function http<T>(path: string, options: RequestInit = {}): Promise<
 
     const err: any = new Error(msg)
     err.status = res.status
-    err.data = data // ✅ important: now UI can do e.data.errors
+    err.data = data
     throw err
   }
 
-  // ✅ handle empty responses safely (DELETE often returns 200 with empty body)
   if (res.status === 204) return undefined as T
 
   const contentType = res.headers.get('content-type') || ''

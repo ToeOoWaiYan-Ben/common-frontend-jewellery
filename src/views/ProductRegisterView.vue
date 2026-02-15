@@ -53,17 +53,38 @@
 
         <div class="pfield">
           <label class="plabel">Weight</label>
-          <input v-model.number="product.weight" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 5.20" />
+          <input
+            v-model.number="product.weight"
+            class="pinput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="e.g. 5.20"
+          />
         </div>
 
         <div class="pfield">
           <label class="plabel">Metarial Loss</label>
-          <input v-model.number="product.metarialLoss" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 0.30" />
+          <input
+            v-model.number="product.metarialLoss"
+            class="pinput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="e.g. 0.30"
+          />
         </div>
 
         <div class="pfield">
           <label class="plabel">Making Cost</label>
-          <input v-model.number="product.makingCost" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 120" />
+          <input
+            v-model.number="product.makingCost"
+            class="pinput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="e.g. 120"
+          />
         </div>
 
         <div class="pfield">
@@ -73,7 +94,14 @@
 
         <div class="pfield">
           <label class="plabel">Depreciation *</label>
-          <input v-model.number="product.depreciation" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 0.10" />
+          <input
+            v-model.number="product.depreciation"
+            class="pinput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="e.g. 0.10"
+          />
         </div>
 
         <div class="pfield">
@@ -98,7 +126,7 @@
       <div class="secHead">
         <div>
           <h3 class="secHead__h">Add Gold For Product</h3>
-          <p class="secHead__p">Choose purchased gold package (Gold Source), enter used weight + current price.</p>
+          <p class="secHead__p">Choose purchased gold package (Gold Source) + craft, enter used weight + current price.</p>
         </div>
 
         <div class="purityPill" :class="purityClass">
@@ -113,8 +141,9 @@
       </div>
 
       <div class="miniTable">
-        <div class="miniTable__head">
+        <div class="miniTable__head miniTable__head--gold">
           <div class="miniTable__th">Gold Source *</div>
+          <div class="miniTable__th">Craft *</div>
           <div class="miniTable__th">Weight Used (kyat/g) *</div>
           <div class="miniTable__th">Current Price (MMK) *</div>
           <div class="miniTable__th miniTable__th--actions">
@@ -122,7 +151,8 @@
           </div>
         </div>
 
-        <div v-for="(row, idx) in product.goldRows" :key="row.key" class="miniTable__row">
+        <div v-for="(row, idx) in product.goldRows" :key="row.key" class="miniTable__row miniTable__row--gold">
+          <!-- GOLD SOURCE -->
           <div class="miniTable__td">
             <div class="combo" @click.stop>
               <button class="combo__btn" type="button" @click.stop="toggleGoldDd(idx)">
@@ -130,16 +160,10 @@
                 <span class="combo__icon">▾</span>
               </button>
 
-              <!-- ✅ GOLD dropdown (uses goldSources ONLY) -->
               <div v-if="row.ddOpen" class="dd dd--up" @click.stop>
                 <div class="dd__search">
                   <span class="dd__searchIcon">🔍</span>
-                  <input
-                    v-model="row.query"
-                    class="dd__searchInput"
-                    type="text"
-                    placeholder="Search package id / merchant..."
-                  />
+                  <input v-model="row.query" class="dd__searchInput" type="text" placeholder="Search package id / merchant..." />
                 </div>
 
                 <div class="dd__list">
@@ -157,14 +181,47 @@
                     </div>
                   </button>
 
-                  <div v-if="filteredGoldSources(row.query).length === 0" class="dd__empty">
-                    No gold packages found
-                  </div>
+                  <div v-if="filteredGoldSources(row.query).length === 0" class="dd__empty">No gold packages found</div>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- CRAFT -->
+          <div class="miniTable__td">
+            <div class="combo" @click.stop>
+              <button class="combo__btn" type="button" @click.stop="toggleCraftDd(idx)">
+                <span class="combo__text">{{ row.craftLabel || 'Select craft' }}</span>
+                <span class="combo__icon">▾</span>
+              </button>
+
+              <div v-if="row.craftDdOpen" class="dd dd--up" @click.stop>
+                <div class="dd__search">
+                  <span class="dd__searchIcon">🔍</span>
+                  <input v-model="row.craftQuery" class="dd__searchInput" type="text" placeholder="Search shop name / NRC / phone..." />
+                </div>
+
+                <div class="dd__list">
+                  <button
+                    v-for="c in filteredCrafts(row.craftQuery)"
+                    :key="c.id"
+                    class="dd__item"
+                    type="button"
+                    @click.stop="selectCraft(idx, c)"
+                  >
+                    <div class="dd__main">{{ c.shopName }}</div>
+                    <div class="dd__sub">NRC: {{ c.nrc }} • Phone: {{ c.phone }}</div>
+                  </button>
+
+                  <div v-if="filteredCrafts(row.craftQuery).length === 0" class="dd__empty">No crafts found</div>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="row.craftError" class="tinyErr">{{ row.craftError }}</div>
+          </div>
+
+          <!-- WEIGHT -->
           <div class="miniTable__td">
             <input
               v-model.number="row.weightUsed"
@@ -178,6 +235,7 @@
             <div v-if="row.weightError" class="tinyErr">{{ row.weightError }}</div>
           </div>
 
+          <!-- PRICE -->
           <div class="miniTable__td">
             <input
               v-model.number="row.currentPrice"
@@ -250,16 +308,10 @@
                 <span class="combo__icon">▾</span>
               </button>
 
-              <!-- ✅ JEWELLERY dropdown (uses gemsPackages ONLY) -->
               <div v-if="row.ddOpen" class="dd dd--up" @click.stop>
                 <div class="dd__search">
                   <span class="dd__searchIcon">🔍</span>
-                  <input
-                    v-model="row.query"
-                    class="dd__searchInput"
-                    type="text"
-                    placeholder="Search package name / gem type..."
-                  />
+                  <input v-model="row.query" class="dd__searchInput" type="text" placeholder="Search package name / gem type..." />
                 </div>
 
                 <div class="dd__list">
@@ -278,9 +330,7 @@
                     </div>
                   </button>
 
-                  <div v-if="filteredGemPackages(row.query).length === 0" class="dd__empty">
-                    No jewellery packages found
-                  </div>
+                  <div v-if="filteredGemPackages(row.query).length === 0" class="dd__empty">No jewellery packages found</div>
                 </div>
               </div>
             </div>
@@ -364,10 +414,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { http } from '../services/http'
 import type { GoldSourceDto } from '../dtos/GoldSourceDto'
 import type { GemsPackageDto } from '../dtos/GemsPackageDto'
+import type { CraftDto } from '../dtos/CraftDto'
+import { useProductsStore } from '../stores/useProductsStore'
 
 const router = useRouter()
 const route = useRoute()
 const isEdit = computed(() => !!route.params.id)
+
+const productsStore = useProductsStore()
 
 type GoldRow = {
   key: string
@@ -381,6 +435,12 @@ type GoldRow = {
   currentPrice: number
   weightError: string
   priceError: string
+
+  craftDdOpen: boolean
+  craftQuery: string
+  craftId: number | null
+  craftLabel: string
+  craftError: string
 }
 
 type JewelryRow = {
@@ -428,6 +488,12 @@ const product = reactive({
       currentPrice: 0,
       weightError: '',
       priceError: '',
+
+      craftDdOpen: false,
+      craftQuery: '',
+      craftId: null,
+      craftLabel: '',
+      craftError: '',
     },
   ] as GoldRow[],
 
@@ -449,9 +515,9 @@ const product = reactive({
   ] as JewelryRow[],
 })
 
-// DB lists
 const goldSources = ref<GoldSourceDto[]>([])
 const gemsPackages = ref<GemsPackageDto[]>([])
+const crafts = ref<CraftDto[]>([])
 
 onMounted(async () => {
   try {
@@ -465,18 +531,28 @@ onMounted(async () => {
   } catch {
     gemsPackages.value = []
   }
+
+  try {
+    crafts.value = (await http<CraftDto[]>('/crafts')) ?? []
+  } catch {
+    crafts.value = []
+  }
 })
 
-// -------- helpers --------
-const unitPriceFromPackage = (p: any) => {
-  // Prefer these if your API has it:
-  // unitPrice, unit_price, pricePerUnit
-  const direct =
-    Number(p.unitPrice ?? p.unit_price ?? p.pricePerUnit ?? p.unit_price_mmk ?? NaN)
+/** ✅ IMPORTANT FIX: convert "18 K" / "24K" -> 18 / 24 (Float) */
+const parseGoldPurityToFloat = (val: any): number => {
+  if (val == null) return 0
+  if (typeof val === 'number') return val
+  const s = String(val).trim()
+  const m = s.match(/(\d+(\.\d+)?)/) // first number
+  if (!m) return 0
+  return Number(m[1])
+}
 
+const unitPriceFromPackage = (p: any) => {
+  const direct = Number(p.unitPrice ?? p.unit_price ?? p.pricePerUnit ?? p.unit_price_mmk ?? NaN)
   if (!Number.isNaN(direct)) return direct
 
-  // Fallback (if your API only has total/original price + quantity)
   const total = Number(p.originalPrice ?? p.original_price ?? 0)
   const qty = Number(p.quantity ?? 0)
   if (qty > 0) return Math.round(total / qty)
@@ -487,12 +563,8 @@ const unitPriceFromPackage = (p: any) => {
 // ----- GOLD -----
 const goldError = ref<string | null>(null)
 
-const totalGoldWeight = computed(() =>
-  product.goldRows.reduce((sum, r) => sum + (Number(r.weightUsed) || 0), 0)
-)
-const totalGoldPrice = computed(() =>
-  product.goldRows.reduce((sum, r) => sum + (Number(r.currentPrice) || 0), 0)
-)
+const totalGoldWeight = computed(() => product.goldRows.reduce((sum, r) => sum + (Number(r.weightUsed) || 0), 0))
+const totalGoldPrice = computed(() => product.goldRows.reduce((sum, r) => sum + (Number(r.currentPrice) || 0), 0))
 
 const goldPurityLabel = computed(() => {
   const purities = product.goldRows.map((r) => (r.purity || '').trim()).filter(Boolean)
@@ -522,9 +594,27 @@ const filteredGoldSources = (q: string) => {
   )
 }
 
+const filteredCrafts = (q: string) => {
+  const term = (q || '').trim().toLowerCase()
+  if (!term) return crafts.value
+  return crafts.value.filter(
+    (c) =>
+      (c.shopName || '').toLowerCase().includes(term) ||
+      (c.nrc || '').toLowerCase().includes(term) ||
+      (c.phone || '').toLowerCase().includes(term) ||
+      String(c.id).includes(term)
+  )
+}
+
 const toggleGoldDd = (idx: number) => {
-  // IMPORTANT: only open GOLD dropdown, close all jewellery dropdowns
   product.goldRows.forEach((r, i) => (r.ddOpen = i === idx ? !r.ddOpen : false))
+  product.goldRows.forEach((r) => (r.craftDdOpen = false))
+  product.jewelryRows.forEach((r) => (r.ddOpen = false))
+}
+
+const toggleCraftDd = (idx: number) => {
+  product.goldRows.forEach((r, i) => (r.craftDdOpen = i === idx ? !r.craftDdOpen : false))
+  product.goldRows.forEach((r) => (r.ddOpen = false))
   product.jewelryRows.forEach((r) => (r.ddOpen = false))
 }
 
@@ -532,10 +622,19 @@ const selectGoldSource = (idx: number, g: GoldSourceDto) => {
   const row = product.goldRows[idx]
   row.goldSourceId = g.id
   row.sourceLabel = g.name || ''
-  row.purity = g.goldPurity || ''
-  row.availableWeight = Number(g.weight ?? 0)
+  row.purity = (g as any).goldPurity || ''
+  row.availableWeight = Number((g as any).weight ?? 0)
   row.ddOpen = false
   row.query = ''
+  validateGoldRows()
+}
+
+const selectCraft = (idx: number, c: CraftDto) => {
+  const row = product.goldRows[idx]
+  row.craftId = (c as any).id
+  row.craftLabel = (c as any).shopName || ''
+  row.craftDdOpen = false
+  row.craftQuery = ''
   validateGoldRows()
 }
 
@@ -552,6 +651,12 @@ const addGoldRow = () => {
     currentPrice: 0,
     weightError: '',
     priceError: '',
+
+    craftDdOpen: false,
+    craftQuery: '',
+    craftId: null,
+    craftLabel: '',
+    craftError: '',
   })
   validateGoldRows()
 }
@@ -569,27 +674,42 @@ const validateGoldRows = () => {
   product.goldRows.forEach((r) => {
     r.weightError = ''
     r.priceError = ''
+    r.craftError = ''
 
-    if (r.goldSourceId) {
-      if ((r.weightUsed ?? 0) <= 0) {
-        r.weightError = 'Weight is required.'
-        hasAnyError = true
-      } else if (r.availableWeight > 0 && r.weightUsed > r.availableWeight) {
-        r.weightError = `Exceeds available weight (${r.availableWeight}).`
-        hasAnyError = true
-      }
+    if (!r.craftId) {
+      r.craftError = 'Craft is required.'
+      hasAnyError = true
+    }
 
-      if ((r.currentPrice ?? 0) <= 0) {
-        r.priceError = 'Current price is required.'
-        hasAnyError = true
-      }
+    if (!r.goldSourceId) {
+      hasAnyError = true
+      return
+    }
+
+    if ((r.weightUsed ?? 0) <= 0) {
+      r.weightError = 'Weight is required.'
+      hasAnyError = true
+    } else if (r.availableWeight > 0 && r.weightUsed > r.availableWeight) {
+      r.weightError = `Exceeds available weight (${r.availableWeight}).`
+      hasAnyError = true
+    }
+
+    if ((r.currentPrice ?? 0) <= 0) {
+      r.priceError = 'Current price is required.'
+      hasAnyError = true
+    }
+
+    // ✅ ensure purity can be converted to float (not 0)
+    const purityVal = parseGoldPurityToFloat(r.purity)
+    if (purityVal <= 0) {
+      hasAnyError = true
     }
   })
 
   if (hasAnyError) goldError.value = 'Please fill the Gold Information !!.'
 }
 
-// ----- JEWELLERY (GemsPackage) -----
+// ----- JEWELLERY -----
 const jewelryError = ref<string | null>(null)
 
 const filteredGemPackages = (q: string) => {
@@ -604,9 +724,9 @@ const filteredGemPackages = (q: string) => {
 }
 
 const toggleJewelryDd = (idx: number) => {
-  // IMPORTANT: only open JEWELLERY dropdown, close all gold dropdowns
   product.jewelryRows.forEach((r, i) => (r.ddOpen = i === idx ? !r.ddOpen : false))
   product.goldRows.forEach((r) => (r.ddOpen = false))
+  product.goldRows.forEach((r) => (r.craftDdOpen = false))
 }
 
 const selectJewelryPackage = (idx: number, p: GemsPackageDto) => {
@@ -615,7 +735,7 @@ const selectJewelryPackage = (idx: number, p: GemsPackageDto) => {
   row.sourceLabel = (p as any).name || ''
   row.availableQty = Number((p as any).quantity ?? 0)
   row.unitWeight = Number((p as any).gemsSize ?? 0)
-  row.unitPrice = unitPriceFromPackage(p as any) // ✅ unit price from gem package
+  row.unitPrice = unitPriceFromPackage(p as any)
   row.ddOpen = false
   row.query = ''
   validateJewelryRows()
@@ -653,46 +773,44 @@ const validateJewelryRows = () => {
     r.qtyError = ''
     r.sellError = ''
 
-    if (r.gemsPackageId) {
-      if ((r.qty ?? 0) <= 0) {
-        r.qtyError = 'Qty is required.'
-        hasAnyError = true
-      } else if (r.availableQty > 0 && r.qty > r.availableQty) {
-        r.qtyError = `Exceeds available qty (${r.availableQty}).`
-        hasAnyError = true
-      }
+    if (!r.gemsPackageId) {
+      hasAnyError = true
+      return
+    }
 
-      if ((r.sellingPrice ?? 0) <= 0) {
-        r.sellError = 'Selling price is required.'
-        hasAnyError = true
-      }
+    if ((r.qty ?? 0) <= 0) {
+      r.qtyError = 'Qty is required.'
+      hasAnyError = true
+    } else if (r.availableQty > 0 && r.qty > r.availableQty) {
+      r.qtyError = `Exceeds available qty (${r.availableQty}).`
+      hasAnyError = true
+    }
+
+    if ((r.sellingPrice ?? 0) <= 0) {
+      r.sellError = 'Selling price is required.'
+      hasAnyError = true
     }
   })
 
   if (hasAnyError) jewelryError.value = 'Please fill the Jewellery Information !!.'
 }
 
-const totalJewelryQty = computed(() =>
-  product.jewelryRows.reduce((sum, r) => sum + (Number(r.qty) || 0), 0)
-)
-
+const totalJewelryQty = computed(() => product.jewelryRows.reduce((sum, r) => sum + (Number(r.qty) || 0), 0))
 const totalJewelryWeight = computed(() =>
   product.jewelryRows.reduce((sum, r) => sum + (Number(r.qty) || 0) * (Number(r.unitWeight) || 0), 0)
 )
-
-const totalSellingPrice = computed(() =>
-  product.jewelryRows.reduce((sum, r) => sum + (Number(r.sellingPrice) || 0), 0)
-)
+const totalSellingPrice = computed(() => product.jewelryRows.reduce((sum, r) => sum + (Number(r.sellingPrice) || 0), 0))
 
 // ----- UI -----
 const closeAllDd = () => {
   product.goldRows.forEach((r) => (r.ddOpen = false))
+  product.goldRows.forEach((r) => (r.craftDdOpen = false))
   product.jewelryRows.forEach((r) => (r.ddOpen = false))
 }
 
 const goBack = () => router.push('/admin/products')
 
-const onSaveAll = () => {
+const onSaveAll = async () => {
   if (!String(product.name || '').trim()) return alert('Product name is required.')
   if (!product.productTypeId || Number(product.productTypeId) <= 0) return alert('Product Type ID is required.')
   if (product.depreciation == null || Number(product.depreciation) <= 0) return alert('Depreciation is required.')
@@ -700,42 +818,94 @@ const onSaveAll = () => {
   validateGoldRows()
   validateJewelryRows()
 
-  const goldMissing = product.goldRows.some((r) => !r.goldSourceId)
+  const goldMissing = product.goldRows.some((r) => !r.goldSourceId || !r.craftId)
   const jewMissing = product.jewelryRows.some((r) => !r.gemsPackageId)
 
-  if (goldMissing) return (goldError.value = 'Please choose Gold Source for every row.')
+  if (goldMissing) return (goldError.value = 'Please choose Gold Source + Craft for every row.')
   if (jewMissing) return (jewelryError.value = 'Please choose Jewellery package for every row.')
   if (goldError.value || jewelryError.value) return
 
-  const payload = {
-    product: {
-      ...product,
-      goldRows: undefined,
-      jewelryRows: undefined,
-    },
-    goldForProduct: product.goldRows.map((r) => ({
-      goldSourceId: r.goldSourceId,
-      weightUsed: r.weightUsed,
-      currentPrice: r.currentPrice,
-      purity: r.purity,
-    })),
-    jewelleryForProduct: product.jewelryRows.map((r) => ({
-      gemsPackageId: r.gemsPackageId,
-      qty: r.qty,
-      unitWeight: r.unitWeight,
-      totalWeight: r.unitWeight * r.qty,
-      sellingPrice: r.sellingPrice,
-      unitPrice: r.unitPrice,
-    })),
-  }
+  try {
+    await productsStore.createProduct({
+      name: product.name,
+      code: product.code,
+      stockStatus: product.stockStatus,
+      desc: product.desc,
+      qty: Number(product.qty ?? 0),
+      collection: product.collection,
+      shortDesc: product.shortDesc,
+      color: product.color,
+      weight: Number(product.weight ?? 0),
+      metarialLoss: Number(product.metarialLoss ?? 0),
+      makingCost: Number(product.makingCost ?? 0),
+      colorCount: Number(product.colorCount ?? 0),
+      depreciation: Number(product.depreciation ?? 0),
+      productTypeId: Number(product.productTypeId ?? 1),
 
-  console.log('SAVE payload:', payload)
-  alert('Saved (mock). Check console payload.')
-  goBack()
+      // ✅ FIXED HERE: goldPurity must be FLOAT, not "18 K"
+      productGolds: product.goldRows.map((r) => ({
+        goldSourceId: r.goldSourceId!,
+        craftId: r.craftId!,
+        weight: Number(r.weightUsed ?? 0),
+        goldPurity: parseGoldPurityToFloat(r.purity), // ✅ Float
+      })),
+
+      productJewellerys: product.jewelryRows.map((r) => ({
+        gemsPackageId: r.gemsPackageId!,
+        qty: Number(r.qty ?? 0),
+        sellingPrice: Number(r.sellingPrice ?? 0),
+      })),
+    } as any)
+
+    await productsStore.loadProducts()
+    alert('Saved successfully!')
+    goBack()
+  } catch (e: any) {
+    alert(e?.message ?? 'Failed to save product.')
+  }
 }
 </script>
-
 <style scoped>
+/* =========================================================
+   ✅ GOLD TABLE FIX (Put this at the TOP)
+   Reason: your generic .miniTable__head overrides the gold grid.
+   We use higher-specificity selectors: .miniTable__head.miniTable__head--gold
+   ========================================================= */
+
+/* ✅ force GOLD header + rows to be 5 columns (Gold | Craft | Weight | Price | Actions) */
+.miniTable__head.miniTable__head--gold,
+.miniTable__row.miniTable__row--gold {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.9fr 0.9fr 170px;
+  gap: 0;
+  align-items: center; /* vertically center like Jewellery table */
+}
+
+/* ✅ move +Add and Delete to the right corner */
+.miniTable__head.miniTable__head--gold .miniTable__th--actions,
+.miniTable__row.miniTable__row--gold .miniTable__td--actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 16px;
+  padding-left: 0;
+}
+
+/* ✅ make buttons consistent + avoid wrapping */
+.btnAdd,
+.btnDel {
+  white-space: nowrap;
+  min-width: 92px;
+}
+
+/* ✅ keep dropdown above everything */
+.combo { position: relative; }
+.dd { z-index: 9999; }
+
+/* =========================================================
+   ✅ KEEP ALL YOUR EXISTING CSS BELOW (no breaking changes)
+   ========================================================= */
+
 .pwrap { background:#f3f4f6; min-height:100vh; padding:18px 18px 30px; }
 .phead { background:#f3f4f6; border:1px solid #e5e7eb; border-radius:16px; padding:14px; }
 .phead__back { border:none; background:transparent; cursor:pointer; font-weight:900; color:#2563eb; }
@@ -777,7 +947,7 @@ const onSaveAll = () => {
 .errBox__icon { font-size:16px; }
 .tinyErr { margin-top:6px; font-size:12px; font-weight:800; color:#b91c1c; }
 
-.miniTable { border:1px solid #e5e7eb; border-radius:16px; overflow:visible; } /* ✅ allow dropdown to overflow nicely */
+.miniTable { border:1px solid #e5e7eb; border-radius:16px; overflow:visible; }
 .miniTable__head,.miniTable__row { display:grid; grid-template-columns:1.3fr 1fr 1fr 120px; gap:0; align-items:start; }
 .miniTable__head--wide,.miniTable__row--wide { grid-template-columns:1.4fr .6fr .7fr .7fr .9fr .9fr 120px; }
 
@@ -789,8 +959,11 @@ const onSaveAll = () => {
 .miniTable__row { background:#fff; border-bottom:1px solid #f1f5f9; }
 .miniTable__row:last-child { border-bottom:none; }
 
-.btnAdd { border:none; background:#2563eb; color:#fff; border-radius:999px; padding:8px 12px; font-weight:900; cursor:pointer; font-size:13px; }
-.btnDel { border:none; background:#fee2e2; color:#991b1b; border-radius:999px; padding:8px 12px; font-weight:900; cursor:pointer; font-size:13px; }
+/* buttons */
+.btnAdd { border:none; background:#2563eb; color:#fff; border-radius:999px; padding:10px 14px; font-weight:900; cursor:pointer; font-size:13px; }
+.btnDel { border:none; background:#fee2e2; color:#991b1b; border-radius:999px; padding:10px 14px; font-weight:900; cursor:pointer; font-size:13px; }
+.btnAdd:hover { filter: brightness(0.95); }
+.btnDel:hover { filter: brightness(0.97); }
 
 .totals { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-top:12px; }
 .totals__box { border:1px solid #e5e7eb; border-radius:14px; background:#fff; padding:12px; }
@@ -800,13 +973,11 @@ const onSaveAll = () => {
 .readPill { display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 12px; border-radius:999px; border:1px solid #e5e7eb; background:#f9fafb; font-weight:900; color:#111827; width:100%; }
 .readPill--muted { color:#374151; }
 
-/* searchable dropdown */
-.combo { position:relative; }
 .combo__btn { width:100%; border:1px solid #d1d5db; background:#fff; border-radius:12px; padding:9px 10px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .combo__text { font-size:13px; font-weight:900; color:#111827; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; text-align:left; }
 .combo__icon { opacity:.7; font-size:12px; }
 
-.dd { position:absolute; z-index:9999; left:0; right:0; border-radius:14px; border:1px solid #e5e7eb; background:#fff; box-shadow:0 18px 45px rgba(17,24,39,.12); overflow:hidden; }
+.dd { position:absolute; left:0; right:0; border-radius:14px; border:1px solid #e5e7eb; background:#fff; box-shadow:0 18px 45px rgba(17,24,39,.12); overflow:hidden; }
 .dd--up { bottom:calc(100% + 8px); }
 
 .dd__search { display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid #eef2f7; background:#fafafa; }
@@ -830,7 +1001,10 @@ const onSaveAll = () => {
   .pgrid { grid-template-columns:1fr; }
   .miniTable__head,.miniTable__row { grid-template-columns:1fr; }
   .miniTable__head--wide,.miniTable__row--wide { grid-template-columns:1fr; }
-  .miniTable__th--actions,.miniTable__td--actions { justify-content:flex-start; }
+
+  /* ✅ keep actions on the right even on mobile */
+  .miniTable__th--actions,.miniTable__td--actions { justify-content:flex-end; }
+
   .totals { grid-template-columns:1fr; }
 }
 </style>

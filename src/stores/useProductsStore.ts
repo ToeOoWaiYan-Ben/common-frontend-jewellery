@@ -1,30 +1,6 @@
-// src/stores/useProductsStore.ts
 import { defineStore } from 'pinia'
 import { http } from '../services/http'
-
-export interface ProductDto {
-  id: number
-  name: string
-  code: string
-  stockStatus: string
-  desc: string
-  qty: number
-  collection: string
-  shortDesc: string
-  color: number
-  weight: number
-  metarialLoss: number
-  makingCost: number
-  colorCount: number
-  depreciation: number
-  productTypeId: number
-}
-
-interface ProductsState {
-  items: ProductDto[]
-  loading: boolean
-  error: string | null
-}
+import type { ProductDto, ProductGoldItemDto, ProductJewelleryItemDto } from '../dtos/ProductDto'
 
 type ProductApi = {
   id: number
@@ -33,11 +9,11 @@ type ProductApi = {
   stockStatus?: string | null
   stock_status?: string | null
   desc?: string | null
-  shortDesc?: string | null
-  short_desc?: string | null
   qty?: number | null
   collection?: string | null
-  color?: number | null
+  shortDesc?: string | null
+  short_desc?: string | null
+  color?: string | null
   weight?: number | null
   metarialLoss?: number | null
   metarial_loss?: number | null
@@ -48,11 +24,14 @@ type ProductApi = {
   depreciation?: number | null
   productTypeId?: number | null
   product_type_id?: number | null
+
+  productGolds?: any[] | null
+  productJewellerys?: any[] | null
 }
 
 function mapToProductDto(x: ProductApi): ProductDto {
   return {
-    id: x.id,
+    id: Number(x.id),
     name: (x.name ?? '') as string,
     code: (x.code ?? '') as string,
     stockStatus: (x.stockStatus ?? x.stock_status ?? '') as string,
@@ -60,26 +39,42 @@ function mapToProductDto(x: ProductApi): ProductDto {
     qty: Number(x.qty ?? 0),
     collection: (x.collection ?? '') as string,
     shortDesc: (x.shortDesc ?? x.short_desc ?? '') as string,
-    color: Number(x.color ?? 0),
+    color: (x.color ?? '') as string,
     weight: Number(x.weight ?? 0),
     metarialLoss: Number(x.metarialLoss ?? x.metarial_loss ?? 0),
     makingCost: Number(x.makingCost ?? x.making_cost ?? 0),
     colorCount: Number(x.colorCount ?? x.color_count ?? 0),
     depreciation: Number(x.depreciation ?? 0),
-    productTypeId: Number(x.productTypeId ?? x.product_type_id ?? 1),
+    productTypeId: Number(x.productTypeId ?? x.product_type_id ?? 0),
+
+    productGolds: (x.productGolds ?? []).map((g: any) => ({
+      id: g.id,
+      goldSourceId: Number(g.goldSourceId ?? 0),
+      craftId: Number(g.craftId ?? 0),
+      weight: Number(g.weight ?? 0),
+      goldPurity: (g.goldPurity ?? '') as string,
+      goldSourceName: g.goldSourceName ?? '',
+      craftShopName: g.craftShopName ?? '',
+    })),
+
+    productJewellerys: (x.productJewellerys ?? []).map((j: any) => ({
+      id: j.id,
+      gemsPackageId: Number(j.gemsPackageId ?? 0),
+      qty: Number(j.qty ?? 0),
+      sellingPrice: Number(j.sellingPrice ?? 0),
+      gemsPackageName: j.gemsPackageName ?? '',
+      originalPrice: Number(j.originalPrice ?? 0),
+      unitWeight: Number(j.unitWeight ?? 0),
+    })),
   }
 }
 
 export const useProductsStore = defineStore('products', {
-  state: (): ProductsState => ({
-    items: [],
+  state: () => ({
+    items: [] as ProductDto[],
     loading: false,
-    error: null,
+    error: null as string | null,
   }),
-
-  getters: {
-    totalProducts: (state) => state.items.length,
-  },
 
   actions: {
     async loadProducts() {
@@ -87,7 +82,7 @@ export const useProductsStore = defineStore('products', {
       this.error = null
       try {
         const raw = await http<ProductApi[]>('/products')
-        this.items = raw.map(mapToProductDto)
+        this.items = (raw ?? []).map(mapToProductDto)
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading products.'
       } finally {
@@ -103,18 +98,30 @@ export const useProductsStore = defineStore('products', {
           code: payload.code?.trim(),
           stockStatus: payload.stockStatus?.trim(),
           desc: payload.desc?.trim(),
+          qty: Number(payload.qty ?? 0),
           collection: payload.collection?.trim(),
           shortDesc: payload.shortDesc?.trim(),
-
-          // ✅ numbers - NO trim
-          qty: Number(payload.qty ?? 0),
-          color: Number(payload.color ?? 0),
-          colorCount: Number(payload.colorCount ?? 0),
+          color: payload.color?.trim(),
           weight: Number(payload.weight ?? 0),
           metarialLoss: Number(payload.metarialLoss ?? 0),
           makingCost: Number(payload.makingCost ?? 0),
+          colorCount: Number(payload.colorCount ?? 0),
           depreciation: Number(payload.depreciation ?? 0),
-          productTypeId: Number(payload.productTypeId ?? 1),
+          productTypeId: Number(payload.productTypeId ?? 0),
+
+          // ✅ send your UI sections as backend expects
+          productGolds: (payload.productGolds ?? []).map((g: ProductGoldItemDto) => ({
+            goldSourceId: g.goldSourceId,
+            craftId: g.craftId,
+            weight: Number(g.weight ?? 0),
+            goldPurity: g.goldPurity ?? '',
+          })),
+
+          productJewellerys: (payload.productJewellerys ?? []).map((j: ProductJewelleryItemDto) => ({
+            gemsPackageId: j.gemsPackageId,
+            qty: Number(j.qty ?? 0),
+            sellingPrice: Number(j.sellingPrice ?? 0),
+          })),
         }
 
         const createdRaw = await http<ProductApi>('/products', {
@@ -123,65 +130,11 @@ export const useProductsStore = defineStore('products', {
         })
 
         const created = mapToProductDto(createdRaw)
-        this.items.push(created)
+
+        // ✅ update list immediately (so ProductListView shows it)
+        this.items.unshift(created)
+
         return created
-      } catch (e: any) {
-        throw e
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async updateProduct(id: number, payload: Omit<ProductDto, 'id'>) {
-      this.loading = true
-      try {
-        const body = {
-          name: payload.name?.trim(),
-          code: payload.code?.trim(),
-          stockStatus: payload.stockStatus?.trim(),
-          desc: payload.desc?.trim(),
-          collection: payload.collection?.trim(),
-          shortDesc: payload.shortDesc?.trim(),
-
-          // ✅ numbers - NO trim
-          qty: Number(payload.qty ?? 0),
-          color: Number(payload.color ?? 0),
-          colorCount: Number(payload.colorCount ?? 0),
-          weight: Number(payload.weight ?? 0),
-          metarialLoss: Number(payload.metarialLoss ?? 0),
-          makingCost: Number(payload.makingCost ?? 0),
-          depreciation: Number(payload.depreciation ?? 0),
-          productTypeId: Number(payload.productTypeId ?? 1),
-        }
-
-        const updatedRaw = await http<ProductApi>(`/products/${id}`, {
-          method: 'PUT',
-          body: JSON.stringify(body),
-        })
-
-        const updated = mapToProductDto(updatedRaw)
-
-        const idx = this.items.findIndex((p) => p.id === id)
-        if (idx === -1) {
-          await this.loadProducts()
-          return
-        }
-
-        this.items[idx] = updated
-      } catch (e: any) {
-        throw e
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async deleteProduct(id: number) {
-      this.loading = true
-      try {
-        await http<void>(`/products/${id}`, { method: 'DELETE' })
-        this.items = this.items.filter((p) => p.id !== id)
-      } catch (e: any) {
-        throw e
       } finally {
         this.loading = false
       }
