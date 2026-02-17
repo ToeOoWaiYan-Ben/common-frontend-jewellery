@@ -1,4 +1,3 @@
-// src/stores/useSellersStore.ts
 import { defineStore } from 'pinia'
 import type { SellerDto } from '../dtos/SellerDto'
 import { http } from '../services/http'

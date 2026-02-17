@@ -35,7 +35,7 @@
             <th>Stock</th>
             <th style="width: 90px">Qty</th>
             <th>Collection</th>
-            <th style="width: 120px">Type</th>
+            <th style="width: 160px">Type</th>
             <th style="width: 170px; text-align: right">Actions</th>
           </tr>
         </thead>
@@ -53,11 +53,21 @@
             <td>{{ p.stockStatus }}</td>
             <td>{{ p.qty }}</td>
             <td>{{ p.collection }}</td>
-            <td>{{ p.productTypeId }}</td>
+
+            <!-- ✅ Show JewelryType name instead of id -->
+            <td>{{ productTypeName(p.productTypeId) }}</td>
+
             <td style="text-align: right">
               <button class="plist__btn" type="button" @click="goEdit(p.id)">Edit</button>
-              <button class="plist__btn plist__btn--danger" type="button" @click="onDelete(p.id)">
-                Delete
+
+              <!-- ✅ Fixed delete -->
+              <button
+                class="plist__btn plist__btn--danger"
+                type="button"
+                :disabled="deletingId === Number(p.id)"
+                @click="onDelete(p.id)"
+              >
+                {{ deletingId === Number(p.id) ? 'Deleting…' : 'Delete' }}
               </button>
             </td>
           </tr>
@@ -65,7 +75,11 @@
       </table>
 
       <div class="plist__pager" v-if="filteredProducts.length > 0">
-        <button class="plist__pageBtn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+        <button
+          class="plist__pageBtn"
+          :disabled="currentPage === 1"
+          @click="goToPage(currentPage - 1)"
+        >
           ‹ Prev
         </button>
 
@@ -88,6 +102,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useProductsStore } from '../stores/useProductsStore'
+import { http } from '../services/http'
+import type { JewelryTypeDto } from '../dtos/JewelryTypeDto'
 
 const router = useRouter()
 const productsStore = useProductsStore()
@@ -95,8 +111,25 @@ const { items: products, loading, error } = storeToRefs(productsStore)
 
 const searchTerm = ref('')
 
+// ✅ For mapping productTypeId -> JewelryType name
+const jewelryTypes = ref<JewelryTypeDto[]>([])
+const typeMap = computed(() => {
+  const m = new Map<number, JewelryTypeDto>()
+  for (const t of jewelryTypes.value) m.set(Number(t.id), t)
+  return m
+})
+
+const deletingId = ref<number | null>(null)
+
 onMounted(async () => {
   await productsStore.loadProducts()
+
+  // ✅ load types once for display
+  try {
+    jewelryTypes.value = (await http<JewelryTypeDto[]>('/jewelry-types')) ?? []
+  } catch {
+    jewelryTypes.value = []
+  }
 })
 
 const isLoading = computed(() => loading.value)
@@ -111,7 +144,12 @@ const filteredProducts = computed(() => {
     const code = String(p.code ?? '').toLowerCase()
     const collection = String(p.collection ?? '').toLowerCase()
     const color = String(p.color ?? '').toLowerCase()
-    return name.includes(term) || code.includes(term) || collection.includes(term) || color.includes(term)
+    return (
+      name.includes(term) ||
+      code.includes(term) ||
+      collection.includes(term) ||
+      color.includes(term)
+    )
   })
 })
 
@@ -145,17 +183,41 @@ const craftLabel = (p: any) => {
   return unique.join(', ')
 }
 
-const goAdd = () => router.push('/admin/products/new')
-const goEdit = (id: number) => router.push(`/admin/products/${id}/edit`)
+// ✅ Display name in Type column
+const productTypeName = (productTypeId: any) => {
+  const id = Number(productTypeId ?? 0)
+  if (!id) return '-'
+  const t = typeMap.value.get(id)
+  if (!t) return String(id) // fallback if not found
+  return t.categoryName ? `${t.name} (${t.categoryName})` : t.name
+}
 
-const onDelete = async (id: number) => {
+const goAdd = () => router.push('/admin/products/new')
+const goEdit = (id: any) => router.push(`/admin/products/${Number(id)}/edit`)
+
+// ✅ Fixed delete action
+const onDelete = async (id: any) => {
+  const productId = Number(id)
+  if (!productId) return alert('Invalid product id.')
+
   const ok = window.confirm('Are you sure you want to delete this product?')
   if (!ok) return
 
+  deletingId.value = productId
   try {
-    await productsStore.deleteProduct(id)
+    await productsStore.deleteProduct(productId)
+
+    // ✅ Reload products list so UI updates even if store doesn't remove it
+    await productsStore.loadProducts()
+
+    // ✅ If current page becomes empty after delete, go back one page
+    if (currentPage.value > 1 && paginatedProducts.value.length === 1) {
+      currentPage.value = currentPage.value - 1
+    }
   } catch (e: any) {
     alert(e?.message ?? 'Failed to delete product.')
+  } finally {
+    deletingId.value = null
   }
 }
 </script>
@@ -181,6 +243,7 @@ const onDelete = async (id: number) => {
 .plist__empty { text-align:center; padding:20px; color:#64748b; }
 .plist__btn { border:1px solid #cbd5e1; background:#fff; padding:6px 10px; border-radius:10px; cursor:pointer; font-weight:800; font-size:13px; margin-left:6px; }
 .plist__btn--danger { border-color:#fecaca; background:#fff1f2; color:#b91c1c; }
+.plist__btn:disabled { opacity: .6; cursor:not-allowed; }
 .plist__pager { display:flex; justify-content:center; gap:10px; align-items:center; padding:12px 8px 4px; }
 .plist__pageBtn { border:1px solid #e2e8f0; background:#fff; padding:6px 10px; border-radius:10px; cursor:pointer; font-weight:800; font-size:13px; }
 .plist__pageBtn:disabled { opacity:.5; cursor:not-allowed; }

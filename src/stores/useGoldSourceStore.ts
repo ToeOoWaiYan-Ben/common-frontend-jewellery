@@ -63,6 +63,7 @@ export const useGoldSourceStore = defineStore('goldSource', {
 
     async create(payload: Omit<GoldSourceDto, 'id'>) {
       this.loading = true
+      this.error = null
       try {
         const body = {
           goldPurity: payload.goldPurity?.trim(),
@@ -83,6 +84,7 @@ export const useGoldSourceStore = defineStore('goldSource', {
         this.items.push(created)
         return created
       } catch (e: any) {
+        this.error = e?.message ?? 'Failed to create gold source.'
         throw e
       } finally {
         this.loading = false
@@ -91,6 +93,7 @@ export const useGoldSourceStore = defineStore('goldSource', {
 
     async update(id: number, payload: Omit<GoldSourceDto, 'id'>) {
       this.loading = true
+      this.error = null
       try {
         const body = {
           goldPurity: payload.goldPurity?.trim(),
@@ -115,19 +118,31 @@ export const useGoldSourceStore = defineStore('goldSource', {
         }
         this.items[idx] = updated
       } catch (e: any) {
+        this.error = e?.message ?? 'Failed to update gold source.'
         throw e
       } finally {
         this.loading = false
       }
     },
 
+    // ✅ FIXED DELETE (only change you need)
     async delete(id: number) {
       this.loading = true
+      this.error = null
       try {
         await http<void>(`/gold-source/${id}`, { method: 'DELETE' })
         this.items = this.items.filter((x) => x.id !== id)
       } catch (e: any) {
-        throw e
+        // read backend message safely (without touching http.ts)
+        const msg =
+          e?.data?.message ||
+          e?.data?.error ||
+          e?.data?.detail ||
+          e?.message ||
+          'Cannot delete: this gold source is referenced by product_gold. Delete related records first.'
+
+        this.error = msg
+        throw new Error(msg) // so your UI alert shows the clean message
       } finally {
         this.loading = false
       }

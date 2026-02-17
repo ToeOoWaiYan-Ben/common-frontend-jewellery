@@ -5,7 +5,7 @@ import { http } from '../services/http'
 interface JewelryTypesState {
   items: JewelryTypeDto[]
   loading: boolean
-  error: string | null // ✅ ONLY for loadJewelryTypes()
+  error: string | null
 }
 
 type JewelryTypeApi = {
@@ -44,7 +44,7 @@ export const useJewelryTypesStore = defineStore('jewelryTypes', {
       try {
         const qs = categoryId ? `?categoryId=${categoryId}` : ''
         const raw = await http<JewelryTypeApi[]>(`/jewelry-types${qs}`)
-        this.items = raw.map(mapToJewelryTypeDto)
+        this.items = (raw ?? []).map(mapToJewelryTypeDto)
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while loading jewelry types.'
       } finally {
@@ -68,8 +68,6 @@ export const useJewelryTypesStore = defineStore('jewelryTypes', {
         const created = mapToJewelryTypeDto(createdRaw)
         this.items.push(created)
         return created
-      } catch (e: any) {
-        throw e
       } finally {
         this.loading = false
       }
@@ -97,8 +95,6 @@ export const useJewelryTypesStore = defineStore('jewelryTypes', {
         }
 
         this.items[idx] = updated
-      } catch (e: any) {
-        throw e
       } finally {
         this.loading = false
       }
@@ -109,8 +105,6 @@ export const useJewelryTypesStore = defineStore('jewelryTypes', {
       try {
         await http<void>(`/jewelry-types/${id}`, { method: 'DELETE' })
         this.items = this.items.filter((t) => t.id !== id)
-      } catch (e: any) {
-        throw e
       } finally {
         this.loading = false
       }

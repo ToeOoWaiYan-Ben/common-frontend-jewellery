@@ -53,38 +53,17 @@
 
         <div class="pfield">
           <label class="plabel">Weight</label>
-          <input
-            v-model.number="product.weight"
-            class="pinput"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="e.g. 5.20"
-          />
+          <input v-model.number="product.weight" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 5.20" />
         </div>
 
         <div class="pfield">
           <label class="plabel">Metarial Loss</label>
-          <input
-            v-model.number="product.metarialLoss"
-            class="pinput"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="e.g. 0.30"
-          />
+          <input v-model.number="product.metarialLoss" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 0.30" />
         </div>
 
         <div class="pfield">
           <label class="plabel">Making Cost</label>
-          <input
-            v-model.number="product.makingCost"
-            class="pinput"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="e.g. 120"
-          />
+          <input v-model.number="product.makingCost" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 120" />
         </div>
 
         <div class="pfield">
@@ -94,19 +73,43 @@
 
         <div class="pfield">
           <label class="plabel">Depreciation *</label>
-          <input
-            v-model.number="product.depreciation"
-            class="pinput"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="e.g. 0.10"
-          />
+          <input v-model.number="product.depreciation" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 0.10" />
         </div>
 
+        <!-- ✅ Product Type dropdown search (JewelryType) -->
         <div class="pfield">
-          <label class="plabel">Product Type ID *</label>
-          <input v-model.number="product.productTypeId" class="pinput" type="number" min="1" placeholder="e.g. 1" />
+          <label class="plabel">Product Type (Jewelry Type) *</label>
+
+          <div class="combo" @click.stop>
+            <button class="combo__btn" type="button" @click.stop="toggleTypeDd">
+              <span class="combo__text">{{ selectedTypeLabel || 'Select jewelry type' }}</span>
+              <span class="combo__icon">▾</span>
+            </button>
+
+            <div v-if="typeDdOpen" class="dd dd--up" @click.stop>
+              <div class="dd__search">
+                <span class="dd__searchIcon">🔍</span>
+                <input v-model="typeQuery" class="dd__searchInput" type="text" placeholder="Search type name / category / id..." />
+              </div>
+
+              <div class="dd__list">
+                <button
+                  v-for="t in filteredJewelryTypes(typeQuery)"
+                  :key="t.id"
+                  class="dd__item"
+                  type="button"
+                  @click.stop="selectType(t)"
+                >
+                  <div class="dd__main">{{ t.name }}</div>
+                  <div class="dd__sub">Category: {{ t.categoryName ?? '-' }} • ID: {{ t.id }}</div>
+                </button>
+
+                <div v-if="filteredJewelryTypes(typeQuery).length === 0" class="dd__empty">
+                  No jewelry types found
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="pfield pfield--full">
@@ -181,7 +184,9 @@
                     </div>
                   </button>
 
-                  <div v-if="filteredGoldSources(row.query).length === 0" class="dd__empty">No gold packages found</div>
+                  <div v-if="filteredGoldSources(row.query).length === 0" class="dd__empty">
+                    No gold packages found
+                  </div>
                 </div>
               </div>
             </div>
@@ -213,7 +218,9 @@
                     <div class="dd__sub">NRC: {{ c.nrc }} • Phone: {{ c.phone }}</div>
                   </button>
 
-                  <div v-if="filteredCrafts(row.craftQuery).length === 0" class="dd__empty">No crafts found</div>
+                  <div v-if="filteredCrafts(row.craftQuery).length === 0" class="dd__empty">
+                    No crafts found
+                  </div>
                 </div>
               </div>
             </div>
@@ -223,29 +230,13 @@
 
           <!-- WEIGHT -->
           <div class="miniTable__td">
-            <input
-              v-model.number="row.weightUsed"
-              class="pinput pinput--tight"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="e.g. 4.0"
-              @input="validateGoldRows"
-            />
+            <input v-model.number="row.weightUsed" class="pinput pinput--tight" type="number" step="0.01" min="0" placeholder="e.g. 4.0" @input="validateGoldRows" />
             <div v-if="row.weightError" class="tinyErr">{{ row.weightError }}</div>
           </div>
 
           <!-- PRICE -->
           <div class="miniTable__td">
-            <input
-              v-model.number="row.currentPrice"
-              class="pinput pinput--tight"
-              type="number"
-              step="1"
-              min="0"
-              placeholder="e.g. 4000"
-              @input="validateGoldRows"
-            />
+            <input v-model.number="row.currentPrice" class="pinput pinput--tight" type="number" step="1" min="0" placeholder="e.g. 4000" @input="validateGoldRows" />
             <div v-if="row.priceError" class="tinyErr">{{ row.priceError }}</div>
           </div>
 
@@ -330,21 +321,16 @@
                     </div>
                   </button>
 
-                  <div v-if="filteredGemPackages(row.query).length === 0" class="dd__empty">No jewellery packages found</div>
+                  <div v-if="filteredGemPackages(row.query).length === 0" class="dd__empty">
+                    No jewellery packages found
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="miniTable__td">
-            <input
-              v-model.number="row.qty"
-              class="pinput pinput--tight"
-              type="number"
-              min="0"
-              placeholder="e.g. 3"
-              @input="validateJewelryRows"
-            />
+            <input v-model.number="row.qty" class="pinput pinput--tight" type="number" min="0" placeholder="e.g. 3" @input="validateJewelryRows" />
             <div v-if="row.qtyError" class="tinyErr">{{ row.qtyError }}</div>
           </div>
 
@@ -357,15 +343,7 @@
           </div>
 
           <div class="miniTable__td">
-            <input
-              v-model.number="row.sellingPrice"
-              class="pinput pinput--tight"
-              type="number"
-              min="0"
-              step="1"
-              placeholder="e.g. 350000"
-              @input="validateJewelryRows"
-            />
+            <input v-model.number="row.sellingPrice" class="pinput pinput--tight" type="number" min="0" step="1" placeholder="e.g. 350000" @input="validateJewelryRows" />
             <div v-if="row.sellError" class="tinyErr">{{ row.sellError }}</div>
           </div>
 
@@ -415,6 +393,7 @@ import { http } from '../services/http'
 import type { GoldSourceDto } from '../dtos/GoldSourceDto'
 import type { GemsPackageDto } from '../dtos/GemsPackageDto'
 import type { CraftDto } from '../dtos/CraftDto'
+import type { JewelryTypeDto } from '../dtos/JewelryTypeDto'
 import { useProductsStore } from '../stores/useProductsStore'
 
 const router = useRouter()
@@ -515,9 +494,15 @@ const product = reactive({
   ] as JewelryRow[],
 })
 
+// DB lists
 const goldSources = ref<GoldSourceDto[]>([])
 const gemsPackages = ref<GemsPackageDto[]>([])
 const crafts = ref<CraftDto[]>([])
+const jewelryTypes = ref<JewelryTypeDto[]>([])
+
+// ✅ ProductType dropdown state
+const typeDdOpen = ref(false)
+const typeQuery = ref('')
 
 onMounted(async () => {
   try {
@@ -537,18 +522,16 @@ onMounted(async () => {
   } catch {
     crafts.value = []
   }
+
+  // ✅ load JewelryTypes for ProductType dropdown
+  try {
+    jewelryTypes.value = (await http<JewelryTypeDto[]>('/jewelry-types')) ?? []
+  } catch {
+    jewelryTypes.value = []
+  }
 })
 
-/** ✅ IMPORTANT FIX: convert "18 K" / "24K" -> 18 / 24 (Float) */
-const parseGoldPurityToFloat = (val: any): number => {
-  if (val == null) return 0
-  if (typeof val === 'number') return val
-  const s = String(val).trim()
-  const m = s.match(/(\d+(\.\d+)?)/) // first number
-  if (!m) return 0
-  return Number(m[1])
-}
-
+// -------- helpers --------
 const unitPriceFromPackage = (p: any) => {
   const direct = Number(p.unitPrice ?? p.unit_price ?? p.pricePerUnit ?? p.unit_price_mmk ?? NaN)
   if (!Number.isNaN(direct)) return direct
@@ -558,6 +541,46 @@ const unitPriceFromPackage = (p: any) => {
   if (qty > 0) return Math.round(total / qty)
 
   return 0
+}
+
+// ✅ IMPORTANT: backend expects Float -> send number (18/24)
+const parsePurityToNumber = (v: any): number => {
+  const m = String(v ?? '').match(/(\d+(\.\d+)?)/) // "18 K" -> 18
+  return m ? Number(m[1]) : 0
+}
+
+// ----- ProductType dropdown helpers -----
+const filteredJewelryTypes = (q: string) => {
+  const term = (q || '').trim().toLowerCase()
+  if (!term) return jewelryTypes.value
+  return jewelryTypes.value.filter(
+    (t) =>
+      (t.name || '').toLowerCase().includes(term) ||
+      (t.categoryName || '').toLowerCase().includes(term) ||
+      String(t.id).includes(term)
+  )
+}
+
+const selectedTypeLabel = computed(() => {
+  if (!product.productTypeId) return ''
+  const t = jewelryTypes.value.find((x) => x.id === product.productTypeId)
+  if (!t) return `Selected ID: ${product.productTypeId}`
+  return t.categoryName ? `${t.name} (${t.categoryName})` : t.name
+})
+
+const toggleTypeDd = () => {
+  typeDdOpen.value = !typeDdOpen.value
+
+  // close other dropdowns
+  product.goldRows.forEach((r) => (r.ddOpen = false))
+  product.goldRows.forEach((r) => (r.craftDdOpen = false))
+  product.jewelryRows.forEach((r) => (r.ddOpen = false))
+}
+
+const selectType = (t: JewelryTypeDto) => {
+  product.productTypeId = t.id
+  typeDdOpen.value = false
+  typeQuery.value = ''
 }
 
 // ----- GOLD -----
@@ -610,12 +633,14 @@ const toggleGoldDd = (idx: number) => {
   product.goldRows.forEach((r, i) => (r.ddOpen = i === idx ? !r.ddOpen : false))
   product.goldRows.forEach((r) => (r.craftDdOpen = false))
   product.jewelryRows.forEach((r) => (r.ddOpen = false))
+  typeDdOpen.value = false
 }
 
 const toggleCraftDd = (idx: number) => {
   product.goldRows.forEach((r, i) => (r.craftDdOpen = i === idx ? !r.craftDdOpen : false))
   product.goldRows.forEach((r) => (r.ddOpen = false))
   product.jewelryRows.forEach((r) => (r.ddOpen = false))
+  typeDdOpen.value = false
 }
 
 const selectGoldSource = (idx: number, g: GoldSourceDto) => {
@@ -631,7 +656,7 @@ const selectGoldSource = (idx: number, g: GoldSourceDto) => {
 
 const selectCraft = (idx: number, c: CraftDto) => {
   const row = product.goldRows[idx]
-  row.craftId = (c as any).id
+  row.craftId = c.id
   row.craftLabel = (c as any).shopName || ''
   row.craftDdOpen = false
   row.craftQuery = ''
@@ -676,33 +701,25 @@ const validateGoldRows = () => {
     r.priceError = ''
     r.craftError = ''
 
+    if (!r.goldSourceId) hasAnyError = true
     if (!r.craftId) {
       r.craftError = 'Craft is required.'
       hasAnyError = true
     }
 
-    if (!r.goldSourceId) {
-      hasAnyError = true
-      return
-    }
+    if (r.goldSourceId) {
+      if ((r.weightUsed ?? 0) <= 0) {
+        r.weightError = 'Weight is required.'
+        hasAnyError = true
+      } else if (r.availableWeight > 0 && r.weightUsed > r.availableWeight) {
+        r.weightError = `Exceeds available weight (${r.availableWeight}).`
+        hasAnyError = true
+      }
 
-    if ((r.weightUsed ?? 0) <= 0) {
-      r.weightError = 'Weight is required.'
-      hasAnyError = true
-    } else if (r.availableWeight > 0 && r.weightUsed > r.availableWeight) {
-      r.weightError = `Exceeds available weight (${r.availableWeight}).`
-      hasAnyError = true
-    }
-
-    if ((r.currentPrice ?? 0) <= 0) {
-      r.priceError = 'Current price is required.'
-      hasAnyError = true
-    }
-
-    // ✅ ensure purity can be converted to float (not 0)
-    const purityVal = parseGoldPurityToFloat(r.purity)
-    if (purityVal <= 0) {
-      hasAnyError = true
+      if ((r.currentPrice ?? 0) <= 0) {
+        r.priceError = 'Current price is required.'
+        hasAnyError = true
+      }
     }
   })
 
@@ -727,6 +744,7 @@ const toggleJewelryDd = (idx: number) => {
   product.jewelryRows.forEach((r, i) => (r.ddOpen = i === idx ? !r.ddOpen : false))
   product.goldRows.forEach((r) => (r.ddOpen = false))
   product.goldRows.forEach((r) => (r.craftDdOpen = false))
+  typeDdOpen.value = false
 }
 
 const selectJewelryPackage = (idx: number, p: GemsPackageDto) => {
@@ -773,22 +791,21 @@ const validateJewelryRows = () => {
     r.qtyError = ''
     r.sellError = ''
 
-    if (!r.gemsPackageId) {
-      hasAnyError = true
-      return
-    }
+    if (!r.gemsPackageId) hasAnyError = true
 
-    if ((r.qty ?? 0) <= 0) {
-      r.qtyError = 'Qty is required.'
-      hasAnyError = true
-    } else if (r.availableQty > 0 && r.qty > r.availableQty) {
-      r.qtyError = `Exceeds available qty (${r.availableQty}).`
-      hasAnyError = true
-    }
+    if (r.gemsPackageId) {
+      if ((r.qty ?? 0) <= 0) {
+        r.qtyError = 'Qty is required.'
+        hasAnyError = true
+      } else if (r.availableQty > 0 && r.qty > r.availableQty) {
+        r.qtyError = `Exceeds available qty (${r.availableQty}).`
+        hasAnyError = true
+      }
 
-    if ((r.sellingPrice ?? 0) <= 0) {
-      r.sellError = 'Selling price is required.'
-      hasAnyError = true
+      if ((r.sellingPrice ?? 0) <= 0) {
+        r.sellError = 'Selling price is required.'
+        hasAnyError = true
+      }
     }
   })
 
@@ -806,13 +823,14 @@ const closeAllDd = () => {
   product.goldRows.forEach((r) => (r.ddOpen = false))
   product.goldRows.forEach((r) => (r.craftDdOpen = false))
   product.jewelryRows.forEach((r) => (r.ddOpen = false))
+  typeDdOpen.value = false
 }
 
 const goBack = () => router.push('/admin/products')
 
 const onSaveAll = async () => {
   if (!String(product.name || '').trim()) return alert('Product name is required.')
-  if (!product.productTypeId || Number(product.productTypeId) <= 0) return alert('Product Type ID is required.')
+  if (!product.productTypeId || Number(product.productTypeId) <= 0) return alert('Product Type is required.')
   if (product.depreciation == null || Number(product.depreciation) <= 0) return alert('Depreciation is required.')
 
   validateGoldRows()
@@ -840,14 +858,17 @@ const onSaveAll = async () => {
       makingCost: Number(product.makingCost ?? 0),
       colorCount: Number(product.colorCount ?? 0),
       depreciation: Number(product.depreciation ?? 0),
-      productTypeId: Number(product.productTypeId ?? 1),
 
-      // ✅ FIXED HERE: goldPurity must be FLOAT, not "18 K"
+      // ✅ send jewelryType id
+      productTypeId: Number(product.productTypeId),
+
       productGolds: product.goldRows.map((r) => ({
         goldSourceId: r.goldSourceId!,
         craftId: r.craftId!,
         weight: Number(r.weightUsed ?? 0),
-        goldPurity: parseGoldPurityToFloat(r.purity), // ✅ Float
+
+        // ✅ FIX: backend expects Float, so send number
+        goldPurity: parsePurityToNumber(r.purity),
       })),
 
       productJewellerys: product.jewelryRows.map((r) => ({
