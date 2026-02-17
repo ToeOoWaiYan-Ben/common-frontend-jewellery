@@ -37,6 +37,39 @@
             required
           />
         </div>
+        <div class="category-form__row">
+          <label class="category-form__label" for="description">Description</label>
+          <textarea
+            id="description"
+            v-model="formDescription"
+            class="category-form__input"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <!-- ✅ Image Upload -->
+        <div class="category-form__row">
+          <label class="category-form__label">Type Image</label>
+
+          <input class="category-form__input" type="file" accept="image/*" @change="onFileChange" />
+
+          <small v-if="uploadingImage" style="color: #555">Uploading…</small>
+          <small v-if="imageUploadError" class="gp-error">{{ imageUploadError }}</small>
+
+          <div v-if="formImageUrl" style="margin-top: 10px">
+            <img
+              :src="formImageUrl"
+              alt="Preview"
+              style="
+                width: 120px;
+                height: 120px;
+                object-fit: cover;
+                border-radius: 10px;
+                border: 1px solid #ddd;
+              "
+            />
+          </div>
+        </div>
 
         <div class="category-form__row">
           <label class="category-form__label" for="categoryId">Category *</label>
@@ -141,9 +174,11 @@
   import { useJewelryTypesStore } from '../stores/useJewelryTypesStore'
   import { useCategoriesStore } from '../stores/useCategoriesStore'
   import type { JewelryTypeDto } from '../dtos/JewelryTypeDto'
+  import { http } from '../services/http'
 
   const typesStore = useJewelryTypesStore()
   const categoriesStore = useCategoriesStore()
+  const formDescription = ref<string | null>(null)
 
   const { items: types, loading, error } = storeToRefs(typesStore)
   const { items: categories } = storeToRefs(categoriesStore)
@@ -202,12 +237,48 @@
   const isSubmitting = ref(false)
   const formError = ref<string | null>(null)
 
+  const formImageUrl = ref<string | null>(null)
+  const uploadingImage = ref(false)
+  const imageUploadError = ref<string | null>(null)
+
+  async function uploadTypeImage(file: File) {
+    uploadingImage.value = true
+    imageUploadError.value = null
+
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+
+      // ✅ expects backend: POST /api/images (your controller is /api/images)
+      // if your API_BASE_URL already includes "/api", use "/images"
+      // otherwise use "/api/images"
+      const uploaded = await http<{ id: number; url: string }>('/images/upload', {
+        method: 'POST',
+        body: fd,
+      })
+
+      formImageUrl.value = uploaded.url
+    } catch (e: any) {
+      imageUploadError.value = e?.message ?? 'Failed to upload image.'
+    } finally {
+      uploadingImage.value = false
+    }
+  }
+  function onFileChange(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (!file) return
+    uploadTypeImage(file)
+  }
+
   const resetForm = () => {
     formName.value = ''
     formCategoryId.value = null
+    formDescription.value = null
     formError.value = null
     isEditing.value = false
     editingId.value = null
+    formImageUrl.value = null
+    imageUploadError.value = null
   }
 
   const onClickNew = () => {
@@ -227,9 +298,12 @@
 
     formName.value = type.name
     formCategoryId.value = type.categoryId ?? null
+    formDescription.value = type.description ?? null
 
     formError.value = null
     window.scrollTo({ top: 0, behavior: 'smooth' })
+    formImageUrl.value = type.imageUrl ?? null
+    imageUploadError.value = null
   }
 
   const closeEdit = () => {
@@ -249,6 +323,8 @@
       name: formName.value.trim(),
       categoryId: formCategoryId.value,
       categoryName: null,
+      imageUrl: formImageUrl.value ?? null,
+      description: formDescription.value ?? null,
     }
 
     isSubmitting.value = true

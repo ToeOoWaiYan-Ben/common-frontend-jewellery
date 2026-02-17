@@ -3,6 +3,10 @@
   import { useRoute, useRouter } from 'vue-router'
   import StoreHeader from '@/components/user/StoreHeader.vue' // ✅ FIXED
 
+  const router = useRouter()
+  const route = useRoute()
+  const category = computed(() => (route.query.category as string) || 'Jewelry')
+
   type Product = {
     id: number
     name: string
@@ -14,9 +18,6 @@
     description: string
     details: string[]
   }
-
-  const router = useRouter()
-  const route = useRoute()
 
   const productId = computed(() => Number(route.params.id))
 
@@ -124,7 +125,12 @@
   }
 
   function backToCatalog() {
-    router.push('/user/catalog')
+    const category = route.query.category as string | undefined
+
+    router.push({
+      path: '/user/catalog',
+      query: category ? { category } : {},
+    })
   }
 
   function selectImage(url: string) {
@@ -151,6 +157,7 @@
           <span class="pd-crumbSep">/</span>
           <button class="pd-crumbLink" type="button" @click="backToCatalog">Jewelry</button>
           <span class="pd-crumbSep">/</span>
+          <span class="pd-crumbCurrent">{{ category }}</span>
           <button class="pd-crumbLink" type="button" @click="backToCatalog">Rings</button>
           <span class="pd-crumbSep">/</span>
           <span class="pd-crumbNow">{{ product.name }}</span>

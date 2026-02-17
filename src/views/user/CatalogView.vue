@@ -2,6 +2,26 @@
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import StoreHeader from '@/components/user/StoreHeader.vue'
+  import { useUserJewelryTypesStore } from '@/stores/useUserJewelryTypesStore'
+
+  import { useRoute } from 'vue-router'
+
+  const typesStore = useUserJewelryTypesStore()
+
+  const heroTitle = computed(() => {
+    return typesStore.activeType?.name ?? 'Jewelry Collection'
+  })
+
+  const heroDesc = computed(() => {
+    return typesStore.activeType?.description ?? 'The perfect choice for an elegant outfit.'
+  })
+
+  const heroImageUrl = computed(() => {
+    return typesStore.activeType?.imageUrl ?? '/default-hero.jpg'
+  })
+  const route = useRoute()
+
+  const category = computed(() => (route.query.category as string) || null)
 
   type Product = {
     id: number
@@ -13,13 +33,21 @@
     color?: string
     material?: string
   }
+  onMounted(async () => {
+    if (typesStore.items.length === 0) {
+      await typesStore.loadAll()
+    }
+  })
+
+  const selectedTypeId = computed(() => Number(route.query.typeId || 0))
+
+  const selectedType = computed(() => {
+    return typesStore.items.find((t) => t.id === selectedTypeId.value) || null
+  })
 
   const router = useRouter()
 
   /* ---------- Hero ---------- */
-  const heroImageUrl = ref(
-    'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70'
-  )
 
   /* ---------- State ---------- */
   const loading = ref(false)
@@ -122,10 +150,12 @@
   }
 
   function openDetail(p: Product) {
-    // ✅ must match your router name: 'user-product-detail'
-    router.push({ name: 'user-product-detail', params: { id: p.id } })
+    router.push({
+      name: 'user-product-detail',
+      params: { id: p.id },
+      query: { category: route.query.category }, // ✅ KEEP CATEGORY
+    })
   }
-
   function toggleWish(_p: Product) {
     // optional for UI
   }
@@ -211,11 +241,7 @@
 
     <!-- ✅ HERO -->
     <section class="sw-hero">
-      <div
-        class="sw-hero__bg"
-        :style="{ backgroundImage: `url(${heroImageUrl})` }"
-        aria-hidden="true"
-      ></div>
+      <div class="sw-hero__bg" :style="{ backgroundImage: `url(${heroImageUrl})` }"></div>
 
       <div class="sw-hero__content">
         <div class="sw-crumbs">
@@ -223,14 +249,11 @@
           <span class="sw-sep">/</span>
           <span>Jewelry</span>
           <span class="sw-sep">/</span>
-          <span class="sw-crumb--active">Collection</span>
+          <span class="sw-crumb--active">{{ heroTitle }}</span>
         </div>
 
-        <h1 class="sw-hero__title">Jewelry Collection</h1>
-        <p class="sw-hero__desc">
-          The perfect choice for an elegant outfit. Discover premium rings, necklaces, and earrings
-          designed for everyday shine.
-        </p>
+        <h1 class="sw-hero__title">{{ heroTitle }}</h1>
+        <p class="sw-hero__desc">{{ heroDesc }}</p>
       </div>
     </section>
 

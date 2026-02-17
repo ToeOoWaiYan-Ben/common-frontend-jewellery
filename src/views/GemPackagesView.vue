@@ -8,7 +8,12 @@
       </div>
 
       <div class="gp-header-actions">
-        <button class="gp-btn gp-btn--primary" @click="openCreate" :disabled="store.loading">
+        <button
+          class="gp-btn gp-btn--primary"
+          type="button"
+          @click="openCreate"
+          :disabled="store.loading"
+        >
           + Add package
         </button>
       </div>
@@ -53,15 +58,18 @@
 
         <template #cell-actions="{ row }">
           <div class="gp-row-actions">
-            <button class="gp-mini" @click="openEdit(row)">Edit</button>
-            <button class="gp-mini gp-mini--danger" @click="onDelete(row)">Delete</button>
+            <button class="gp-mini" type="button" @click="openEdit(row)">Edit</button>
+            <button class="gp-mini gp-mini--danger" type="button" @click="onDelete(row)">
+              Delete
+            </button>
           </div>
         </template>
       </AdminTable>
     </div>
 
-    <!-- FORM -->
+    <!-- FORM + PREVIEW -->
     <div v-if="showForm" class="gp-grid gp-grid--below">
+      <!-- LEFT: FORM -->
       <div class="gp-card">
         <div class="gp-card-head">
           <div>
@@ -71,7 +79,14 @@
             </p>
           </div>
 
-          <button class="gp-btn" @click="closeForm" :disabled="store.loading">✕ Close</button>
+          <button class="gp-btn" type="button" @click="closeForm" :disabled="store.loading">
+            ✕ Close
+          </button>
+        </div>
+
+        <div v-if="formError" class="gp-alert gp-alert--error" style="margin-bottom: 12px">
+          <span class="gp-alert-icon">⚠</span>
+          <span>{{ formError }}</span>
         </div>
 
         <div class="gp-form">
@@ -84,7 +99,7 @@
 
           <!-- Package No -->
           <div class="gp-field">
-            <label class="gp-label">Package No.</label>
+            <label class="gp-label">Package No. *</label>
             <input
               :value="form.packageNumber ?? ''"
               class="gp-input"
@@ -97,9 +112,9 @@
             }}</small>
           </div>
 
-          <!-- Unit Weight (per gem) -> gemsSize -->
+          <!-- Unit Weight (gemsSize) -->
           <div class="gp-field">
-            <label class="gp-label">Unit Weight (Carat)</label>
+            <label class="gp-label">Unit Weight (Carat) *</label>
             <input
               :value="form.gemsSize ?? ''"
               class="gp-input"
@@ -108,12 +123,10 @@
               placeholder="e.g. 0.02"
               @input="form.gemsSize = toNumOrNull(($event.target as HTMLInputElement).value)"
             />
-            <small v-if="fieldErrors.gemsSize" class="gp-error">
-              {{ fieldErrors.gemsSize }}
-            </small>
+            <small v-if="fieldErrors.gemsSize" class="gp-error">{{ fieldErrors.gemsSize }}</small>
           </div>
 
-          <!-- Quantity (INPUT) -->
+          <!-- Quantity -->
           <div class="gp-field">
             <label class="gp-label">Quantity *</label>
             <input
@@ -126,7 +139,7 @@
             <small v-if="fieldErrors.quantity" class="gp-error">{{ fieldErrors.quantity }}</small>
           </div>
 
-          <!-- Package Weight (Carat) (AUTO) -->
+          <!-- Package Weight (AUTO) -->
           <div class="gp-field">
             <label class="gp-label">Package Weight (Carat)</label>
             <input
@@ -136,17 +149,14 @@
               readonly
               placeholder="auto"
             />
-            <small v-if="fieldErrors.gemsWeight" class="gp-error">
-              {{ fieldErrors.gemsWeight }}
-            </small>
           </div>
 
-          <!-- ✅ Price block (Unit Price input + totals auto + diff message) -->
+          <!-- Price block -->
           <div class="gp-field gp-field--full">
             <div class="ae-block">
               <div class="ae-left">
                 <div class="ae-row">
-                  <label class="ae-label">Unit Price</label>
+                  <label class="ae-label">Unit Price *</label>
                   <input
                     :value="form.unitPrice ?? ''"
                     class="ae-input"
@@ -155,10 +165,10 @@
                     placeholder="e.g. 1.20"
                     @input="form.unitPrice = toNumOrNull(($event.target as HTMLInputElement).value)"
                   />
-                  <small v-if="fieldErrors.unitPrice" class="gp-error">
-                    {{ fieldErrors.unitPrice }}
-                  </small>
                 </div>
+                <small v-if="fieldErrors.unitPrice" class="gp-error">{{
+                  fieldErrors.unitPrice
+                }}</small>
 
                 <div class="gp-field">
                   <label class="gp-label">Actual Total Price *</label>
@@ -172,13 +182,13 @@
                       form.totalPrice = toNumOrNull(($event.target as HTMLInputElement).value)
                     "
                   />
-                  <small v-if="fieldErrors.totalPrice" class="gp-error">
-                    {{ fieldErrors.totalPrice }}
-                  </small>
+                  <small v-if="fieldErrors.totalPrice" class="gp-error">{{
+                    fieldErrors.totalPrice
+                  }}</small>
                 </div>
 
                 <div class="ae-row">
-                  <label class="ae-label">Estimated Total Price</label>
+                  <label class="ae-label">Estimated Total</label>
                   <input
                     :value="estimatedTotalPriceFormatted"
                     class="ae-input"
@@ -196,51 +206,34 @@
           </div>
 
           <!-- Gem Type -->
-          <!-- Gem Type -->
           <div class="gp-field">
-            <label class="gp-label">Gem Type</label>
-
+            <label class="gp-label">Gem Type *</label>
             <select v-model="form.gemTypeId" class="gp-input gp-select">
               <option :value="null">Select gem type</option>
               <option v-for="t in gemTypesStore.items" :key="t.id" :value="t.id">
                 {{ t.name }}
               </option>
             </select>
-
-            <small
-              v-if="gemTypesStore.items.length === 0"
-              class="gp-muted"
-              style="display: block; margin-top: 6px"
-            >
-              No gem types found. Please register gem types first.
-            </small>
-            <small v-if="fieldErrors.gemTypeId" class="gp-error">
-              {{ fieldErrors.gemTypeId }}
-            </small>
+            <small v-if="fieldErrors.gemTypeId" class="gp-error">{{ fieldErrors.gemTypeId }}</small>
           </div>
 
           <!-- Buy Date -->
           <div class="gp-field">
-            <label class="gp-label">Buy Date</label>
+            <label class="gp-label">Buy Date *</label>
             <input v-model="form.buyDate" class="gp-input" type="date" />
-            <small v-if="fieldErrors.buyDate" class="gp-error">
-              {{ fieldErrors.buyDate }}
-            </small>
+            <small v-if="fieldErrors.buyDate" class="gp-error">{{ fieldErrors.buyDate }}</small>
           </div>
 
           <!-- Color -->
           <div class="gp-field">
-            <label class="gp-label">Color</label>
+            <label class="gp-label">Color *</label>
             <input v-model.trim="form.color" class="gp-input" placeholder="e.g. D" />
-            <small v-if="fieldErrors.color" class="gp-error">
-              {{ fieldErrors.color }}
-            </small>
+            <small v-if="fieldErrors.color" class="gp-error">{{ fieldErrors.color }}</small>
           </div>
 
           <!-- Cutting -->
           <div class="gp-field">
-            <label class="gp-label">Cutting</label>
-
+            <label class="gp-label">Cutting *</label>
             <select v-model="form.cutting" class="gp-input gp-select">
               <option value="">Select cutting</option>
               <option value="Round">Round</option>
@@ -254,26 +247,12 @@
               <option value="Radiant">Radiant</option>
               <option value="Heart">Heart</option>
             </select>
-            <small v-if="fieldErrors.cutting" class="gp-error">
-              {{ fieldErrors.cutting }}
-            </small>
+            <small v-if="fieldErrors.cutting" class="gp-error">{{ fieldErrors.cutting }}</small>
           </div>
 
-          <!-- Certificate -->
-          <div class="gp-field">
-            <label class="gp-label">Certificate ID</label>
-            <input
-              :value="form.certificateId ?? ''"
-              class="gp-input"
-              type="number"
-              placeholder="e.g. 10"
-              @input="form.certificateId = toIntOrNull(($event.target as HTMLInputElement).value)"
-            />
-          </div>
-
-          <!-- Seller searchable -->
-          <div class="gp-field">
-            <label class="gp-label">Seller</label>
+          <!-- Seller (simple dropdown search like yours) -->
+          <div class="gp-field gp-field--full" style="position: relative">
+            <label class="gp-label">Seller *</label>
 
             <input
               v-model.trim="sellerQuery"
@@ -301,9 +280,43 @@
               Selected:
               <b>{{ form.sellerId ? `${form.sellerId} - ${form.sellerName ?? ''}` : '-' }}</b>
             </small>
-            <small v-if="fieldErrors.sellerId" class="gp-error">
-              {{ fieldErrors.sellerId }}
-            </small>
+
+            <small v-if="fieldErrors.sellerId" class="gp-error">{{ fieldErrors.sellerId }}</small>
+          </div>
+
+          <!-- Certificates -->
+          <div class="gp-field gp-field--full">
+            <label class="gp-label">Certificate Title (optional)</label>
+            <input v-model.trim="certTitle" class="gp-input" placeholder="e.g. GIA Report" />
+          </div>
+
+          <div class="gp-field gp-field--full">
+            <label class="gp-label">Certificate Images</label>
+            <input type="file" multiple accept="image/*" @change="onCertFilesSelected" />
+            <div class="gp-muted" style="margin-top: 8px">
+              Selected: {{ certFiles.length }} file(s)
+            </div>
+          </div>
+
+          <!-- Existing certificate list -->
+          <div class="gp-field gp-field--full" v-if="isEdit">
+            <div v-if="certList.length === 0" class="gp-muted">No certificates yet.</div>
+
+            <div v-else class="gp-cert-grid">
+              <div v-for="c in certList" :key="c.id" class="gp-cert-card">
+                <img :src="c.imageUrl" class="gp-cert-img" />
+                <div class="gp-cert-meta">
+                  <div class="gp-strong">{{ c.title || 'Certificate' }}</div>
+                  <button
+                    class="gp-mini gp-mini--danger"
+                    type="button"
+                    @click="deleteCertificate(c.id)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Description -->
@@ -318,6 +331,7 @@
           </div>
         </div>
 
+        <!-- Actions (INSIDE card) -->
         <div class="gp-actions">
           <button class="gp-btn" type="button" @click="resetForm" :disabled="store.loading">
             Reset
@@ -334,7 +348,7 @@
         </div>
       </div>
 
-      <!-- Side preview -->
+      <!-- RIGHT: PREVIEW -->
       <div class="gp-card gp-card--side">
         <div class="gp-side-top">
           <div class="gp-side-sku">
@@ -368,22 +382,12 @@
 
             <div class="gp-preview-row">
               <span class="gp-muted">Package Weight</span>
-              <span class="gp-strong">{{ packageWeightDisplay ?? '-' }}</span>
-            </div>
-
-            <div class="gp-preview-row">
-              <span class="gp-muted">Actual Qty</span>
-              <span class="gp-strong">{{ form.quantity ?? '-' }}</span>
+              <span class="gp-strong">{{ packageWeightDisplay || '-' }}</span>
             </div>
 
             <div class="gp-preview-row">
               <span class="gp-muted">Quantity</span>
               <span class="gp-strong">{{ form.quantity ?? '-' }}</span>
-            </div>
-
-            <div class="gp-preview-row">
-              <span class="gp-muted">Package Weight</span>
-              <span class="gp-strong">{{ packageWeightDisplay || '-' }}</span>
             </div>
 
             <div class="gp-preview-row">
@@ -395,13 +399,28 @@
 
             <div class="gp-preview-row">
               <span class="gp-muted">Actual Total</span>
-              <span class="gp-strong">{{ actualTotalPriceDisplay || '-' }}</span>
+              <span class="gp-strong">{{
+                form.totalPrice == null ? '-' : formatMoney(form.totalPrice)
+              }}</span>
             </div>
 
             <div class="gp-preview-row">
               <span class="gp-muted">Estimated Total</span>
-              <span class="gp-strong">{{ estimatedTotalPrice || '-' }}</span>
+              <span class="gp-strong">
+                {{ estimatedTotalPrice == null ? '-' : formatMoney(estimatedTotalPrice) }}
+              </span>
             </div>
+          </div>
+        </div>
+
+        <div class="gp-side-block">
+          <div class="gp-side-title">Certificates</div>
+          <div class="gp-muted">
+            {{
+              isEdit
+                ? `${certList.length} file(s)`
+                : 'Create package first, then upload certificates.'
+            }}
           </div>
         </div>
       </div>
@@ -425,7 +444,6 @@
   const showForm = ref(false)
   const editId = ref<number | null>(null)
 
-  // ✅ Your backend dto now includes: quantity, unitPrice, totalPrice
   const blank = (): Omit<GemsPackageDto, 'id'> => ({
     name: '',
     packageNumber: null,
@@ -436,15 +454,11 @@
     description: null,
     originalPrice: null,
     buyDate: null,
-
-    certificateId: null,
+    certificateImages: [],
     sellerId: null,
     sellerName: null,
-
     gemTypeId: null,
     gemTypeName: null,
-
-    // ✅ new backend fields
     quantity: null,
     unitPrice: null,
     totalPrice: null,
@@ -452,6 +466,16 @@
 
   const form = reactive<Omit<GemsPackageDto, 'id'>>(blank())
   const snapshot = ref(JSON.stringify(form))
+
+  const certTitle = ref('')
+  const certFiles = ref<File[]>([])
+
+  function onCertFilesSelected(e: Event) {
+    const input = e.target as HTMLInputElement
+    certFiles.value = input.files ? Array.from(input.files) : []
+  }
+
+  const certList = computed(() => form.certificateImages ?? [])
 
   const formError = ref<string | null>(null)
   const fieldErrors = reactive<Partial<Record<string, string>>>({})
@@ -502,30 +526,18 @@
     packageWeight.value == null ? '' : String(packageWeight.value)
   )
 
-  // ✅ INPUT (Actual Total Price) — user types this (NOT derived)
-  const actualTotalPriceDisplay = computed(() =>
-    form.totalPrice == null ? '' : String(form.totalPrice)
-  )
-
-  // ✅ DERIVED (Estimated Total Price) = unitPrice * ACTUAL quantity
   const estimatedTotalPrice = computed<number | null>(() => {
     const unit = form.unitPrice
-    const qty = form.quantity // ✅ actual quantity
+    const qty = form.quantity
     if (unit == null || qty == null) return null
     if (unit < 0 || qty <= 0) return null
     return Number((unit * qty).toFixed(2))
   })
 
-  // ✅ FORMATTED strings for UI (nice money display)
-  const actualTotalPriceFormatted = computed(() =>
-    form.totalPrice == null ? '' : formatMoney(form.totalPrice)
-  )
-
   const estimatedTotalPriceFormatted = computed(() =>
     estimatedTotalPrice.value == null ? '' : formatMoney(estimatedTotalPrice.value)
   )
 
-  // ✅ show “diff” only when both exist and actually different
   const showPriceDiff = computed(() => {
     const a = form.totalPrice
     const e = estimatedTotalPrice.value
@@ -549,11 +561,10 @@
     sellerQuery.value = `${id} - ${name}`
     showSellerDropdown.value = false
   }
+
   function clearErrors() {
     formError.value = null
-    for (const k in fieldErrors) {
-      fieldErrors[k] = ''
-    }
+    for (const k in fieldErrors) fieldErrors[k] = ''
   }
 
   function applyBackendErrors(e: any) {
@@ -565,44 +576,48 @@
     }
     return false
   }
+
   function openCreate() {
     showForm.value = true
     editId.value = null
     Object.assign(form, blank())
     sellerQuery.value = ''
+    certTitle.value = ''
+    certFiles.value = []
     snapshot.value = JSON.stringify(form)
-
-    setTimeout(() => {
-      document.querySelector('.gp-grid--below')?.scrollIntoView({ behavior: 'smooth' })
-    }, 0)
+    clearErrors()
   }
+
   function openEdit(row: GemsPackageDto) {
     showForm.value = true
     editId.value = row.id
     Object.assign(form, { ...row })
+    sellerQuery.value = row.sellerId ? `${row.sellerId} - ${row.sellerName ?? ''}` : ''
+    certFiles.value = []
     snapshot.value = JSON.stringify(form)
     clearErrors()
   }
 
   function resetForm() {
     Object.assign(form, blank())
+    certTitle.value = ''
+    certFiles.value = []
     snapshot.value = JSON.stringify(form)
     clearErrors()
   }
 
-  onMounted(async () => {
-    await store.loadAll()
-    await gemTypesStore.loadAll()
-    await sellersStore.loadAll()
-  })
+  function closeForm() {
+    showForm.value = false
+    editId.value = null
+    clearErrors()
+  }
 
   function formatMoney(v?: number | null) {
     if (v == null || Number.isNaN(v)) return '-'
     return (
-      new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(v) + ' MMKs'
+      new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+        v
+      ) + ' MMKs'
     )
   }
 
@@ -612,6 +627,7 @@
     const n = Number(t)
     return Number.isFinite(n) ? n : null
   }
+
   function toIntOrNull(v: string): number | null {
     const t = v.trim()
     if (!t) return null
@@ -619,9 +635,25 @@
     return Number.isFinite(n) ? n : null
   }
 
-  function closeForm() {
-    showForm.value = false
-    editId.value = null
+  async function onDelete(row: GemsPackageDto) {
+    if (!row?.id) return
+    const ok = window.confirm(`Delete package #${row.id} (${row.name}) ?`)
+    if (!ok) return
+
+    try {
+      await store.remove(row.id)
+      if (editId.value === row.id) closeForm()
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  async function deleteCertificate(certId: number) {
+    if (!isEdit.value) return
+    await store.deleteCertificate(certId, editId.value!)
+    const latest = await store.getById(editId.value!)
+    Object.assign(form, { ...latest })
+    snapshot.value = JSON.stringify(form)
   }
 
   async function save() {
@@ -634,34 +666,49 @@
     }
 
     try {
+      let saved: GemsPackageDto
+
       if (isEdit.value) {
-        await store.update(editId.value!, { ...form })
+        saved = await store.update(editId.value!, { ...form })
       } else {
-        await store.create({ ...form })
+        saved = await store.create({ ...form })
+        editId.value = saved.id
       }
 
-      await store.loadAll()
-      closeForm()
-    } catch (e: any) {
-      // ✅ show field errors under inputs
-      if (applyBackendErrors(e)) return
+      // upload certificates (if selected)
+      for (const file of certFiles.value) {
+        const url = await store.uploadToS3(file)
+        await store.addCertificate(saved.id, {
+          imageUrl: url,
+          title: certTitle.value.trim() || null,
+        })
+      }
 
-      // ✅ fallback top error
+      certFiles.value = []
+      certTitle.value = ''
+
+      // reload latest so form shows certificateImages
+      const latest = await store.getById(saved.id)
+      Object.assign(form, { ...latest })
+      snapshot.value = JSON.stringify(form)
+
+      await store.loadAll()
+    } catch (e: any) {
+      if (applyBackendErrors(e)) return
       formError.value = e?.message ?? 'Failed to save.'
     }
   }
 
-  async function onDelete(row: GemsPackageDto) {
-    if (!confirm(`Delete "${row.name}"?`)) return
-    await store.remove(row.id)
+  onMounted(async () => {
     await store.loadAll()
-  }
+    await gemTypesStore.loadAll()
+    await sellersStore.loadAll()
+  })
 </script>
 
 <style scoped src="@/styles/admin/gems-package-page.css"></style>
 
 <style scoped>
-  /* ✅ Actual vs Estimated block style (like your screenshot) */
   .ae-block {
     display: grid;
     grid-template-columns: 420px 1fr;
@@ -684,86 +731,60 @@
   }
   .ae-input {
     width: 100%;
-    border: 2px solid #111827;
     border-radius: 6px;
     padding: 10px 12px;
     font-size: 14px;
     background: #fff;
   }
-  .ae-right {
-    color: #111827;
-    font-weight: 600;
-  }
-  /* ✅ unify border color + remove "bold/strong" look */
   .gp-input,
   .ae-input,
   .gp-textarea,
   .gp-dropdown {
-    border: 1px solid #cbd5e1; /* same border everywhere */
+    border: 1px solid #cbd5e1;
   }
-
-  /* ✅ make the AE inputs look same weight as other inputs */
-  .ae-input {
-    font-weight: 400; /* remove bold feeling */
-    background: #fff;
-    box-shadow: none;
-  }
-
-  /* ✅ Bigger selects (Gem Type + Cutting) */
   .gp-select {
-    height: 44px; /* bigger */
+    height: 44px;
     padding: 10px 12px;
-    line-height: 1.2;
-    appearance: none; /* cleaner dropdown */
-    -webkit-appearance: none;
-    -moz-appearance: none;
   }
-
-  /* ✅ prevent dropdown from being "cut" by parent containers */
-  .gp-form,
-  .gp-field {
-    overflow: visible;
-  }
-
-  /* (optional) add a simple dropdown arrow look */
-  .gp-field select.gp-select {
-    background-image:
-      linear-gradient(45deg, transparent 50%, #64748b 50%),
-      linear-gradient(135deg, #64748b 50%, transparent 50%),
-      linear-gradient(to right, transparent, transparent);
-    background-position:
-      calc(100% - 18px) calc(50% - 2px),
-      calc(100% - 12px) calc(50% - 2px),
-      calc(100% - 2.5em) 0.5em;
-    background-size:
-      6px 6px,
-      6px 6px,
-      1px 1.5em;
-    background-repeat: no-repeat;
-    padding-right: 36px;
-  }
-
-  /* ✅ Difference text should be RED (not black) */
   .ae-diff {
-    color: #dc2626; /* red */
+    color: #dc2626;
     font-weight: 600;
-  }
-
-  /* optional: make diff area look like warning badge */
-  .ae-right.ae-diff {
     background: #fef2f2;
     border: 1px solid #fecaca;
     padding: 10px 12px;
     border-radius: 10px;
   }
-  .gp-input--error {
-    border-color: #dc2626 !important;
-  }
-
   .gp-error {
     color: #dc2626;
     font-size: 12px;
     margin-top: 4px;
     display: block;
+  }
+
+  .gp-cert-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .gp-cert-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px;
+    background: #fff;
+  }
+  .gp-cert-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+  }
+  .gp-cert-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    gap: 10px;
   }
 </style>
