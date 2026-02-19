@@ -104,6 +104,7 @@
       <th>#</th>
       <th>Name</th>
       <th>Phone</th>
+      <th>Email</th>
       <th>Type</th>
       <th>Status</th>
       <th>Actions</th>
@@ -113,6 +114,7 @@
       <td>{{ item.id }}</td>
       <td>{{ item.name }}</td>
       <td>{{ item.phone }}</td>
+      <td>{{ item.email }}</td>
       <td>{{ item.customerType }}</td>
       <td>{{ item.status }}</td>
       <td>

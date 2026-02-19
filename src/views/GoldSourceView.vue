@@ -34,9 +34,16 @@
             <input id="name" v-model="formName" class="gs-input" type="text" required />
           </div>
 
+          <!-- Gold Purity -->
           <div class="gs-field">
-            <label class="gs-label" for="goldPurity">Gold Purity</label>
-            <input id="goldPurity" v-model="formGoldPurity" class="gs-input" type="text" />
+            <label class="gs-label" for="goldPurity">Gold Purity *</label>
+
+            <select id="goldPurity" v-model="formGoldPurity" class="gs-input" required>
+              <option value="K24">24K</option>
+              <option value="K22">22K</option>
+              <option value="K18">18K</option>
+              <option value="K14">14K</option>
+            </select>
           </div>
 
           <div class="gs-field">
@@ -50,9 +57,17 @@
             />
           </div>
 
+          <!-- Gold Color -->
           <div class="gs-field">
-            <label class="gs-label" for="color">Color</label>
-            <input id="color" v-model="formColor" class="gs-input" type="text" />
+            <label class="gs-label" for="color">Color *</label>
+
+            <select id="color" v-model="formColor" class="gs-input" required>
+              <option value="">Select color</option>
+              <option value="Yellow">Yellow Gold</option>
+              <option value="White">White Gold</option>
+              <option value="Rose">Rose Gold</option>
+              <option value="Green">Green Gold</option>
+            </select>
           </div>
 
           <div class="gs-field">
