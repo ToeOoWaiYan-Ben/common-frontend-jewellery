@@ -2,7 +2,7 @@
   <div class="page">
     <!-- Title -->
     <div class="titleRow">
-      <button class="pill" @click="goList">← Back to list</button>
+      <button class="pill" type="button" @click="goList">← Back to list</button>
       <h1 class="h1">Products Purchase</h1>
     </div>
 
@@ -10,12 +10,22 @@
     <div class="meta">
       <div class="metaItem">
         <span class="muted">Invoice No.:</span>
-        <b class="mono">{{ purchase.invoiceNo }}</b>
+        <b class="mono">{{ purchase.invoiceNo || "-" }}</b>
       </div>
 
       <div class="metaItem">
         <span class="muted">Date:</span>
         <b>{{ purchase.date }}</b>
+      </div>
+
+      <div class="metaItem">
+        <span class="muted">Payment:</span>
+        <select v-model="purchase.paymentMethod" class="select" @change="saveAuto">
+          <option value="CASH">Cash</option>
+          <option value="CARD">Card</option>
+          <option value="TRANSFER">Transfer</option>
+          <option value="QR">QR</option>
+        </select>
       </div>
 
       <div class="metaItem grow">
@@ -36,11 +46,21 @@
           <div class="body">
             <div class="searchWrap">
               <span class="icon">🔎</span>
-              <input v-model="search" class="search" placeholder="Search product by code or name" />
+              <input
+                v-model="search"
+                class="search"
+                placeholder="Search product by code or name"
+              />
             </div>
 
             <div v-if="suggestions.length" class="suggestions">
-              <button v-for="p in suggestions" :key="p.code" class="sug" @click="selectProduct(p)">
+              <button
+                v-for="p in suggestions"
+                :key="p.code"
+                class="sug"
+                type="button"
+                @click="selectProduct(p)"
+              >
                 <b class="mono">{{ p.code }}</b> | {{ p.name }}
               </button>
             </div>
@@ -62,22 +82,34 @@
                 <div class="control">
                   <span class="label">Qty</span>
                   <div class="stepper">
-                    <button class="stepBtn" @click="selQty = Math.max(1, selQty - 1)">−</button>
+                    <button class="stepBtn" type="button" @click="selQty = Math.max(1, selQty - 1)">
+                      −
+                    </button>
                     <div class="stepVal">{{ selQty }}</div>
-                    <button class="stepBtn" @click="selQty = selQty + 1">+</button>
+                    <button class="stepBtn" type="button" @click="selQty = selQty + 1">
+                      +
+                    </button>
                   </div>
                 </div>
 
                 <div class="control">
                   <span class="label">Selling Price</span>
-                  <input class="price" type="number" min="0" step="0.01" v-model.number="selPrice" />
+                  <input
+                    class="price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    v-model.number="selPrice"
+                  />
                 </div>
               </div>
 
-              <button class="btn" @click="addItem">Add Item</button>
+              <button class="btn" type="button" @click="addItem">Add Item</button>
             </div>
 
-            <div v-else class="muted" style="margin-top: 10px;">Pick a product to add.</div>
+            <div v-else class="muted" style="margin-top: 10px;">
+              Pick a product to add.
+            </div>
           </div>
         </div>
 
@@ -100,24 +132,36 @@
               <tbody>
                 <tr v-for="(it, idx) in purchase.items" :key="it.id">
                   <td>{{ idx + 1 }}</td>
+
                   <td>
                     <div><b class="mono">{{ it.code }}</b> | {{ it.name }}</div>
                     <div class="small muted">
                       Available: {{ it.available }} | Weight: {{ it.weight }} | Color: {{ it.color }} | Dep: {{ it.dep }}
                     </div>
-                  </td>
-                  <td class="right">{{ money(it.unitPrice) }}</td>
-                  <td>
-                    <div class="stepper smallStep">
-                      <button class="stepBtn" @click="setQty(it.id, it.qty - 1)">−</button>
-                      <div class="stepVal">{{ it.qty }}</div>
-                      <button class="stepBtn" @click="setQty(it.id, it.qty + 1)">+</button>
+                    <div class="small muted">
+                      Product ID: <b class="mono">{{ it.productId }}</b>
                     </div>
                   </td>
+
+                  <td class="right">{{ money(it.unitPrice) }}</td>
+
+                  <td>
+                    <div class="stepper smallStep">
+                      <button class="stepBtn" type="button" @click="setQty(it.id, it.qty - 1)">
+                        −
+                      </button>
+                      <div class="stepVal">{{ it.qty }}</div>
+                      <button class="stepBtn" type="button" @click="setQty(it.id, it.qty + 1)">
+                        +
+                      </button>
+                    </div>
+                  </td>
+
                   <td class="right">{{ money(it.unitPrice * it.qty) }}</td>
+
                   <td class="right">
-                    <button class="iconBtn" @click="openEditPrice(it)">✎</button>
-                    <button class="iconBtn" @click="removeItem(it.id)">🗑</button>
+                    <button class="iconBtn" type="button" @click="openEditPrice(it)">✎</button>
+                    <button class="iconBtn" type="button" @click="removeItem(it.id)">🗑</button>
                   </td>
                 </tr>
 
@@ -128,14 +172,18 @@
             </table>
 
             <div class="footer">
-              <button class="btn soft" @click="clearAll">Clear All</button>
+              <button class="btn soft" type="button" @click="clearAll">Clear All</button>
 
               <div class="footerRight">
-                <span class="muted">Promotion:</span>
-                <input class="miniInput" disabled />
-
                 <span class="muted">Discount:</span>
-                <input class="miniInput" type="number" min="0" step="0.01" v-model.number="purchase.discount" @input="saveAuto" />
+                <input
+                  class="miniInput"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  v-model.number="purchase.discount"
+                  @input="saveAuto"
+                />
 
                 <b>Final Price:</b>
                 <div class="finalBox">{{ money(total.finalPrice) }}</div>
@@ -150,8 +198,21 @@
         <div class="card">
           <div class="head">Customer</div>
           <div class="body">
-            <input class="input" v-model="purchase.customer.name" placeholder="Search by phone or name (frontend)" @input="saveAuto" />
+            <!-- For now: user types name/phone (display only) -->
+            <input class="input" v-model="purchase.customer.name" placeholder="Customer name" @input="saveAuto" />
             <input class="input" v-model="purchase.customer.phone" placeholder="Phone" @input="saveAuto" />
+
+            <!-- Important: customerId used by backend -->
+            <div class="small muted" style="margin-bottom: 10px;">
+              Customer ID (backend):
+              <input
+                class="input"
+                type="number"
+                min="1"
+                v-model.number="purchase.customer.customerId"
+                @input="saveAuto"
+              />
+            </div>
 
             <div class="summary">
               <div class="sumRow">
@@ -160,7 +221,14 @@
               </div>
               <div class="sumRow">
                 <span class="muted">Discount:</span>
-                <input class="sumInput" type="number" min="0" step="0.01" v-model.number="purchase.discount" @input="saveAuto" />
+                <input
+                  class="sumInput"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  v-model.number="purchase.discount"
+                  @input="saveAuto"
+                />
               </div>
               <div class="sumRow big">
                 <span>Final Price:</span>
@@ -169,13 +237,12 @@
             </div>
 
             <div class="btnStack">
-              <button class="btn soft" @click="saveDraft">💾 Save Draft</button>
-              <button class="btn" @click="confirmReduce">🔧 Confirm & Reduce Stock</button>
-              <button class="btn soft" @click="printInvoice">🖨 Print Invoice</button>
+              <button class="btn" type="button" @click="confirmSave">✅ Confirm & Save</button>
+              <button class="btn soft" type="button" @click="printInvoice">🖨 Print Invoice</button>
             </div>
 
             <div class="small muted" style="margin-top: 10px;">
-              Reduce stock is simulated on frontend only.
+              This page saves to DB using your backend API. No localStorage.
             </div>
           </div>
         </div>
@@ -188,8 +255,8 @@
         <b>Edit Unit Price</b>
         <input class="input" type="number" min="0" step="0.01" v-model.number="priceModal.price" />
         <div class="modalActions">
-          <button class="btn soft" @click="priceModal.open=false">Cancel</button>
-          <button class="btn" @click="applyPrice">Save</button>
+          <button class="btn soft" type="button" @click="priceModal.open=false">Cancel</button>
+          <button class="btn" type="button" @click="applyPrice">Save</button>
         </div>
       </div>
     </div>
@@ -200,10 +267,12 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import type { Purchase, PurchaseItem } from "@/stores/usePurchasesStore";
 import { usePurchasesStore } from "@/stores/usePurchasesStore";
+import type { Purchase, PurchaseItem } from "@/stores/usePurchasesStore";
 
+/** Demo products (replace later with real product list API) */
 type Product = {
+  productId: number;
   code: string;
   name: string;
   available: number;
@@ -213,11 +282,10 @@ type Product = {
   price: number;
 };
 
-// frontend demo products (replace later with API)
 const productMaster = ref<Product[]>([
-  { code: "PRD001", name: "Product Name", available: 10, weight: "2.5g", color: "Gold", dep: "0.5%", price: 100 },
-  { code: "PRD002", name: "Product Name", available: 12, weight: "3.0g", color: "Gold", dep: "0.5%", price: 150 },
-  { code: "PRD003", name: "Product Name", available: 8,  weight: "2.0g", color: "Gold", dep: "0.5%", price: 200 },
+  { productId: 101, code: "PRD001", name: "Product Name", available: 10, weight: "2.5g", color: "Gold", dep: "0.5%", price: 100 },
+  { productId: 102, code: "PRD002", name: "Product Name", available: 12, weight: "3.0g", color: "Gold", dep: "0.5%", price: 150 },
+  { productId: 103, code: "PRD003", name: "Product Name", available: 8,  weight: "2.0g", color: "Gold", dep: "0.5%", price: 200 },
 ]);
 
 const store = usePurchasesStore();
@@ -226,46 +294,46 @@ const router = useRouter();
 
 const purchase = reactive<Purchase>({
   id: "",
+  invoiceId: undefined,
   invoiceNo: "",
-  date: "",
+  date: new Date().toISOString().slice(0, 10),
   status: "Draft",
-  customer: { name: "", phone: "" },
+  paymentMethod: "CASH",
+  customer: { name: "", phone: "", customerId: 1 },
   discount: 0,
   items: [],
-  createdAt: 0,
-  updatedAt: 0,
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
 });
 
-onMounted(() => {
-  store.load();
-
+onMounted(async () => {
   const id = String(route.params.id || "");
-  if (id) {
-    const exist = store.getById(id);
-    if (exist) Object.assign(purchase, exist);
-    else {
-      const created = store.createPurchase();
-      Object.assign(purchase, created);
-      router.replace(`/purchases/${created.id}`);
-    }
-  } else {
-    const created = store.createPurchase();
-    Object.assign(purchase, created);
-    router.replace(`/purchases/${created.id}`);
+
+  // If numeric -> load from DB
+  const invoiceId = Number(id);
+  if (!Number.isNaN(invoiceId) && invoiceId > 0) {
+    const fromDb = await store.fetchOne(invoiceId);
+    Object.assign(purchase, fromDb);
+    store.upsertLocal({ ...purchase });
+    return;
   }
+
+  // Otherwise create new draft (memory only)
+  const created = store.createPurchase();
+  Object.assign(purchase, created);
 });
 
 const total = computed(() => store.totals(purchase));
 
 function saveAuto() {
-  store.upsertPurchase({ ...purchase });
+  store.upsertLocal({ ...purchase });
 }
 
 function goList() {
-  router.push("/purchases");
+  router.push("/admin/purchases");
 }
 
-// search + select
+/** search + select product */
 const search = ref("");
 const selected = ref<Product | null>(null);
 const selQty = ref(1);
@@ -293,6 +361,7 @@ function addItem() {
 
   const item: PurchaseItem = {
     id: Math.random().toString(36).slice(2),
+    productId: p.productId, // ✅ IMPORTANT for backend
     code: p.code,
     name: p.name,
     unitPrice: Number(selPrice.value || 0),
@@ -326,7 +395,7 @@ function clearAll() {
   saveAuto();
 }
 
-// modal edit price
+/** modal edit price */
 const priceModal = reactive({ open: false, itemId: "", price: 0 });
 
 function openEditPrice(it: PurchaseItem) {
@@ -342,24 +411,29 @@ function applyPrice() {
   saveAuto();
 }
 
-// right actions
-function saveDraft() {
-  purchase.status = "Draft";
-  saveAuto();
-  alert("Saved as Draft (localStorage).");
+/** ✅ Save to DB */
+async function saveDraft() {
+  try {
+    purchase.status = "Draft";
+    const saved = await store.saveToDb({ ...purchase });
+    Object.assign(purchase, saved);
+    router.replace(`/admin/purchases/${saved.id}/edit`);
+    alert("Saved to database (Draft).");
+  } catch (e: any) {
+    alert(e?.message || "Save failed");
+  }
 }
 
-function confirmReduce() {
-  purchase.status = "Confirmed";
-
-  // simulate reduce stock (frontend only)
-  for (const it of purchase.items) {
-    const prod = productMaster.value.find((p) => p.code === it.code);
-    if (prod) prod.available = Math.max(0, prod.available - it.qty);
+async function confirmSave() {
+  try {
+    purchase.status = "Confirmed";
+    const saved = await store.saveToDb({ ...purchase });
+    Object.assign(purchase, saved);
+    router.replace(`/admin/purchases/${saved.id}/edit`);
+    alert("Confirmed and saved to database.");
+  } catch (e: any) {
+    alert(e?.message || "Confirm failed");
   }
-
-  saveAuto();
-  alert("Confirmed (simulated). Stock reduced in frontend memory.");
 }
 
 function printInvoice() {
@@ -368,11 +442,13 @@ function printInvoice() {
     .join("\n");
 
   const msg =
-`Invoice ${purchase.invoiceNo}
+`Invoice ${purchase.invoiceNo || "-"}
 Date: ${purchase.date}
 Status: ${purchase.status}
+Payment: ${purchase.paymentMethod}
 
 Customer: ${purchase.customer.name || "-"} (${purchase.customer.phone || "-"})
+CustomerId: ${purchase.customer.customerId}
 
 Items:
 ${lines}
@@ -484,7 +560,6 @@ function money(n: number) {
   font-weight:900; cursor:pointer; background:#4b5563; color:#fff;
 }
 .btn.soft { background:#fff; color:#111827; }
-.mt { margin-top: 0; }
 
 .iconBtn {
   border:1px solid #e5e7eb; background:#fff; border-radius:10px;

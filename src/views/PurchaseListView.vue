@@ -10,7 +10,7 @@
           class="input"
           placeholder="Search invoice / customer / status"
         />
-        <button class="btn primary" @click="createNew">
+        <button class="btn primary" type="button" @click="createNew">
           + New Purchase
         </button>
       </div>
@@ -21,13 +21,19 @@
       <div class="card-head">Purchases</div>
 
       <div class="card-body">
-        <table class="table">
+        <div v-if="store.isLoading" class="note">Loading…</div>
+        <div v-else-if="store.errorMessage" class="note error">
+          {{ store.errorMessage }}
+        </div>
+
+        <table v-else class="table">
           <thead>
             <tr>
               <th>Invoice</th>
               <th>Date</th>
               <th>Status</th>
               <th>Customer</th>
+              <th>Payment</th>
               <th class="right">Final</th>
               <th class="right" style="width:180px;">Actions</th>
             </tr>
@@ -35,40 +41,40 @@
 
           <tbody>
             <tr v-for="p in filtered" :key="p.id">
-              <td class="mono">{{ p.invoiceNo }}</td>
+              <td class="mono">{{ p.invoiceNo || "-" }}</td>
               <td>{{ p.date }}</td>
+
               <td>
-                <span
-                  class="badge"
-                  :class="p.status === 'Confirmed' ? 'ok' : 'draft'"
-                >
+                <span class="badge" :class="p.status === 'Confirmed' ? 'ok' : 'draft'">
                   {{ p.status }}
                 </span>
               </td>
+
               <td>{{ p.customer?.name || "-" }}</td>
+              <td>{{ paymentLabel(p.paymentMethod) }}</td>
+
               <td class="right">
                 {{ money(store.totals(p).finalPrice) }}
               </td>
+
               <td class="right">
-                <button class="btn small" @click="open(p.id)">
+                <button class="btn small" type="button" @click="open(p.id)">
                   Open
                 </button>
-                <button class="btn small danger" @click="del(p.id)">
+                <button class="btn small danger" type="button" @click="del(p.id)">
                   Delete
                 </button>
               </td>
             </tr>
 
             <tr v-if="!filtered.length">
-              <td colspan="6" class="empty">
-                No purchases found.
-              </td>
+              <td colspan="7" class="empty">No purchases found.</td>
             </tr>
           </tbody>
         </table>
 
         <div class="note">
-          Frontend only — data saved in <b>localStorage</b>.
+          Data is loaded from <b>Database</b>.
         </div>
       </div>
     </div>
@@ -79,14 +85,23 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { usePurchasesStore } from "@/stores/usePurchasesStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const router = useRouter();
 const store = usePurchasesStore();
+const auth = useAuthStore();
 
 const search = ref("");
 
-onMounted(() => {
-  store.seedIfEmpty();
+/** ✅ FIX 1: If not logged in, do NOT call API (prevents http.ts redirect loop) */
+onMounted(async () => {
+  if (!auth.isLoggedIn) {
+    const next = encodeURIComponent("/admin/purchases");
+    router.push(`/login?next=${next}`);
+    return;
+  }
+
+  await store.fetchAll();
 });
 
 const filtered = computed(() => {
@@ -98,6 +113,7 @@ const filtered = computed(() => {
       p.invoiceNo,
       p.date,
       p.status,
+      p.paymentMethod,
       p.customer?.name,
       p.customer?.phone,
     ]
@@ -108,50 +124,39 @@ const filtered = computed(() => {
   });
 });
 
-/* ✅ When click NEW PURCHASE */
 function createNew() {
-  const newPurchase = store.createPurchase();
+  const newPurchase = store.createPurchase(); // local draft (memory only)
   router.push(`/admin/purchases/${newPurchase.id}/edit`);
 }
 
-/* ✅ When click OPEN */
 function open(id: string) {
   router.push(`/admin/purchases/${id}/edit`);
 }
 
-function del(id: string) {
+async function del(id: string) {
   if (!confirm("Delete this purchase?")) return;
-  store.deletePurchase(id);
+  await store.deletePurchase(id);
 }
 
 function money(n: number) {
   return `$${Number(n || 0).toFixed(2)}`;
 }
+
+function paymentLabel(v: string) {
+  const x = String(v || "").toUpperCase();
+  if (x === "CASH") return "Cash";
+  if (x === "CARD") return "Card";
+  if (x === "TRANSFER") return "Transfer";
+  if (x === "QR") return "QR";
+  return x || "-";
+}
 </script>
 
 <style scoped>
-.page {
-  display: grid;
-  gap: 14px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.title {
-  margin: 0;
-  font-size: 28px;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
+.page { display: grid; gap: 14px; }
+.header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+.title { margin: 0; font-size: 28px; }
+.actions { display: flex; gap: 10px; align-items: center; }
 
 .input {
   height: 38px;
@@ -174,14 +179,9 @@ function money(n: number) {
   font-weight: 900;
 }
 
-.card-body {
-  padding: 12px 14px;
-}
+.card-body { padding: 12px 14px; }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
+.table { width: 100%; border-collapse: collapse; }
 
 .table th,
 .table td {
@@ -189,9 +189,7 @@ function money(n: number) {
   border-bottom: 1px solid #f1f5f9;
 }
 
-.right {
-  text-align: right;
-}
+.right { text-align: right; }
 
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
@@ -205,9 +203,7 @@ function money(n: number) {
   border: 1px solid #e5e7eb;
 }
 
-.badge.draft {
-  background: #f9fafb;
-}
+.badge.draft { background: #f9fafb; }
 
 .badge.ok {
   background: #ecfdf5;
@@ -237,9 +233,7 @@ function money(n: number) {
   border-color: #ef4444;
 }
 
-.btn.small {
-  height: 30px;
-}
+.btn.small { height: 30px; }
 
 .empty {
   text-align: center;
@@ -247,8 +241,6 @@ function money(n: number) {
   color: #6b7280;
 }
 
-.note {
-  margin-top: 10px;
-  color: #6b7280;
-}
+.note { margin-top: 10px; color: #6b7280; }
+.note.error { color: #b91c1c; }
 </style>

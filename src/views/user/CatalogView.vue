@@ -17,10 +17,7 @@
   const router = useRouter()
 
   /* ---------- Hero ---------- */
-  const heroImageUrl = ref(
-    'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70'
-  )
-
+const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70' )
   /* ---------- State ---------- */
   const loading = ref(false)
   const error = ref('')
