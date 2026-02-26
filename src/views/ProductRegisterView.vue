@@ -1,593 +1,1031 @@
 <template>
-  <div class="page">
-    <!-- Title -->
-    <div class="titleRow">
-      <button class="pill" type="button" @click="goList">← Back to list</button>
-      <h1 class="h1">Products Purchase</h1>
+  <div class="pwrap" @click="closeAllDd">
+    <!-- header -->
+    <div class="phead">
+      <button class="phead__back" type="button" @click="goBack">← Back to products</button>
     </div>
 
-    <!-- Meta -->
-    <div class="meta">
-      <div class="metaItem">
-        <span class="muted">Invoice No.:</span>
-        <b class="mono">{{ purchase.invoiceNo || "-" }}</b>
-      </div>
-
-      <div class="metaItem">
-        <span class="muted">Date:</span>
-        <b>{{ purchase.date }}</b>
-      </div>
-
-      <div class="metaItem">
-        <span class="muted">Payment:</span>
-        <select v-model="purchase.paymentMethod" class="select" @change="saveAuto">
-          <option value="CASH">Cash</option>
-          <option value="CARD">Card</option>
-          <option value="TRANSFER">Transfer</option>
-          <option value="QR">QR</option>
-        </select>
-      </div>
-
-      <div class="metaItem grow">
-        <span class="muted">Status:</span>
-        <select v-model="purchase.status" class="select" @change="saveAuto">
-          <option value="Draft">Draft</option>
-          <option value="Confirmed">Confirmed</option>
-        </select>
-      </div>
+    <div class="ptitle">
+      <h2 class="ptitle__h">{{ isEdit ? 'Edit product' : 'Add product' }}</h2>
+      <p class="ptitle__p">Create product + add gold sources + add jewellery sources.</p>
     </div>
 
-    <div class="grid">
-      <!-- LEFT -->
-      <div class="left">
-        <!-- Add Product -->
-        <div class="card">
-          <div class="head">Add Product</div>
-          <div class="body">
-            <div class="searchWrap">
-              <span class="icon">🔎</span>
-              <input
-                v-model="search"
-                class="search"
-                placeholder="Search product by code or name"
-                @focus="searchOpen = true"
-                @blur="onBlurSearch"
-              />
+    <!-- MAIN PRODUCT CARD -->
+    <div class="pcard">
+      <div class="pgrid">
+        <div class="pfield">
+          <label class="plabel">Name *</label>
+          <input v-model="product.name" class="pinput" type="text" placeholder="e.g. Gold Ring 18K" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Code</label>
+          <input v-model="product.code" class="pinput" type="text" placeholder="e.g. GR-001" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Stock Status</label>
+          <div class="pselectWrap">
+            <select v-model="product.stockStatus" class="pselect">
+              <option value="">Select status</option>
+              <option value="IN_STOCK">IN_STOCK</option>
+              <option value="LOW_STOCK">LOW_STOCK</option>
+              <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
+            </select>
+            <span class="pselectIcon">▾</span>
+          </div>
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Qty</label>
+          <input v-model.number="product.qty" class="pinput" type="number" min="0" placeholder="e.g. 10" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Collection</label>
+          <input v-model="product.collection" class="pinput" type="text" placeholder="e.g. Classic" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Color</label>
+          <input v-model="product.color" class="pinput" type="text" placeholder="e.g. Yellow Gold" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Weight</label>
+          <input v-model.number="product.weight" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 5.20" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Metarial Loss</label>
+          <input v-model.number="product.metarialLoss" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 0.30" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Making Cost</label>
+          <input v-model.number="product.makingCost" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 120" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Color Count</label>
+          <input v-model.number="product.colorCount" class="pinput" type="number" min="0" placeholder="e.g. 2" />
+        </div>
+
+        <div class="pfield">
+          <label class="plabel">Depreciation *</label>
+          <input v-model.number="product.depreciation" class="pinput" type="number" step="0.01" min="0" placeholder="e.g. 0.10" />
+        </div>
+
+        <!-- ✅ Product Type dropdown search (JewelryType) -->
+        <div class="pfield">
+          <label class="plabel">Product Type (Jewelry Type) *</label>
+
+          <div class="combo" @click.stop>
+            <button class="combo__btn" type="button" @click.stop="toggleTypeDd">
+              <span class="combo__text">{{ selectedTypeLabel || 'Select jewelry type' }}</span>
+              <span class="combo__icon">▾</span>
+            </button>
+
+            <div v-if="typeDdOpen" class="dd dd--up" @click.stop>
+              <div class="dd__search">
+                <span class="dd__searchIcon">🔍</span>
+                <input v-model="typeQuery" class="dd__searchInput" type="text" placeholder="Search type name / category / id..." />
+              </div>
+
+              <div class="dd__list">
+                <button
+                  v-for="t in filteredJewelryTypes(typeQuery)"
+                  :key="t.id"
+                  class="dd__item"
+                  type="button"
+                  @click.stop="selectType(t)"
+                >
+                  <div class="dd__main">{{ t.name }}</div>
+                  <div class="dd__sub">Category: {{ t.categoryName ?? '-' }} • ID: {{ t.id }}</div>
+                </button>
+
+                <div v-if="filteredJewelryTypes(typeQuery).length === 0" class="dd__empty">
+                  No jewelry types found
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
 
-            <div v-if="suggestions.length" class="suggestions">
-              <button
-                v-for="p in suggestions"
-                :key="p.productId"
-                class="sug"
-                type="button"
-                @click="selectProduct(p)"
-              >
-                <b class="mono">{{ p.code }}</b> | {{ p.name }}
+        <div class="pfield pfield--full">
+          <label class="plabel">Short Desc</label>
+          <input v-model="product.shortDesc" class="pinput" type="text" placeholder="e.g. 18K ring with clean design" />
+        </div>
+
+        <div class="pfield pfield--full">
+          <label class="plabel">Desc (varchar300)</label>
+          <textarea v-model="product.desc" class="ptextarea" rows="3" placeholder="Write product description..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD GOLD FOR PRODUCT -->
+    <div class="pcard">
+      <div class="secHead">
+        <div>
+          <h3 class="secHead__h">Add Gold For Product</h3>
+          <p class="secHead__p">Choose purchased gold package (Gold Source) + craft, enter used weight + current price.</p>
+        </div>
+
+        <div class="purityPill" :class="purityClass">
+          <span class="purityPill__dot"></span>
+          <span class="purityPill__text">{{ goldPurityLabel }}</span>
+        </div>
+      </div>
+
+      <div v-if="goldError" class="errBox">
+        <span class="errBox__icon">⚠</span>
+        <span>{{ goldError }}</span>
+      </div>
+
+      <div class="miniTable">
+        <div class="miniTable__head miniTable__head--gold">
+          <div class="miniTable__th">Gold Source *</div>
+          <div class="miniTable__th">Craft *</div>
+          <div class="miniTable__th">Weight Used (kyat/g) *</div>
+          <div class="miniTable__th">Current Price (MMK) *</div>
+          <div class="miniTable__th miniTable__th--actions">
+            <button class="btnAdd" type="button" @click.stop="addGoldRow">+ Add</button>
+          </div>
+        </div>
+
+        <div v-for="(row, idx) in product.goldRows" :key="row.key" class="miniTable__row miniTable__row--gold">
+          <!-- GOLD SOURCE -->
+          <div class="miniTable__td">
+            <div class="combo" @click.stop>
+              <button class="combo__btn" type="button" @click.stop="toggleGoldDd(idx)">
+                <span class="combo__text">{{ row.sourceLabel || 'Select gold package' }}</span>
+                <span class="combo__icon">▾</span>
               </button>
-            </div>
 
-            <div v-if="selected" class="productRow">
-              <div class="pLeft">
-                <div class="pTitle">
-                  <span class="mono code">{{ selected.code }}</span>
-                  <b>{{ selected.name }}</b>
+              <div v-if="row.ddOpen" class="dd dd--up" @click.stop>
+                <div class="dd__search">
+                  <span class="dd__searchIcon">🔍</span>
+                  <input v-model="row.query" class="dd__searchInput" type="text" placeholder="Search package id / merchant..." />
                 </div>
 
-                <div class="pMeta">
-                  <span>Available: {{ selected.available }}</span>
-                  <span>Weight: {{ selected.weight }}</span>
-                  <span>Color: {{ selected.color }}</span>
-                  <span>Dep: {{ selected.dep }}</span>
-                </div>
+                <div class="dd__list">
+                  <button
+                    v-for="g in filteredGoldSources(row.query)"
+                    :key="g.id"
+                    class="dd__item"
+                    type="button"
+                    @click.stop="selectGoldSource(idx, g)"
+                  >
+                    <div class="dd__main">{{ g.name }}</div>
+                    <div class="dd__sub">
+                      {{ g.sourceCountry || '-' }} • Available: {{ Number(g.weight || 0).toFixed(2) }} • Purity:
+                      {{ g.goldPurity || '-' }}
+                    </div>
+                  </button>
 
-                <div class="control">
-                  <span class="label">Qty</span>
-                  <div class="stepper">
-                    <button class="stepBtn" type="button" @click="selQty = Math.max(1, selQty - 1)">
-                      −
-                    </button>
-                    <div class="stepVal">{{ selQty }}</div>
-                    <button class="stepBtn" type="button" @click="selQty = selQty + 1">
-                      +
-                    </button>
+                  <div v-if="filteredGoldSources(row.query).length === 0" class="dd__empty">
+                    No gold packages found
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <div class="control">
-                  <span class="label">Selling Price</span>
-                  <input
-                    class="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    v-model.number="selPrice"
-                  />
+          <!-- CRAFT -->
+          <div class="miniTable__td">
+            <div class="combo" @click.stop>
+              <button class="combo__btn" type="button" @click.stop="toggleCraftDd(idx)">
+                <span class="combo__text">{{ row.craftLabel || 'Select craft' }}</span>
+                <span class="combo__icon">▾</span>
+              </button>
+
+              <div v-if="row.craftDdOpen" class="dd dd--up" @click.stop>
+                <div class="dd__search">
+                  <span class="dd__searchIcon">🔍</span>
+                  <input v-model="row.craftQuery" class="dd__searchInput" type="text" placeholder="Search shop name / NRC / phone..." />
+                </div>
+
+                <div class="dd__list">
+                  <button
+                    v-for="c in filteredCrafts(row.craftQuery)"
+                    :key="c.id"
+                    class="dd__item"
+                    type="button"
+                    @click.stop="selectCraft(idx, c)"
+                  >
+                    <div class="dd__main">{{ c.shopName }}</div>
+                    <div class="dd__sub">NRC: {{ c.nrc }} • Phone: {{ c.phone }}</div>
+                  </button>
+
+                  <div v-if="filteredCrafts(row.craftQuery).length === 0" class="dd__empty">
+                    No crafts found
+                  </div>
                 </div>
               </div>
-
-              <button class="btn" type="button" @click="addItem">Add Item</button>
             </div>
 
-            <div v-else class="muted" style="margin-top: 10px;">
-              Pick a product to add.
-            </div>
+            <div v-if="row.craftError" class="tinyErr">{{ row.craftError }}</div>
           </div>
-        </div>
 
-        <!-- Items List -->
-        <div class="card mt">
-          <div class="head">Items List</div>
-          <div class="body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th style="width:60px;">No.</th>
-                  <th>Product</th>
-                  <th class="right">Unit Price</th>
-                  <th style="width:160px;">Qty</th>
-                  <th class="right">Line Subtotal</th>
-                  <th style="width:110px;" class="right">Actions</th>
-                </tr>
-              </thead>
+          <!-- WEIGHT -->
+          <div class="miniTable__td">
+            <input v-model.number="row.weightUsed" class="pinput pinput--tight" type="number" step="0.01" min="0" placeholder="e.g. 4.0" @input="validateGoldRows" />
+            <div v-if="row.weightError" class="tinyErr">{{ row.weightError }}</div>
+          </div>
 
-              <tbody>
-                <tr v-for="(it, idx) in purchase.items" :key="it.id">
-                  <td>{{ idx + 1 }}</td>
+          <!-- PRICE -->
+          <div class="miniTable__td">
+            <input v-model.number="row.currentPrice" class="pinput pinput--tight" type="number" step="1" min="0" placeholder="e.g. 4000" @input="validateGoldRows" />
+            <div v-if="row.priceError" class="tinyErr">{{ row.priceError }}</div>
+          </div>
 
-                  <td>
-                    <div><b class="mono">{{ it.code }}</b> | {{ it.name }}</div>
-                    <div class="small muted">
-                      Available: {{ it.available }} | Weight: {{ it.weight }} | Color: {{ it.color }} | Dep: {{ it.dep }}
-                    </div>
-                    <div class="small muted">
-                      Product ID: <b class="mono">{{ it.productId }}</b>
-                    </div>
-                  </td>
-
-                  <td class="right">{{ money(it.unitPrice) }}</td>
-
-                  <td>
-                    <div class="stepper smallStep">
-                      <button class="stepBtn" type="button" @click="setQty(it.id, it.qty - 1)">
-                        −
-                      </button>
-                      <div class="stepVal">{{ it.qty }}</div>
-                      <button class="stepBtn" type="button" @click="setQty(it.id, it.qty + 1)">
-                        +
-                      </button>
-                    </div>
-                  </td>
-
-                  <td class="right">{{ money(it.unitPrice * it.qty) }}</td>
-
-                  <td class="right">
-                    <button class="iconBtn" type="button" @click="openEditPrice(it)">✎</button>
-                    <button class="iconBtn" type="button" @click="removeItem(it.id)">🗑</button>
-                  </td>
-                </tr>
-
-                <tr v-if="!purchase.items.length">
-                  <td colspan="6" class="empty">No items yet.</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div class="footer">
-              <button class="btn soft" type="button" @click="clearAll">Clear All</button>
-
-              <div class="footerRight">
-                <span class="muted">Discount:</span>
-                <input
-                  class="miniInput"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  v-model.number="purchase.discount"
-                  @input="saveAuto"
-                />
-
-                <b>Final Price:</b>
-                <div class="finalBox">{{ money(total.finalPrice) }}</div>
-              </div>
-            </div>
+          <div class="miniTable__td miniTable__td--actions">
+            <button class="btnDel" type="button" @click.stop="removeGoldRow(idx)">Delete</button>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT -->
-      <div class="rightPanel">
-        <div class="card">
-          <div class="head">Customer</div>
-          <div class="body">
-            <input class="input" v-model="purchase.customer.name" placeholder="Customer name" @input="saveAuto" />
-            <input class="input" v-model="purchase.customer.phone" placeholder="Phone" @input="saveAuto" />
+      <div class="totals">
+        <div class="totals__box">
+          <div class="totals__label">Total Weight Used</div>
+          <div class="totals__value">{{ totalGoldWeight.toFixed(2) }}</div>
+        </div>
 
-            <div class="small muted" style="margin-bottom: 10px;">
-              Customer ID (backend):
-              <input
-                class="input"
-                type="number"
-                min="1"
-                v-model.number="purchase.customer.customerId"
-                @input="saveAuto"
-              />
-            </div>
+        <div class="totals__box">
+          <div class="totals__label">Total Current Price</div>
+          <div class="totals__value">{{ totalGoldPrice.toLocaleString() }} MMK</div>
+        </div>
 
-            <div class="summary">
-              <div class="sumRow">
-                <span class="muted">Subtotal:</span>
-                <b>{{ money(total.subtotal) }}</b>
-              </div>
-              <div class="sumRow">
-                <span class="muted">Discount:</span>
-                <input
-                  class="sumInput"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  v-model.number="purchase.discount"
-                  @input="saveAuto"
-                />
-              </div>
-              <div class="sumRow big">
-                <span>Final Price:</span>
-                <b>{{ money(total.finalPrice) }}</b>
-              </div>
-            </div>
-
-            <div class="btnStack">
-              <button class="btn" type="button" @click="confirmSave">✅ Confirm & Save</button>
-              <button class="btn soft" type="button" @click="printInvoice">🖨 Print Invoice</button>
-            </div>
-
-            <div class="small muted" style="margin-top: 10px;">
-              This page saves to DB using your backend API. No localStorage.
-            </div>
-          </div>
+        <div class="totals__box">
+          <div class="totals__label"> </div>
+          <div class="totals__value"> </div>
         </div>
       </div>
     </div>
 
-    <!-- Edit price modal -->
-    <div v-if="priceModal.open" class="modalOverlay" @click.self="priceModal.open=false">
-      <div class="modal">
-        <b>Edit Unit Price</b>
-        <input class="input" type="number" min="0" step="0.01" v-model.number="priceModal.price" />
-        <div class="modalActions">
-          <button class="btn soft" type="button" @click="priceModal.open=false">Cancel</button>
-          <button class="btn" type="button" @click="applyPrice">Save</button>
+    <!-- ADD JEWELLERY FOR PRODUCT -->
+    <div class="pcard">
+      <div class="secHead">
+        <div>
+          <h3 class="secHead__h">Add Jewellery For Product</h3>
+          <p class="secHead__p">Choose jewellery source, enter qty + selling price. Unit price comes from gem package.</p>
+        </div>
+      </div>
+
+      <div v-if="jewelryError" class="errBox">
+        <span class="errBox__icon">⚠</span>
+        <span>{{ jewelryError }}</span>
+      </div>
+
+      <div class="miniTable">
+        <div class="miniTable__head miniTable__head--wide">
+          <div class="miniTable__th">Jewellery Source *</div>
+          <div class="miniTable__th">Qty *</div>
+          <div class="miniTable__th">Unit Weight</div>
+          <div class="miniTable__th">Total Weight</div>
+          <div class="miniTable__th">Selling Price *</div>
+          <div class="miniTable__th">Original Price</div>
+          <div class="miniTable__th miniTable__th--actions">
+            <button class="btnAdd" type="button" @click.stop="addJewelryRow">+ Add</button>
+          </div>
+        </div>
+
+        <div v-for="(row, idx) in product.jewelryRows" :key="row.key" class="miniTable__row miniTable__row--wide">
+          <div class="miniTable__td">
+            <div class="combo" @click.stop>
+              <button class="combo__btn" type="button" @click.stop="toggleJewelryDd(idx)">
+                <span class="combo__text">{{ row.sourceLabel || 'Select jewellery package' }}</span>
+                <span class="combo__icon">▾</span>
+              </button>
+
+              <div v-if="row.ddOpen" class="dd dd--up" @click.stop>
+                <div class="dd__search">
+                  <span class="dd__searchIcon">🔍</span>
+                  <input v-model="row.query" class="dd__searchInput" type="text" placeholder="Search package name / gem type..." />
+                </div>
+
+                <div class="dd__list">
+                  <button
+                    v-for="p in filteredGemPackages(row.query)"
+                    :key="p.id"
+                    class="dd__item"
+                    type="button"
+                    @click.stop="selectJewelryPackage(idx, p)"
+                  >
+                    <div class="dd__main">{{ p.name }}</div>
+                    <div class="dd__sub">
+                      {{ p.gemTypeName || '-' }} • Available Qty: {{ Number(p.quantity ?? 0) }} • Unit Wt:
+                      {{ Number(p.gemsSize ?? 0).toFixed(4) }} • Unit Price:
+                      {{ unitPriceFromPackage(p).toLocaleString() }}
+                    </div>
+                  </button>
+
+                  <div v-if="filteredGemPackages(row.query).length === 0" class="dd__empty">
+                    No jewellery packages found
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="miniTable__td">
+            <input v-model.number="row.qty" class="pinput pinput--tight" type="number" min="0" placeholder="e.g. 3" @input="validateJewelryRows" />
+            <div v-if="row.qtyError" class="tinyErr">{{ row.qtyError }}</div>
+          </div>
+
+          <div class="miniTable__td">
+            <div class="readPill">{{ row.unitWeight || 0 }}</div>
+          </div>
+
+          <div class="miniTable__td">
+            <div class="readPill">{{ (Number(row.unitWeight || 0) * Number(row.qty || 0)).toFixed(2) }}</div>
+          </div>
+
+          <div class="miniTable__td">
+            <input v-model.number="row.sellingPrice" class="pinput pinput--tight" type="number" min="0" step="1" placeholder="e.g. 350000" @input="validateJewelryRows" />
+            <div v-if="row.sellError" class="tinyErr">{{ row.sellError }}</div>
+          </div>
+
+          <div class="miniTable__td">
+            <div class="readPill readPill--muted">{{ (row.unitPrice ?? 0).toLocaleString() }}</div>
+          </div>
+
+          <div class="miniTable__td miniTable__td--actions">
+            <button class="btnDel" type="button" @click.stop="removeJewelryRow(idx)">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="totals">
+        <div class="totals__box">
+          <div class="totals__label">Total Jewellery Qty</div>
+          <div class="totals__value">{{ totalJewelryQty }}</div>
+        </div>
+
+        <div class="totals__box">
+          <div class="totals__label">Total Jewellery Weight</div>
+          <div class="totals__value">{{ totalJewelryWeight.toFixed(2) }}</div>
+        </div>
+
+        <div class="totals__box">
+          <div class="totals__label">Total Selling Price</div>
+          <div class="totals__value">{{ totalSellingPrice.toLocaleString() }}</div>
         </div>
       </div>
     </div>
 
+    <!-- SAVE -->
+    <div class="saveBar">
+      <div class="saveBar__left"></div>
+      <div class="saveBar__right">
+        <button class="btnGhost" type="button" @click="goBack">Cancel</button>
+        <button class="btnPrimary" type="button" @click="onSaveAll">Save</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { usePurchasesStore } from "@/stores/usePurchasesStore";
-import type { Purchase, PurchaseItem } from "@/stores/usePurchasesStore";
-import { http } from "@/services/http"; // ✅ ADD (use your existing http service)
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { http } from '../services/http'
+import type { GoldSourceDto } from '../dtos/GoldSourceDto'
+import type { GemsPackageDto } from '../dtos/GemsPackageDto'
+import type { CraftDto } from '../dtos/CraftDto'
+import type { JewelryTypeDto } from '../dtos/JewelryTypeDto'
+import { useProductsStore } from '../stores/useProductsStore'
 
-/** ✅ Product type used in this page (same fields you already display) */
-type Product = {
-  productId: number;
-  code: string;
-  name: string;
-  available: number;
-  weight: string;
-  color: string;
-  dep: string;
-  price: number;
-};
+const router = useRouter()
+const route = useRoute()
+const isEdit = computed(() => !!route.params.id)
 
-const store = usePurchasesStore();
-const route = useRoute();
-const router = useRouter();
+const productsStore = useProductsStore()
 
-const purchase = reactive<Purchase>({
-  id: "",
-  invoiceId: undefined,
-  invoiceNo: "",
-  date: new Date().toISOString().slice(0, 10),
-  status: "Draft",
-  paymentMethod: "CASH",
-  customer: { name: "", phone: "", customerId: 1 },
-  discount: 0,
-  items: [],
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-});
+type GoldRow = {
+  key: string
+  ddOpen: boolean
+  query: string
+  goldSourceId: number | null
+  sourceLabel: string
+  purity: string
+  availableWeight: number
+  weightUsed: number
+  currentPrice: number
+  weightError: string
+  priceError: string
 
-/** ✅ REAL PRODUCTS FROM DB */
-const productMaster = ref<Product[]>([]);
+  craftDdOpen: boolean
+  craftQuery: string
+  craftId: number | null
+  craftLabel: string
+  craftError: string
+}
+
+type JewelryRow = {
+  key: string
+  ddOpen: boolean
+  query: string
+  gemsPackageId: number | null
+  sourceLabel: string
+  availableQty: number
+  unitWeight: number
+  unitPrice: number
+  qty: number
+  sellingPrice: number
+  qtyError: string
+  sellError: string
+}
+
+const product = reactive({
+  id: 0,
+  name: '',
+  code: '',
+  stockStatus: '',
+  desc: '',
+  qty: 0,
+  collection: '',
+  shortDesc: '',
+  color: '',
+  weight: 0,
+  metarialLoss: 0,
+  makingCost: 0,
+  colorCount: 0,
+  depreciation: 0,
+  productTypeId: null as number | null,
+
+  goldRows: [
+    {
+      key: crypto.randomUUID(),
+      ddOpen: false,
+      query: '',
+      goldSourceId: null,
+      sourceLabel: '',
+      purity: '',
+      availableWeight: 0,
+      weightUsed: 0,
+      currentPrice: 0,
+      weightError: '',
+      priceError: '',
+
+      craftDdOpen: false,
+      craftQuery: '',
+      craftId: null,
+      craftLabel: '',
+      craftError: '',
+    },
+  ] as GoldRow[],
+
+  jewelryRows: [
+    {
+      key: crypto.randomUUID(),
+      ddOpen: false,
+      query: '',
+      gemsPackageId: null,
+      sourceLabel: '',
+      availableQty: 0,
+      unitWeight: 0,
+      unitPrice: 0,
+      qty: 0,
+      sellingPrice: 0,
+      qtyError: '',
+      sellError: '',
+    },
+  ] as JewelryRow[],
+})
+
+// DB lists
+const goldSources = ref<GoldSourceDto[]>([])
+const gemsPackages = ref<GemsPackageDto[]>([])
+const crafts = ref<CraftDto[]>([])
+const jewelryTypes = ref<JewelryTypeDto[]>([])
+
+// ✅ ProductType dropdown state
+const typeDdOpen = ref(false)
+const typeQuery = ref('')
 
 onMounted(async () => {
-  // ✅ Load products from DB (same data as Products List)
   try {
-    const productsFromDb = (await http<any[]>("/products")) ?? [];
-    productMaster.value = productsFromDb.map((p: any) => ({
-      productId: Number(p.id),
-      code: String(p.code || ""),
-      name: String(p.name || ""),
-      available: Number(p.qty ?? 0),
-      weight: p.weight != null ? String(p.weight) : "-",
-      color: String(p.color || "-"),
-      dep: p.depreciation != null ? String(p.depreciation) : "-",
-      price: 0, // if you store selling price in DB, map it here
-    }));
+    goldSources.value = (await http<GoldSourceDto[]>('/gold-source')) ?? []
   } catch {
-    productMaster.value = [];
+    goldSources.value = []
   }
 
-  const id = String(route.params.id || "");
-
-  // If numeric -> load from DB
-  const invoiceId = Number(id);
-  if (!Number.isNaN(invoiceId) && invoiceId > 0) {
-    const fromDb = await store.fetchOne(invoiceId);
-    Object.assign(purchase, fromDb);
-    store.upsertLocal({ ...purchase });
-    return;
-  }
-
-  // Otherwise create new draft (memory only)
-  const created = store.createPurchase();
-  Object.assign(purchase, created);
-});
-
-const total = computed(() => store.totals(purchase));
-
-function saveAuto() {
-  store.upsertLocal({ ...purchase });
-}
-
-function goList() {
-  router.push("/admin/purchases");
-}
-
-/** search + select product */
-const search = ref("");
-const selected = ref<Product | null>(null);
-const selQty = ref(1);
-const selPrice = ref(0);
-
-/** ✅ Show suggestion when click search box */
-const searchOpen = ref(false);
-function onBlurSearch() {
-  setTimeout(() => (searchOpen.value = false), 150); // let click work
-}
-
-const suggestions = computed(() => {
-  if (!searchOpen.value) return [];
-  const s = search.value.trim().toLowerCase();
-
-  // ✅ When user just clicks (empty), show first products
-  if (!s) return productMaster.value.slice(0, 6);
-
-  return productMaster.value
-    .filter((p) => `${p.code} ${p.name}`.toLowerCase().includes(s))
-    .slice(0, 6);
-});
-
-function selectProduct(p: Product) {
-  selected.value = p;
-  selQty.value = 1;
-  selPrice.value = p.price;
-  search.value = ""; // keep your behavior
-  searchOpen.value = false;
-}
-
-function addItem() {
-  if (!selected.value) return;
-
-  const p = selected.value;
-
-  const item: PurchaseItem = {
-    id: Math.random().toString(36).slice(2),
-    productId: p.productId, // ✅ IMPORTANT for backend
-    code: p.code,
-    name: p.name,
-    unitPrice: Number(selPrice.value || 0),
-    qty: Number(selQty.value || 1),
-    available: p.available,
-    weight: p.weight,
-    color: p.color,
-    dep: p.dep,
-  };
-
-  purchase.items.push(item);
-  saveAuto();
-}
-
-function setQty(itemId: string, qty: number) {
-  const it = purchase.items.find((x) => x.id === itemId);
-  if (!it) return;
-  it.qty = Math.max(1, Number(qty || 1));
-  saveAuto();
-}
-
-function removeItem(itemId: string) {
-  purchase.items = purchase.items.filter((x) => x.id !== itemId);
-  saveAuto();
-}
-
-function clearAll() {
-  if (!confirm("Clear all items?")) return;
-  purchase.items = [];
-  purchase.discount = 0;
-  saveAuto();
-}
-
-/** modal edit price */
-const priceModal = reactive({ open: false, itemId: "", price: 0 });
-
-function openEditPrice(it: PurchaseItem) {
-  priceModal.open = true;
-  priceModal.itemId = it.id;
-  priceModal.price = it.unitPrice;
-}
-
-function applyPrice() {
-  const it = purchase.items.find((x) => x.id === priceModal.itemId);
-  if (it) it.unitPrice = Number(priceModal.price || 0);
-  priceModal.open = false;
-  saveAuto();
-}
-
-/** ✅ Confirm & Save to DB -> then Purchase List shows it */
-async function confirmSave() {
   try {
-    purchase.status = "Confirmed";
-    const saved = await store.saveToDb({ ...purchase });
-    Object.assign(purchase, saved);
-
-    // ✅ go back to purchase list
-    router.push("/admin/purchases");
-  } catch (e: any) {
-    alert(e?.message || "Confirm failed");
+    gemsPackages.value = (await http<GemsPackageDto[]>('/gems-packages')) ?? []
+  } catch {
+    gemsPackages.value = []
   }
+
+  try {
+    crafts.value = (await http<CraftDto[]>('/crafts')) ?? []
+  } catch {
+    crafts.value = []
+  }
+
+  // ✅ load JewelryTypes for ProductType dropdown
+  try {
+    jewelryTypes.value = (await http<JewelryTypeDto[]>('/jewelry-types')) ?? []
+  } catch {
+    jewelryTypes.value = []
+  }
+})
+
+// -------- helpers --------
+const unitPriceFromPackage = (p: any) => {
+  const direct = Number(p.unitPrice ?? p.unit_price ?? p.pricePerUnit ?? p.unit_price_mmk ?? NaN)
+  if (!Number.isNaN(direct)) return direct
+
+  const total = Number(p.originalPrice ?? p.original_price ?? 0)
+  const qty = Number(p.quantity ?? 0)
+  if (qty > 0) return Math.round(total / qty)
+
+  return 0
 }
 
-function printInvoice() {
-  const lines = purchase.items
-    .map((it) => `${it.code} ${it.name} x${it.qty} = ${money(it.unitPrice * it.qty)}`)
-    .join("\n");
-
-  const msg =
-`Invoice ${purchase.invoiceNo || "-"}
-Date: ${purchase.date}
-Status: ${purchase.status}
-Payment: ${purchase.paymentMethod}
-
-Customer: ${purchase.customer.name || "-"} (${purchase.customer.phone || "-"})
-CustomerId: ${purchase.customer.customerId}
-
-Items:
-${lines}
-
-Subtotal: ${money(total.value.subtotal)}
-Discount: ${money(total.value.discount)}
-Final: ${money(total.value.finalPrice)}
-`;
-
-  const w = window.open("", "_blank");
-  if (!w) return;
-  w.document.write(`<pre style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas; white-space: pre-wrap;">${escapeHtml(msg)}</pre>`);
-  w.document.close();
-  w.print();
+// ✅ IMPORTANT: backend expects Float -> send number (18/24)
+const parsePurityToNumber = (v: any): number => {
+  const m = String(v ?? '').match(/(\d+(\.\d+)?)/) // "18 K" -> 18
+  return m ? Number(m[1]) : 0
 }
 
-function escapeHtml(str: string) {
-  return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+// ----- ProductType dropdown helpers -----
+const filteredJewelryTypes = (q: string) => {
+  const term = (q || '').trim().toLowerCase()
+  if (!term) return jewelryTypes.value
+  return jewelryTypes.value.filter(
+    (t) =>
+      (t.name || '').toLowerCase().includes(term) ||
+      (t.categoryName || '').toLowerCase().includes(term) ||
+      String(t.id).includes(term)
+  )
 }
 
-function money(n: number) {
-  return `$${Number(n || 0).toFixed(2)}`;
+const selectedTypeLabel = computed(() => {
+  if (!product.productTypeId) return ''
+  const t = jewelryTypes.value.find((x) => x.id === product.productTypeId)
+  if (!t) return `Selected ID: ${product.productTypeId}`
+  return t.categoryName ? `${t.name} (${t.categoryName})` : t.name
+})
+
+const toggleTypeDd = () => {
+  typeDdOpen.value = !typeDdOpen.value
+
+  // close other dropdowns
+  product.goldRows.forEach((r) => (r.ddOpen = false))
+  product.goldRows.forEach((r) => (r.craftDdOpen = false))
+  product.jewelryRows.forEach((r) => (r.ddOpen = false))
+}
+
+const selectType = (t: JewelryTypeDto) => {
+  product.productTypeId = t.id
+  typeDdOpen.value = false
+  typeQuery.value = ''
+}
+
+// ----- GOLD -----
+const goldError = ref<string | null>(null)
+
+const totalGoldWeight = computed(() => product.goldRows.reduce((sum, r) => sum + (Number(r.weightUsed) || 0), 0))
+const totalGoldPrice = computed(() => product.goldRows.reduce((sum, r) => sum + (Number(r.currentPrice) || 0), 0))
+
+const goldPurityLabel = computed(() => {
+  const purities = product.goldRows.map((r) => (r.purity || '').trim()).filter(Boolean)
+  if (purities.length === 0) return 'Purity: not set'
+  const unique = Array.from(new Set(purities))
+  if (unique.length === 1) return `Purity: ${unique[0]}`
+  return 'Purity: MIXED'
+})
+
+const purityClass = computed(() => {
+  const t = goldPurityLabel.value
+  if (t.includes('18')) return 'purityPill--18'
+  if (t.includes('24')) return 'purityPill--24'
+  if (t.includes('MIXED')) return 'purityPill--mix'
+  return 'purityPill--none'
+})
+
+const filteredGoldSources = (q: string) => {
+  const term = (q || '').trim().toLowerCase()
+  if (!term) return goldSources.value
+  return goldSources.value.filter(
+    (g) =>
+      (g.name || '').toLowerCase().includes(term) ||
+      (g.sourceCountry || '').toLowerCase().includes(term) ||
+      (g.color || '').toLowerCase().includes(term) ||
+      String(g.id).includes(term)
+  )
+}
+
+const filteredCrafts = (q: string) => {
+  const term = (q || '').trim().toLowerCase()
+  if (!term) return crafts.value
+  return crafts.value.filter(
+    (c) =>
+      (c.shopName || '').toLowerCase().includes(term) ||
+      (c.nrc || '').toLowerCase().includes(term) ||
+      (c.phone || '').toLowerCase().includes(term) ||
+      String(c.id).includes(term)
+  )
+}
+
+const toggleGoldDd = (idx: number) => {
+  product.goldRows.forEach((r, i) => (r.ddOpen = i === idx ? !r.ddOpen : false))
+  product.goldRows.forEach((r) => (r.craftDdOpen = false))
+  product.jewelryRows.forEach((r) => (r.ddOpen = false))
+  typeDdOpen.value = false
+}
+
+const toggleCraftDd = (idx: number) => {
+  product.goldRows.forEach((r, i) => (r.craftDdOpen = i === idx ? !r.craftDdOpen : false))
+  product.goldRows.forEach((r) => (r.ddOpen = false))
+  product.jewelryRows.forEach((r) => (r.ddOpen = false))
+  typeDdOpen.value = false
+}
+
+const selectGoldSource = (idx: number, g: GoldSourceDto) => {
+  const row = product.goldRows[idx]
+  row.goldSourceId = g.id
+  row.sourceLabel = g.name || ''
+  row.purity = (g as any).goldPurity || ''
+  row.availableWeight = Number((g as any).weight ?? 0)
+  row.ddOpen = false
+  row.query = ''
+  validateGoldRows()
+}
+
+const selectCraft = (idx: number, c: CraftDto) => {
+  const row = product.goldRows[idx]
+  row.craftId = c.id
+  row.craftLabel = (c as any).shopName || ''
+  row.craftDdOpen = false
+  row.craftQuery = ''
+  validateGoldRows()
+}
+
+const addGoldRow = () => {
+  product.goldRows.push({
+    key: crypto.randomUUID(),
+    ddOpen: false,
+    query: '',
+    goldSourceId: null,
+    sourceLabel: '',
+    purity: '',
+    availableWeight: 0,
+    weightUsed: 0,
+    currentPrice: 0,
+    weightError: '',
+    priceError: '',
+
+    craftDdOpen: false,
+    craftQuery: '',
+    craftId: null,
+    craftLabel: '',
+    craftError: '',
+  })
+  validateGoldRows()
+}
+
+const removeGoldRow = (idx: number) => {
+  if (product.goldRows.length === 1) return
+  product.goldRows.splice(idx, 1)
+  validateGoldRows()
+}
+
+const validateGoldRows = () => {
+  goldError.value = null
+  let hasAnyError = false
+
+  product.goldRows.forEach((r) => {
+    r.weightError = ''
+    r.priceError = ''
+    r.craftError = ''
+
+    if (!r.goldSourceId) hasAnyError = true
+    if (!r.craftId) {
+      r.craftError = 'Craft is required.'
+      hasAnyError = true
+    }
+
+    if (r.goldSourceId) {
+      if ((r.weightUsed ?? 0) <= 0) {
+        r.weightError = 'Weight is required.'
+        hasAnyError = true
+      } else if (r.availableWeight > 0 && r.weightUsed > r.availableWeight) {
+        r.weightError = `Exceeds available weight (${r.availableWeight}).`
+        hasAnyError = true
+      }
+
+      if ((r.currentPrice ?? 0) <= 0) {
+        r.priceError = 'Current price is required.'
+        hasAnyError = true
+      }
+    }
+  })
+
+  if (hasAnyError) goldError.value = 'Please fill the Gold Information !!.'
+}
+
+// ----- JEWELLERY -----
+const jewelryError = ref<string | null>(null)
+
+const filteredGemPackages = (q: string) => {
+  const term = (q || '').trim().toLowerCase()
+  if (!term) return gemsPackages.value
+  return gemsPackages.value.filter(
+    (p: any) =>
+      (p.name || '').toLowerCase().includes(term) ||
+      (p.gemTypeName || '').toLowerCase().includes(term) ||
+      String(p.id).includes(term)
+  )
+}
+
+const toggleJewelryDd = (idx: number) => {
+  product.jewelryRows.forEach((r, i) => (r.ddOpen = i === idx ? !r.ddOpen : false))
+  product.goldRows.forEach((r) => (r.ddOpen = false))
+  product.goldRows.forEach((r) => (r.craftDdOpen = false))
+  typeDdOpen.value = false
+}
+
+const selectJewelryPackage = (idx: number, p: GemsPackageDto) => {
+  const row = product.jewelryRows[idx]
+  row.gemsPackageId = (p as any).id
+  row.sourceLabel = (p as any).name || ''
+  row.availableQty = Number((p as any).quantity ?? 0)
+  row.unitWeight = Number((p as any).gemsSize ?? 0)
+  row.unitPrice = unitPriceFromPackage(p as any)
+  row.ddOpen = false
+  row.query = ''
+  validateJewelryRows()
+}
+
+const addJewelryRow = () => {
+  product.jewelryRows.push({
+    key: crypto.randomUUID(),
+    ddOpen: false,
+    query: '',
+    gemsPackageId: null,
+    sourceLabel: '',
+    availableQty: 0,
+    unitWeight: 0,
+    unitPrice: 0,
+    qty: 0,
+    sellingPrice: 0,
+    qtyError: '',
+    sellError: '',
+  })
+  validateJewelryRows()
+}
+
+const removeJewelryRow = (idx: number) => {
+  if (product.jewelryRows.length === 1) return
+  product.jewelryRows.splice(idx, 1)
+  validateJewelryRows()
+}
+
+const validateJewelryRows = () => {
+  jewelryError.value = null
+  let hasAnyError = false
+
+  product.jewelryRows.forEach((r) => {
+    r.qtyError = ''
+    r.sellError = ''
+
+    if (!r.gemsPackageId) hasAnyError = true
+
+    if (r.gemsPackageId) {
+      if ((r.qty ?? 0) <= 0) {
+        r.qtyError = 'Qty is required.'
+        hasAnyError = true
+      } else if (r.availableQty > 0 && r.qty > r.availableQty) {
+        r.qtyError = `Exceeds available qty (${r.availableQty}).`
+        hasAnyError = true
+      }
+
+      if ((r.sellingPrice ?? 0) <= 0) {
+        r.sellError = 'Selling price is required.'
+        hasAnyError = true
+      }
+    }
+  })
+
+  if (hasAnyError) jewelryError.value = 'Please fill the Jewellery Information !!.'
+}
+
+const totalJewelryQty = computed(() => product.jewelryRows.reduce((sum, r) => sum + (Number(r.qty) || 0), 0))
+const totalJewelryWeight = computed(() =>
+  product.jewelryRows.reduce((sum, r) => sum + (Number(r.qty) || 0) * (Number(r.unitWeight) || 0), 0)
+)
+const totalSellingPrice = computed(() => product.jewelryRows.reduce((sum, r) => sum + (Number(r.sellingPrice) || 0), 0))
+
+// ----- UI -----
+const closeAllDd = () => {
+  product.goldRows.forEach((r) => (r.ddOpen = false))
+  product.goldRows.forEach((r) => (r.craftDdOpen = false))
+  product.jewelryRows.forEach((r) => (r.ddOpen = false))
+  typeDdOpen.value = false
+}
+
+const goBack = () => router.push('/admin/products')
+
+const onSaveAll = async () => {
+  if (!String(product.name || '').trim()) return alert('Product name is required.')
+  if (!product.productTypeId || Number(product.productTypeId) <= 0) return alert('Product Type is required.')
+  if (product.depreciation == null || Number(product.depreciation) <= 0) return alert('Depreciation is required.')
+
+  validateGoldRows()
+  validateJewelryRows()
+
+  const goldMissing = product.goldRows.some((r) => !r.goldSourceId || !r.craftId)
+  const jewMissing = product.jewelryRows.some((r) => !r.gemsPackageId)
+
+  if (goldMissing) return (goldError.value = 'Please choose Gold Source + Craft for every row.')
+  if (jewMissing) return (jewelryError.value = 'Please choose Jewellery package for every row.')
+  if (goldError.value || jewelryError.value) return
+
+  try {
+    await productsStore.createProduct({
+      name: product.name,
+      code: product.code,
+      stockStatus: product.stockStatus,
+      desc: product.desc,
+      qty: Number(product.qty ?? 0),
+      collection: product.collection,
+      shortDesc: product.shortDesc,
+      color: product.color,
+      weight: Number(product.weight ?? 0),
+      metarialLoss: Number(product.metarialLoss ?? 0),
+      makingCost: Number(product.makingCost ?? 0),
+      colorCount: Number(product.colorCount ?? 0),
+      depreciation: Number(product.depreciation ?? 0),
+
+      // ✅ send jewelryType id
+      productTypeId: Number(product.productTypeId),
+
+      productGolds: product.goldRows.map((r) => ({
+        goldSourceId: r.goldSourceId!,
+        craftId: r.craftId!,
+        weight: Number(r.weightUsed ?? 0),
+
+        // ✅ FIX: backend expects Float, so send number
+        goldPurity: parsePurityToNumber(r.purity),
+      })),
+
+      productJewellerys: product.jewelryRows.map((r) => ({
+        gemsPackageId: r.gemsPackageId!,
+        qty: Number(r.qty ?? 0),
+        sellingPrice: Number(r.sellingPrice ?? 0),
+      })),
+    } as any)
+
+    await productsStore.loadProducts()
+    alert('Saved successfully!')
+    goBack()
+  } catch (e: any) {
+    alert(e?.message ?? 'Failed to save product.')
+  }
 }
 </script>
-
 <style scoped>
-.page { display:grid; gap:14px; }
-.titleRow { display:flex; align-items:center; gap:12px; }
-.h1 { margin:0; font-size: 32px; letter-spacing:-.5px; }
+/* =========================================================
+   ✅ GOLD TABLE FIX (Put this at the TOP)
+   Reason: your generic .miniTable__head overrides the gold grid.
+   We use higher-specificity selectors: .miniTable__head.miniTable__head--gold
+   ========================================================= */
 
-.pill { border:1px solid #e5e7eb; background:#fff; border-radius:999px; padding:8px 12px; font-weight:800; cursor:pointer; }
-.muted { color:#6b7280; }
-.small { font-size:12px; }
-.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas; }
-
-.meta {
-  display:flex; gap:18px; flex-wrap:wrap; align-items:center;
-  border:1px solid #e5e7eb; border-radius:12px; background:#fff; padding: 12px 14px;
-}
-.metaItem { display:flex; gap:8px; align-items:center; }
-.grow { margin-left:auto; }
-.select { height:36px; border:1px solid #e5e7eb; border-radius:10px; padding:0 10px; font-weight:800; }
-
-.grid { display:grid; grid-template-columns: 1fr 340px; gap:16px; }
-.left { display:grid; gap:16px; }
-.rightPanel { align-self:start; }
-
-.card { border:1px solid #e5e7eb; border-radius:12px; background:#fff; overflow:hidden; }
-.head { padding: 12px 14px; border-bottom:1px solid #e5e7eb; font-weight:900; background: #fafafa; }
-.body { padding: 12px 14px; }
-
-.searchWrap { position:relative; }
-.icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:.6; }
-.search {
-  width:100%; height:38px; border:1px solid #e5e7eb; border-radius:10px;
-  padding: 0 12px 0 36px;
+/* ✅ force GOLD header + rows to be 5 columns (Gold | Craft | Weight | Price | Actions) */
+.miniTable__head.miniTable__head--gold,
+.miniTable__row.miniTable__row--gold {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.9fr 0.9fr 170px;
+  gap: 0;
+  align-items: center; /* vertically center like Jewellery table */
 }
 
-.suggestions { margin-top:10px; display:grid; gap:8px; }
-.sug { text-align:left; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; background:#fff; cursor:pointer; font-weight:700; }
-.sug:hover { background:#f9fafb; }
-
-.productRow {
-  margin-top:12px;
-  display:flex; gap:12px; align-items:flex-start; justify-content:space-between;
-  border:1px solid #e5e7eb; border-radius:12px; padding: 12px;
-}
-.pLeft { display:grid; gap:10px; width:100%; }
-.pTitle { display:flex; gap:10px; align-items:baseline; }
-.code { color:#6b7280; font-weight:900; }
-.pMeta { display:flex; gap:12px; flex-wrap:wrap; font-size:12px; color:#6b7280; }
-
-.control { display:flex; gap:12px; align-items:center; }
-.label { width: 110px; font-weight:900; color:#6b7280; }
-
-.stepper {
-  display:flex; align-items:center; height:34px;
-  border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; background:#fff;
-}
-.smallStep { height:32px; }
-.stepBtn { width:38px; height:100%; border:none; background:#f3f4f6; font-weight:900; cursor:pointer; }
-.stepVal { width:46px; text-align:center; font-weight:900; }
-
-.price { height:34px; width: 140px; border:1px solid #e5e7eb; border-radius:10px; padding:0 10px; }
-
-.table { width:100%; border-collapse:collapse; }
-.table th, .table td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
-.right { text-align:right; }
-.empty { text-align:center; padding:16px; color:#6b7280; }
-
-.footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; }
-.footerRight { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
-.miniInput { height:34px; width: 120px; border:1px solid #e5e7eb; border-radius:10px; padding:0 10px; background:#fff; }
-.finalBox { padding: 8px 12px; border-radius:10px; background:#111827; color:#fff; font-weight:900; }
-
-.input {
-  width:100%; height:38px; border:1px solid #e5e7eb; border-radius:10px; padding:0 12px;
-  margin-bottom:10px;
+/* ✅ move +Add and Delete to the right corner */
+.miniTable__head.miniTable__head--gold .miniTable__th--actions,
+.miniTable__row.miniTable__row--gold .miniTable__td--actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 16px;
+  padding-left: 0;
 }
 
-.summary { border-top:1px solid #e5e7eb; margin-top:10px; padding-top:10px; display:grid; gap:10px; }
-.sumRow { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-.sumRow.big { font-size:18px; font-weight:900; }
-.sumInput { height:34px; width: 140px; border:1px solid #e5e7eb; border-radius:10px; padding:0 10px; text-align:right; }
-
-.btnStack { display:grid; gap:10px; margin-top:12px; }
-.btn {
-  height:38px; border-radius:10px; border:1px solid #e5e7eb;
-  font-weight:900; cursor:pointer; background:#4b5563; color:#fff;
-}
-.btn.soft { background:#fff; color:#111827; }
-
-.iconBtn {
-  border:1px solid #e5e7eb; background:#fff; border-radius:10px;
-  height:34px; width:40px; cursor:pointer; margin-left:6px;
+/* ✅ make buttons consistent + avoid wrapping */
+.btnAdd,
+.btnDel {
+  white-space: nowrap;
+  min-width: 92px;
 }
 
-.modalOverlay {
-  position:fixed; inset:0; background:rgba(0,0,0,.35);
-  display:grid; place-items:center; z-index: 50;
+/* ✅ keep dropdown above everything */
+.combo { position: relative; }
+.dd { z-index: 9999; }
+
+/* =========================================================
+   ✅ KEEP ALL YOUR EXISTING CSS BELOW (no breaking changes)
+   ========================================================= */
+
+.pwrap { background:#f3f4f6; min-height:100vh; padding:18px 18px 30px; }
+.phead { background:#f3f4f6; border:1px solid #e5e7eb; border-radius:16px; padding:14px; }
+.phead__back { border:none; background:transparent; cursor:pointer; font-weight:900; color:#2563eb; }
+
+.ptitle { margin:12px 2px 14px; }
+.ptitle__h { margin:0; font-size:22px; font-weight:900; color:#111827; }
+.ptitle__p { margin:4px 0 0; font-size:13px; color:#6b7280; }
+
+.pcard { background:#fff; border:1px solid #e5e7eb; border-radius:18px; padding:16px; margin-top:12px; }
+
+.pgrid { display:grid; grid-template-columns:1fr 1fr; gap:12px 16px; }
+.pfield { display:grid; gap:6px; }
+.pfield--full { grid-column:1/-1; }
+
+.plabel { font-size:13px; font-weight:900; color:#374151; }
+
+.pinput,.ptextarea { width:100%; border:1px solid #d1d5db; border-radius:12px; padding:10px 12px; outline:none; font-size:14px; background:#fff; }
+.pinput--tight { padding:9px 10px; border-radius:10px; }
+.pinput:focus,.ptextarea:focus { border-color:#2563eb; }
+.ptextarea { resize:vertical; }
+
+.pselectWrap { position:relative; }
+.pselect { appearance:none; width:100%; border:1px solid #d1d5db; border-radius:12px; padding:10px 38px 10px 12px; outline:none; font-size:14px; background:#fff; cursor:pointer; }
+.pselect:focus { border-color:#2563eb; }
+.pselectIcon { position:absolute; right:12px; top:50%; transform:translateY(-50%); opacity:.7; pointer-events:none; }
+
+.secHead { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:10px; }
+.secHead__h { margin:0; font-weight:900; font-size:16px; color:#111827; }
+.secHead__p { margin:4px 0 0; font-size:13px; color:#6b7280; }
+
+.purityPill { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; font-weight:900; font-size:13px; border:1px solid #e5e7eb; background:#fff; color:#111827; white-space:nowrap; }
+.purityPill__dot { width:10px; height:10px; border-radius:999px; background:#9ca3af; }
+.purityPill--18 { border-color:#fde68a; background:#fffbeb; } .purityPill--18 .purityPill__dot { background:#f59e0b; }
+.purityPill--24 { border-color:#c7d2fe; background:#eef2ff; } .purityPill--24 .purityPill__dot { background:#4f46e5; }
+.purityPill--mix { border-color:#fecaca; background:#fff1f2; } .purityPill--mix .purityPill__dot { background:#ef4444; }
+.purityPill--none { opacity:.9; }
+
+.errBox { display:flex; gap:8px; align-items:center; background:#fff1f2; border:1px solid #fecdd3; color:#9f1239; padding:10px 12px; border-radius:12px; margin:10px 0 12px; font-size:13px; }
+.errBox__icon { font-size:16px; }
+.tinyErr { margin-top:6px; font-size:12px; font-weight:800; color:#b91c1c; }
+
+.miniTable { border:1px solid #e5e7eb; border-radius:16px; overflow:visible; }
+.miniTable__head,.miniTable__row { display:grid; grid-template-columns:1.3fr 1fr 1fr 120px; gap:0; align-items:start; }
+.miniTable__head--wide,.miniTable__row--wide { grid-template-columns:1.4fr .6fr .7fr .7fr .9fr .9fr 120px; }
+
+.miniTable__head { background:#f9fafb; border-bottom:1px solid #eef2f7; }
+.miniTable__th,.miniTable__td { padding:12px; }
+.miniTable__th { font-size:12px; font-weight:900; color:#374151; }
+.miniTable__th--actions,.miniTable__td--actions { display:flex; justify-content:flex-end; }
+
+.miniTable__row { background:#fff; border-bottom:1px solid #f1f5f9; }
+.miniTable__row:last-child { border-bottom:none; }
+
+/* buttons */
+.btnAdd { border:none; background:#2563eb; color:#fff; border-radius:999px; padding:10px 14px; font-weight:900; cursor:pointer; font-size:13px; }
+.btnDel { border:none; background:#fee2e2; color:#991b1b; border-radius:999px; padding:10px 14px; font-weight:900; cursor:pointer; font-size:13px; }
+.btnAdd:hover { filter: brightness(0.95); }
+.btnDel:hover { filter: brightness(0.97); }
+
+.totals { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-top:12px; }
+.totals__box { border:1px solid #e5e7eb; border-radius:14px; background:#fff; padding:12px; }
+.totals__label { font-size:12px; color:#6b7280; font-weight:900; }
+.totals__value { margin-top:6px; font-size:16px; font-weight:900; color:#111827; }
+
+.readPill { display:inline-flex; align-items:center; justify-content:center; min-height:38px; padding:0 12px; border-radius:999px; border:1px solid #e5e7eb; background:#f9fafb; font-weight:900; color:#111827; width:100%; }
+.readPill--muted { color:#374151; }
+
+.combo__btn { width:100%; border:1px solid #d1d5db; background:#fff; border-radius:12px; padding:9px 10px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.combo__text { font-size:13px; font-weight:900; color:#111827; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; text-align:left; }
+.combo__icon { opacity:.7; font-size:12px; }
+
+.dd { position:absolute; left:0; right:0; border-radius:14px; border:1px solid #e5e7eb; background:#fff; box-shadow:0 18px 45px rgba(17,24,39,.12); overflow:hidden; }
+.dd--up { bottom:calc(100% + 8px); }
+
+.dd__search { display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid #eef2f7; background:#fafafa; }
+.dd__searchIcon { opacity:.6; }
+.dd__searchInput { width:100%; border:1px solid #e5e7eb; border-radius:999px; padding:8px 10px; outline:none; font-size:14px; background:#fff; }
+.dd__searchInput:focus { border-color:#2563eb; }
+
+.dd__list { max-height:240px; overflow:auto; padding:6px; }
+.dd__item { width:100%; text-align:left; border:none; background:transparent; cursor:pointer; padding:10px 10px; border-radius:12px; }
+.dd__item:hover { background:#eef2ff; }
+.dd__main { font-weight:900; color:#111827; font-size:14px; }
+.dd__sub { font-size:12px; color:#6b7280; margin-top:2px; }
+.dd__empty { padding:14px 10px; color:#6b7280; font-size:13px; }
+
+.saveBar { margin-top:14px; background:#fff; border:1px solid #e5e7eb; border-radius:18px; padding:14px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.saveBar__right { display:flex; gap:10px; }
+.btnGhost { border:none; border-radius:999px; padding:10px 16px; font-weight:900; cursor:pointer; font-size:14px; background:#f3f4f6; color:#111827; }
+.btnPrimary { border:none; border-radius:999px; padding:10px 16px; font-weight:900; cursor:pointer; font-size:14px; background:#f59e0b; color:#111827; }
+
+@media (max-width:980px) {
+  .pgrid { grid-template-columns:1fr; }
+  .miniTable__head,.miniTable__row { grid-template-columns:1fr; }
+  .miniTable__head--wide,.miniTable__row--wide { grid-template-columns:1fr; }
+
+  /* ✅ keep actions on the right even on mobile */
+  .miniTable__th--actions,.miniTable__td--actions { justify-content:flex-end; }
+
+  .totals { grid-template-columns:1fr; }
 }
-.modal {
-  width: 360px; background:#fff; border-radius:12px; padding: 14px;
-  border:1px solid #e5e7eb;
-}
-.modalActions { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
 </style>

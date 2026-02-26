@@ -22,8 +22,8 @@ export interface ProductDto {
   depreciation: number
   productTypeId?: number | null
 
-  productGolds?: any[]
-  productJewellerys?: any[]
+  productGolds?: any[] 
+  productJewellerys?: any[] 
 }
 
 interface ProductsState {
@@ -83,8 +83,7 @@ export const useProductsStore = defineStore('products', {
           method: 'POST',
           body: JSON.stringify(payload),
         })
-        // optional: refresh list so table is always correct
-        await this.loadProducts()
+        await this.loadProducts() // Refresh list
         return created
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to create product.'
@@ -102,7 +101,7 @@ export const useProductsStore = defineStore('products', {
           method: 'PUT',
           body: JSON.stringify(payload),
         })
-        await this.loadProducts()
+        await this.loadProducts() // Refresh list
         return updated
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to update product.'
@@ -112,17 +111,11 @@ export const useProductsStore = defineStore('products', {
       }
     },
 
-    /**
-     * ✅ THIS is what your ProductListView is calling.
-     * Adds the missing function so no more "not a function" error.
-     */
     async deleteProduct(id: number) {
       this.loading = true
       this.error = null
       try {
         await http<void>(`/products/${Number(id)}`, { method: 'DELETE' })
-
-        // Update UI immediately
         this.items = this.items.filter((p) => Number(p.id) !== Number(id))
       } catch (e: any) {
         this.error = e?.message ?? 'Failed to delete product.'

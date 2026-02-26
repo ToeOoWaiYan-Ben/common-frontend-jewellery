@@ -47,16 +47,16 @@
           </RouterLink>
         </li>
         
-        <li class="side-nav__item">
+
+<li class="side-nav__item">
   <RouterLink
-    to="/admin/purchases"
+    to="/admin/purchase"
     class="side-nav__link"
     active-class="side-nav__link--active"
   >
-    Purchases
+    Products Purchase
   </RouterLink>
 </li>
-
         <li class="side-nav__item">
           <RouterLink
             to="/admin/settings"
