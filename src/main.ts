@@ -5,6 +5,8 @@ import router from './router'
 import { createPinia } from 'pinia'
 import './assets/styles/common.css'
 import '@/styles/user/catalog.css'
+import '@/assets/styles/select.css'
+import '../src/styles/admin/gems-package-page.css'
 
 const app = createApp(App)
 

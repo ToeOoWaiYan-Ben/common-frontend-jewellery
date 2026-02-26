@@ -15,6 +15,9 @@ type JewelryTypeApi = {
   category_id?: number | null
   categoryName?: string | null
   category_name?: string | null
+  description?: string | null
+  imageUrl?: string | null
+  image_url?: string | null
 }
 
 function mapToJewelryTypeDto(x: JewelryTypeApi): JewelryTypeDto {
@@ -23,6 +26,8 @@ function mapToJewelryTypeDto(x: JewelryTypeApi): JewelryTypeDto {
     name: (x.name ?? '') as string,
     categoryId: (x.categoryId ?? x.category_id ?? null) as number | null,
     categoryName: (x.categoryName ?? x.category_name ?? null) as string | null,
+    imageUrl: (x.imageUrl ?? x.image_url ?? null) as string | null,
+    description: (x.description ?? null) as string | null,
   }
 }
 
@@ -58,6 +63,8 @@ export const useJewelryTypesStore = defineStore('jewelryTypes', {
         const body = {
           name: payload.name?.trim(),
           categoryId: payload.categoryId,
+          imageUrl: payload.imageUrl ?? null,
+          description: payload.description ?? null,
         }
 
         const createdRaw = await http<JewelryTypeApi>('/jewelry-types', {
@@ -79,6 +86,8 @@ export const useJewelryTypesStore = defineStore('jewelryTypes', {
         const body = {
           name: payload.name?.trim(),
           categoryId: payload.categoryId,
+          imageUrl: payload.imageUrl ?? null,
+          description: payload.description ?? null,
         }
 
         const updatedRaw = await http<JewelryTypeApi>(`/jewelry-types/${id}`, {

@@ -1,3 +1,4 @@
+import type { CertificateImageDto } from './CertificateImageDto'
 export interface GemsPackageDto {
   id: number
   name: string
@@ -12,8 +13,8 @@ export interface GemsPackageDto {
 
   gemTypeId: number | null
   gemTypeName?: string | null
+  remainingQty?: number 
 
-  certificateId: number | null
   sellerId: number | null
   sellerName: string | null
 
@@ -21,4 +22,6 @@ export interface GemsPackageDto {
   quantity: number | null
   unitPrice: number | null
   totalPrice: number | null
+
+  certificateImages?: CertificateImageDto[]
 }
