@@ -2,6 +2,31 @@
   import { computed, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import StoreHeader from '@/components/user/StoreHeader.vue'
+  import { useUserJewelryTypesStore } from '@/stores/useUserJewelryTypesStore'
+
+  import type { ProductDto } from '../dtos/ProductDto'
+  import { watch } from 'vue'
+  import axios from 'axios'
+  import { useProductsStore } from '@/stores/useProductsStore'
+  const route = useRoute()
+  const productsStore = useProductsStore() // or useUserProductsStore if that’s your name
+  const products = computed(() => productsStore.items)
+  const loading = computed(() => productsStore.loading)
+  const error = computed(() => productsStore.error ?? '')
+
+  import { useRoute } from 'vue-router'
+
+  const typesStore = useUserJewelryTypesStore()
+
+  const heroTitle = computed(() => selectedType.value?.name ?? 'Jewelry Collection')
+
+  const heroDesc = computed(
+    () => selectedType.value?.description ?? 'The perfect choice for an elegant outfit.'
+  )
+
+  const heroImageUrl = computed(() => selectedType.value?.imageUrl ?? '/default-hero.jpg')
+
+  const category = computed(() => (route.query.category as string) || null)
 
   type Product = {
     id: number
@@ -13,15 +38,23 @@
     color?: string
     material?: string
   }
+  onMounted(async () => {
+    if (typesStore.items.length === 0) {
+      await typesStore.loadAll()
+    }
+  })
+  function getPrice(p: ProductDto) {
+    return p.productJewellerys?.[0]?.sellingPrice ?? 0
+  }
+
+  const selectedType = computed(() => {
+    return typesStore.items.find((t) => t.id === selectedTypeId.value) || null
+  })
 
   const router = useRouter()
 
   /* ---------- Hero ---------- */
-const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=2400&q=70' )
   /* ---------- State ---------- */
-  const loading = ref(false)
-  const error = ref('')
-  const products = ref<Product[]>([])
 
   /* ---------- Drawer ---------- */
   const drawerOpen = ref(false)
@@ -111,21 +144,31 @@ const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52
   }
 
   function formatPrice(v: number) {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'THB',
-      maximumFractionDigits: 0,
-    }).format(v)
-  }
-
+  return new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 0,
+  }).format(v) + ' MMK'
+}
   function openDetail(p: Product) {
-    // ✅ must match your router name: 'user-product-detail'
-    router.push({ name: 'user-product-detail', params: { id: p.id } })
+    router.push({
+      name: 'user-product-detail',
+      params: { id: p.id },
+      query: { category: route.query.category },
+      // ✅ KEEP CATEGORY
+    })
   }
-
   function toggleWish(_p: Product) {
     // optional for UI
   }
+  function getThumb(p: ProductDto) {
+  return p.productImages?.[0]?.imageUrl || 'https://via.placeholder.com/400x400?text=Product'
+}
+function getDesc(p: ProductDto) {
+  return (p.shortDesc && p.shortDesc.trim()) ? p.shortDesc : (p.desc || '')
+}
+function getTotalPrice(p: ProductDto) {
+  // sum of sellingPrice from all jewellery rows
+  return (p.productJewellerys ?? []).reduce((sum, r) => sum + (Number(r.sellingPrice) || 0), 0)
+}
 
   /* ---------- Filtering + Sorting ---------- */
   const filteredProducts = computed(() => {
@@ -146,13 +189,11 @@ const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52
     }
 
     // price
-    if (priceMin.value != null) list = list.filter((p) => p.price >= priceMin.value!)
-    if (priceMax.value != null) list = list.filter((p) => p.price <= priceMax.value!)
+    if (priceMin.value != null) list = list.filter((p) => getTotalPrice(p) >= priceMin.value!)
+if (priceMax.value != null) list = list.filter((p) => getTotalPrice(p) <= priceMax.value!)
 
-    // sort
-    if (sortBy.value === 'priceLow') list.sort((a, b) => a.price - b.price)
-    if (sortBy.value === 'priceHigh') list.sort((a, b) => b.price - a.price)
-
+if (sortBy.value === 'priceLow') list.sort((a, b) => getTotalPrice(a) - getTotalPrice(b))
+if (sortBy.value === 'priceHigh') list.sort((a, b) => getTotalPrice(b) - getTotalPrice(a))
     // (new/relevance demo: keep original order)
     return list
   })
@@ -165,41 +206,20 @@ const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52
     const start = (currentPage.value - 1) * pageSize.value
     return filteredProducts.value.slice(start, start + pageSize.value)
   })
-
-  /* ---------- Frontend-only demo data ---------- */
-  onMounted(() => {
-    loading.value = true
-    error.value = ''
-
-    try {
-      const imgs = [
-        'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?auto=format&fit=crop&w=1200&q=60',
-        'https://images.unsplash.com/photo-1601121141461-9d6644b2925b?auto=format&fit=crop&w=1200&q=60',
-        'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=60',
-        'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=1200&q=60',
-      ]
-
-      const many: Product[] = []
-      for (let i = 0; i < 20; i++) {
-        many.push({
-          id: i + 1,
-          name: `Jewelry Item ${i + 1}`,
-          price: 390 + i * 45,
-          imageUrl: imgs[i % imgs.length],
-          subtitle: 'Premium sparkle, designed for everyday wear.',
-          badge: i % 6 === 0 ? 'Sale' : i % 5 === 0 ? 'New' : '',
-          color: colors[i % colors.length].name,
-          material: materials[i % materials.length],
-        })
-      }
-
-      products.value = many
-    } catch (e: any) {
-      error.value = e?.message ?? 'Failed to load products'
-    } finally {
-      loading.value = false
-    }
+  const selectedTypeId = computed(() => {
+    const id = route.query.typeId
+    return id ? Number(id) : null
   })
+
+  async function loadProducts() {
+    if (selectedTypeId.value !== null) {
+      await productsStore.loadByTypeId(selectedTypeId.value)
+    } else {
+      productsStore.items = []
+    }
+  }
+  onMounted(loadProducts)
+  watch(selectedTypeId, loadProducts)
 </script>
 
 <template>
@@ -208,11 +228,7 @@ const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52
 
     <!-- ✅ HERO -->
     <section class="sw-hero">
-      <div
-        class="sw-hero__bg"
-        :style="{ backgroundImage: `url(${heroImageUrl})` }"
-        aria-hidden="true"
-      ></div>
+      <div class="sw-hero__bg" :style="{ backgroundImage: `url(${heroImageUrl})` }"></div>
 
       <div class="sw-hero__content">
         <div class="sw-crumbs">
@@ -220,14 +236,11 @@ const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52
           <span class="sw-sep">/</span>
           <span>Jewelry</span>
           <span class="sw-sep">/</span>
-          <span class="sw-crumb--active">Collection</span>
+          <span class="sw-crumb--active">{{ heroTitle }}</span>
         </div>
 
-        <h1 class="sw-hero__title">Jewelry Collection</h1>
-        <p class="sw-hero__desc">
-          The perfect choice for an elegant outfit. Discover premium rings, necklaces, and earrings
-          designed for everyday shine.
-        </p>
+        <h1 class="sw-hero__title">{{ heroTitle }}</h1>
+        <p class="sw-hero__desc">{{ heroDesc }}</p>
       </div>
     </section>
 
@@ -265,25 +278,19 @@ const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52
             </button>
 
             <div class="sw-img" role="button" tabindex="0" @click="openDetail(p)">
-              <img :src="p.imageUrl" :alt="p.name" />
-            </div>
+  <img :src="getThumb(p)" :alt="p.name" />
+</div>
 
-            <div class="sw-info">
-              <div class="sw-smallLine">
-                <span
-                  v-if="p.badge"
-                  class="sw-badgeText"
-                  :class="p.badge === 'Sale' ? 'sale' : 'new'"
-                >
-                  {{ p.badge }}
-                </span>
-              </div>
+<div class="sw-info">
+  <h3 class="sw-title" @click="openDetail(p)">{{ p.name }}</h3>
 
-              <h3 class="sw-title" @click="openDetail(p)">{{ p.name }}</h3>
+  <p class="sw-sub">
+    {{ getDesc(p) }}
+  </p>
 
-              <p v-if="p.subtitle" class="sw-sub">{{ p.subtitle }}</p>
-
-              <div class="sw-price">{{ formatPrice(p.price) }}</div>
+  <div class="sw-price">
+    {{ formatPrice(getTotalPrice(p)) }}
+  </div>
             </div>
           </article>
         </div>
@@ -514,4 +521,16 @@ const heroImageUrl = ref( 'https://images.unsplash.com/photo-1522312346375-d1a52
   </div>
 </template>
 
-<style scoped src="@/styles/user/catalog.css"></style>
+<style scoped src="@/styles/user/catalog.css">
+.sw-sub{
+  margin: 6px 0 10px;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.35;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;       /* show 2 lines only */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

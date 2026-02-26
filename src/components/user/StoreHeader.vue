@@ -25,11 +25,8 @@
 
     <!-- Nav -->
     <nav class="mh-nav">
-      <button class="mh-nav__link" type="button" @click="go('/user/home')">Home</button>
-      <button class="mh-nav__link" type="button">SALE</button>
-      <button class="mh-nav__link" type="button">New In</button>
-
-      <!-- ✅ Jewelry dropdown (fixed: click open + click outside close) -->
+      
+      <!-- ✅ Jewelry dropdown (dynamic from DB) -->
       <div class="mh-nav__dropdown" ref="dropdownRef" @click.stop>
         <button
           class="mh-nav__link mh-nav__link--active"
@@ -37,85 +34,95 @@
           :aria-expanded="open"
           @click.stop="open = !open"
         >
-          Jewelry
+        Home
         </button>
 
         <div v-if="open" class="mh-mega" @click.stop>
-          <div class="mh-mega__col">
-            <div class="mh-mega__title">Necklaces and pendants</div>
-            <button class="mh-mega__item" type="button" @click="goCategory('Necklaces')">
-              Necklaces
-            </button>
-            <button class="mh-mega__item" type="button" @click="goCategory('Pendants')">
-              Pendants
-            </button>
-            <button class="mh-mega__item" type="button" @click="goCategory('Chokers')">
-              Chokers
-            </button>
+          <!-- ✅ loading / error -->
+          <div v-if="typesStore.loading" class="mh-mega__col">
+            <div class="mh-mega__title">Loading…</div>
           </div>
 
-          <div class="mh-mega__col">
-            <div class="mh-mega__title">Earrings</div>
-            <button class="mh-mega__item" type="button" @click="goCategory('Earrings')">
-              Earrings
-            </button>
-            <button class="mh-mega__item" type="button" @click="goCategory('Stud earrings')">
-              Stud earrings
-            </button>
-            <button class="mh-mega__item" type="button" @click="goCategory('Hoop earrings')">
-              Hoop earrings
-            </button>
+          <div v-else-if="typesStore.error" class="mh-mega__col">
+            <div class="mh-mega__title">Error</div>
+            <div style="padding: 8px 0">{{ typesStore.error }}</div>
           </div>
 
-          <div class="mh-mega__col">
-            <div class="mh-mega__title">Rings</div>
-            <button class="mh-mega__item" type="button" @click="goCategory('Rings')">Rings</button>
-            <button class="mh-mega__item" type="button" @click="goCategory('Band rings')">
-              Band rings
-            </button>
-            <button class="mh-mega__item" type="button" @click="goCategory('Stackable rings')">
-              Stackable rings
-            </button>
-          </div>
+          <!-- ✅ grouped columns -->
+          <template v-else>
+            <div v-for="(list, catName) in groupedTypes" :key="catName" class="mh-mega__col">
+              <div class="mh-mega__title">{{ catName }}</div>
 
-          <div class="mh-mega__promo">
-            <div>
-              <div class="mh-mega__promoTitle">Sale</div>
-              <div class="mh-mega__promoSub">Up to 40% off select styles*</div>
+              <button
+                v-for="t in list"
+                :key="t.id"
+                class="mh-mega__item"
+                type="button"
+                @click="goType(t.id)"
+              >
+                {{ t.name }}
+              </button>
             </div>
-            <div class="mh-mega__promoImg"></div>
-          </div>
+
+            <!-- promo stays the same -->
+            <div class="mh-mega__promo">
+              <div>
+                <div class="mh-mega__promoTitle">Sale</div>
+                <div class="mh-mega__promoSub">Up to 40% off select styles*</div>
+              </div>
+              <div class="mh-mega__promoImg"></div>
+            </div>
+          </template>
         </div>
       </div>
 
-      <button class="mh-nav__link" type="button">Watches</button>
-      <button class="mh-nav__link" type="button">Accessories</button>
-      <button class="mh-nav__link" type="button">Decorations</button>
-      <button class="mh-nav__link" type="button">Gifts</button>
-      <button class="mh-nav__link" type="button">World of Myit Thar Oo</button>
+      
 
       <button class="mh-nav__icon" type="button" aria-label="Search">🔍</button>
       <button class="mh-nav__icon" type="button" aria-label="Bag">👜</button>
     </nav>
   </header>
 </template>
-
 <script setup lang="ts">
-  import { onBeforeUnmount, onMounted, ref } from 'vue'
+  import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useUserJewelryTypesStore } from '@/stores/useUserJewelryTypesStore'
 
   const router = useRouter()
   const open = ref(false)
   const dropdownRef = ref<HTMLElement | null>(null)
 
+  const typesStore = useUserJewelryTypesStore()
+
   function go(path: string) {
     router.push(path)
   }
 
-  function goCategory(category: string) {
-    router.push({ path: '/user/catalog', query: { category } })
+  function goType(typeId: number) {
+    typesStore.setActiveType(typeId)
     open.value = false
+    router.push({
+      path: '/user/catalog',
+      query: { typeId }, // example: ?typeId=3
+    })
   }
+
+  /* ✅ group jewelry types by categoryName (column titles) */
+  const groupedTypes = computed(() => {
+    const map: Record<string, any[]> = {}
+    for (const t of typesStore.items) {
+      const key = t.categoryName || 'Other'
+      if (!map[key]) map[key] = []
+      map[key].push(t)
+    }
+
+    // optional: sort items A-Z inside each group
+    Object.keys(map).forEach((k) => {
+      map[k].sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    })
+
+    return map
+  })
 
   /* ✅ Close only when clicking outside */
   function onDocClick(e: MouseEvent) {
@@ -125,8 +132,14 @@
     if (!el.contains(target)) open.value = false
   }
 
-  onMounted(() => document.addEventListener('click', onDocClick))
-  onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
+  onMounted(async () => {
+    await typesStore.loadAll()
+    document.addEventListener('click', onDocClick)
+  })
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', onDocClick)
+  })
 </script>
 
 <style scoped src="@/styles/user/store-header.css"></style>

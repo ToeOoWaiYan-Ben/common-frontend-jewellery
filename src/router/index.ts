@@ -32,9 +32,16 @@ import PurchaseListView from '@/views/PurchaseListView.vue'
 
 
 
+import ImageUploadView from '../views/AdminImagesView.vue'
 /* -------- User Storefront -------- */
 import CatalogView from '../views/user/CatalogView.vue'
 import ProductDetailView from '../views/user/ProductDetailView.vue'
+import UserCollectionView from '../views/user/UserCollectionView.vue'
+import Operations from '../views/selection/Operations.vue'
+import Products from '../views/selection/Products.vue'
+import Suppliers from '../views/selection/Suppliers.vue'
+import Pricing from '../views/selection/Pricing.vue'
+import UsersSelection from '../views/selection/Users.vue'
 
 const routes: RouteRecordRaw[] = [
   /* ---------- Default ---------- */
@@ -58,6 +65,11 @@ const routes: RouteRecordRaw[] = [
         name: 'user-product-detail',
         component: ProductDetailView,
         props: true,
+      },
+      {
+        path: '/user/collection',
+        name: 'user-collection',
+        component: UserCollectionView,
       },
     ],
   },
@@ -97,6 +109,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'customers', name: 'customers', component: CustomersView },
       { path: 'gold-price-history', name: 'gold-price-history', component: GoldPriceHistoryView },
       { path: 'promotions', name: 'promotions', component: PromotionsView },
+      { path: 'images', name: 'images', component: ImageUploadView },
 
 
       /* --- forms that are standalone pages --- */
@@ -105,6 +118,12 @@ const routes: RouteRecordRaw[] = [
       { path: 'seller-form', name: 'seller-form', component: SellerFormView },
 
       { path: 'settings', name: 'admin-settings', component: SettingsView },
+      /* ---------- SELECTION PAGES ---------- */
+      { path: 'selection/operations', name: 'selection-operations', component: Operations },
+      { path: 'selection/products', name: 'selection-products', component: Products },
+      { path: 'selection/suppliers', name: 'selection-suppliers', component: Suppliers },
+      { path: 'selection/pricing', name: 'selection-pricing', component: Pricing },
+      { path: 'selection/users', name: 'selection-users', component: UsersSelection },
     ],
   },
 

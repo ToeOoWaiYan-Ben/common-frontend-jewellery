@@ -1,3 +1,4 @@
+import type { ProductImageDto } from './ProductImageDto'
 export interface ProductGoldItemDto {
   id?: number
   goldSourceId: number
@@ -38,4 +39,5 @@ export interface ProductDto {
   // ✅ matches backend fields
   productGolds: ProductGoldItemDto[]
   productJewellerys: ProductJewelleryItemDto[]
+  productImages?: ProductImageDto[]
 }

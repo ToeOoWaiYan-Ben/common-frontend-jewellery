@@ -7,4 +7,6 @@ export interface GoldSourceDto {
   originalPrice: number
   sellerId: number | null
   name: string
+  usedWeight?: number
+  remainingWeight?: number
 }

@@ -83,10 +83,10 @@ const formatDate = (date: string) => {
   border: 1px solid #d1d5db;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
 .table th,
 .table td {
