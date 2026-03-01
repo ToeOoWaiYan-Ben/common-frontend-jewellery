@@ -1,5 +1,5 @@
 // services/purchaseApi.ts
-import { http } from "./http"
+import { http } from './http'
 
 export interface PurchaseItemRequest {
   productId: number

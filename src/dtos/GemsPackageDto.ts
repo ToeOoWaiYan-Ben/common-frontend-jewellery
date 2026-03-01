@@ -13,7 +13,7 @@ export interface GemsPackageDto {
 
   gemTypeId: number | null
   gemTypeName?: string | null
-  remainingQty?: number 
+  remainingQty?: number
 
   sellerId: number | null
   sellerName: string | null

@@ -23,6 +23,7 @@ export interface ProductDto {
   colorCount?: number | null
   depreciation: number
   productTypeId?: number | null
+  finalPrice?: number | null
 
   productGolds?: any[]
   productJewellerys?: any[]
@@ -118,6 +119,7 @@ export const useProductsStore = defineStore('products', {
       this.error = null
       try {
         const raw = await http<ProductDto[]>(`/products/type/${Number(typeId)}`)
+
         this.items = (raw ?? []).map((p: any) => ({
           ...p,
           id: Number(p.id),

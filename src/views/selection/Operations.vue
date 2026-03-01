@@ -9,9 +9,13 @@
         <p>Manage orders</p>
       </RouterLink>
 
-      <RouterLink to="/admin/purchases" class="card">
+      <RouterLink to="/admin/purchase" class="card">
         <h3>Purchases</h3>
         <p>Manage purchases</p>
+      </RouterLink>
+      <RouterLink to="/admin/vendors" class="card">
+        <h3>Vendors</h3>
+        <p>Manage vendors</p>
       </RouterLink>
     </div>
   </div>

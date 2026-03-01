@@ -1,5 +1,5 @@
 export type GoldPriceStatus = 'ACTIVE' | 'INACTIVE'
-export type GoldPurity = 'K24' | 'K22' | 'K18' | 'K14'
+export type GoldPurity = 'K24' | 'K22' | 'K18' | 'K16' | 'K14' | 'K13'
 
 export interface GoldPriceHistoryDto {
   id: number

@@ -42,7 +42,9 @@
               <option value="K24">24K</option>
               <option value="K22">22K</option>
               <option value="K18">18K</option>
+              <option value="K22">16K</option>
               <option value="K14">14K</option>
+              <option value="K22">13K</option>
             </select>
           </div>
           <div class="gs-field">

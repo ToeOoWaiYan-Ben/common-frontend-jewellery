@@ -55,14 +55,7 @@
           />
         </div>
 
-        <!-- Status -->
-        <div class="category-form__row">
-          <label class="category-form__label" for="status">Status *</label>
-          <select id="status" v-model="form.status" class="category-form__input" required>
-            <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Inactive</option>
-          </select>
-        </div>
+        
 
         <!-- Start Date -->
         <div class="category-form__row">
@@ -160,7 +153,11 @@
       <td>{{ item.id }}</td>
       <td>{{ item.name }}</td>
       <td>{{ formatPercent(item.discountRate) }}</td>
-      <td>{{ item.status }}</td>
+      <td>
+  <span :class="['status-badge', item.status === 'ACTIVE' ? 'active' : 'inactive']">
+    {{ item.status }}
+  </span>
+</td>
       <td>{{ item.startDate }}</td>
       <td>{{ item.endDate }}</td>
       <td>{{ item.description ?? '-' }}</td>
@@ -246,16 +243,15 @@
   const isSubmitting = ref(false)
   const formError = ref<string | null>(null)
 
-  const blank = (): Omit<PromotionDto, 'id' | 'createdAt' | 'updatedAt'> => ({
-    name: '',
-    discountRate: 0,
-    description: null,
-    startDate: '',
-    endDate: '',
-    status: 'ACTIVE',
-  })
+    const blank = () => ({
+  name: '',
+  discountRate: 0,
+  description: null,
+  startDate: '',
+  endDate: '',
+})
 
-  const form = reactive<Omit<PromotionDto, 'id' | 'createdAt' | 'updatedAt'>>(blank())
+const form = reactive(blank())
 
   const resetForm = () => {
     Object.assign(form, blank())
@@ -290,7 +286,7 @@
       description: p.description ?? null,
       startDate: p.startDate ?? '',
       endDate: p.endDate ?? '',
-      status: p.status ?? 'ACTIVE',
+     
     })
 
     formError.value = null
@@ -374,3 +370,20 @@
 
 <style scoped src="@/styles/admin/admin-table.css"></style>
 <style scoped src="@/styles/admin/admin-form.css"></style>
+<style>
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}</style>

@@ -35,6 +35,7 @@ export interface ProductDto {
   colorCount: number
   depreciation: number
   productTypeId: number
+  finalPrice: number
 
   // ✅ matches backend fields
   productGolds: ProductGoldItemDto[]

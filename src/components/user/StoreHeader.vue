@@ -25,7 +25,6 @@
 
     <!-- Nav -->
     <nav class="mh-nav">
-      
       <!-- ✅ Jewelry dropdown (dynamic from DB) -->
       <div class="mh-nav__dropdown" ref="dropdownRef" @click.stop>
         <button
@@ -34,7 +33,7 @@
           :aria-expanded="open"
           @click.stop="open = !open"
         >
-        Home
+          Home
         </button>
 
         <div v-if="open" class="mh-mega" @click.stop>
@@ -75,8 +74,6 @@
           </template>
         </div>
       </div>
-
-      
 
       <button class="mh-nav__icon" type="button" aria-label="Search">🔍</button>
       <button class="mh-nav__icon" type="button" aria-label="Bag">👜</button>

@@ -106,6 +106,15 @@
             min="0"
             placeholder="e.g. 120"
           />
+
+          <!-- ✅ REF PRICE DISPLAY -->
+          <div class="tinyHint">
+            Ref Final/Unit: <strong>{{ formatMoney(finalUnitPriceRef) }}</strong>
+            <span style="opacity: 0.8">
+              (Gold {{ formatMoney(goldCostRef) }} + Making {{ formatMoney(makingCostRef) }} → Dep
+              {{ depLabel }})
+            </span>
+          </div>
         </div>
 
         <div class="pfield">
@@ -129,9 +138,10 @@
             min="0"
             placeholder="e.g. 0.10"
           />
+          <div class="tinyHint">Tip: 0.10 = 10%</div>
         </div>
 
-        <!-- ✅ Product Type dropdown search (JewelryType) -->
+        <!-- Product Type dropdown search (JewelryType) -->
         <div class="pfield">
           <label class="plabel">Product Type (Jewelry Type) *</label>
 
@@ -191,46 +201,46 @@
             placeholder="Write product description..."
           ></textarea>
         </div>
-        <!-- Product Images -->
-        <!-- PRODUCT IMAGES (GRID LIKE YOUR SCREENSHOT) -->
+
+        <!-- PRODUCT IMAGES -->
         <div class="pfield pfield--full">
-  <label class="plabel">Product Images</label>
+          <label class="plabel">Product Images</label>
 
-  <div class="media-grid">
-    <!-- DB images -->
-    <div v-for="img in productImages" :key="'db-' + img.id" class="media-card">
-      <img :src="img.imageUrl" class="media-img" />
-      <button class="media-x" type="button" @click.stop="deleteDbImage(img.id)">×</button>
-    </div>
+          <div class="media-grid">
+            <!-- DB images -->
+            <div v-for="img in productImages" :key="'db-' + img.id" class="media-card">
+              <img :src="img.imageUrl" class="media-img" />
+              <button class="media-x" type="button" @click.stop="deleteDbImage(img.id)">×</button>
+            </div>
 
-    <!-- preview images -->
-    <div v-for="p in selectedPreviews" :key="'pv-' + p.key" class="media-card">
-      <img :src="p.previewUrl" class="media-img" />
-      <button class="media-x" type="button" @click.stop="removePreview(p.key)">×</button>
-    </div>
+            <!-- preview images -->
+            <div v-for="p in selectedPreviews" :key="'pv-' + p.key" class="media-card">
+              <img :src="p.previewUrl" class="media-img" />
+              <button class="media-x" type="button" @click.stop="removePreview(p.key)">×</button>
+            </div>
 
-    <!-- empty slots -->
-    <button
-      v-for="n in emptySlots"
-      :key="'slot-' + n"
-      type="button"
-      class="media-slot"
-      @click.stop="triggerFilePicker"
-      :disabled="totalCount >= MAX_PHOTOS"
-    >
-      <div class="media-plus">+</div>
-    </button>
+            <!-- empty slots -->
+            <button
+              v-for="n in emptySlots"
+              :key="'slot-' + n"
+              type="button"
+              class="media-slot"
+              @click.stop="triggerFilePicker"
+              :disabled="totalCount >= MAX_PHOTOS"
+            >
+              <div class="media-plus">+</div>
+            </button>
 
-    <input
-      ref="fileInput"
-      type="file"
-      multiple
-      accept="image/*"
-      style="display:none"
-      @change="onImgFilesSelected"
-    />
-  </div>
-</div>
+            <input
+              ref="fileInput"
+              type="file"
+              multiple
+              accept="image/*"
+              style="display: none"
+              @change="onImgFilesSelected"
+            />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -238,7 +248,7 @@
     <div class="pcard">
       <div class="secHead">
         <div>
-          <h3 class="secHead__h">Add Gold For Product</h3>
+          <h3 class="secHead__h">Add Gold For the Quantity of the Product</h3>
           <p class="secHead__p">
             Choose purchased gold package (Gold Source) + craft, enter used weight + current price.
           </p>
@@ -261,6 +271,7 @@
           <div class="miniTable__th">Craft *</div>
           <div class="miniTable__th">Weight Used (kyat/g) *</div>
           <div class="miniTable__th">Current Price (MMK) *</div>
+          <div class="miniTable__th">Line Total</div>
           <div class="miniTable__th miniTable__th--actions">
             <button class="btnAdd" type="button" @click.stop="addGoldRow">+ Add</button>
           </div>
@@ -355,7 +366,6 @@
                 </div>
               </div>
             </div>
-
             <div v-if="row.craftError" class="tinyErr">{{ row.craftError }}</div>
           </div>
 
@@ -383,16 +393,29 @@
 
           <!-- PRICE -->
           <div class="miniTable__td">
-            <input
-              v-model.number="row.currentPrice"
-              class="pinput pinput--tight"
-              type="number"
-              step="1"
-              min="0"
-              placeholder="e.g. 4000"
-              @input="validateGoldRows"
-            />
+            <div class="readPill readPill--muted">
+              {{ Number(row.currentPrice ?? 0).toLocaleString() }} MMK
+            </div>
+
+            <div class="tinyHint" v-if="row.purity">
+              <template v-if="getActiveSellPrice(row.purity)">
+                Active {{ row.purity }} sell price ({{
+                  getActiveSellPrice(row.purity)?.recordDate
+                }})
+              </template>
+              <template v-else>
+                No ACTIVE gold price for {{ row.purity }} (please set in Gold Price History)
+              </template>
+            </div>
+
             <div v-if="row.priceError" class="tinyErr">{{ row.priceError }}</div>
+          </div>
+
+          <!-- ✅ LINE TOTAL -->
+          <div class="miniTable__td">
+            <div class="readPill readPill--muted">
+              {{ goldRowLineTotal(row).toLocaleString() }} MMK
+            </div>
           </div>
 
           <div class="miniTable__td miniTable__td--actions">
@@ -407,16 +430,14 @@
           <div class="totals__value">{{ totalGoldWeight.toFixed(2) }}</div>
         </div>
 
-
-    
         <div class="totals__box">
-          <div class="totals__label">Total Current Price</div>
-          <div class="totals__value">{{ totalGoldPrice.toLocaleString() }} MMK</div>
+          <div class="totals__label">Total (Weight × Current Price)</div>
+          <div class="totals__value">{{ totalGoldLineAmount.toLocaleString() }} MMK</div>
         </div>
 
         <div class="totals__box">
-          <div class="totals__label"></div>
-          <div class="totals__value"></div>
+          <div class="totals__label">Avg Current Price (for reference)</div>
+          <div class="totals__value">{{ avgGoldPrice.toLocaleString() }} MMK</div>
         </div>
       </div>
     </div>
@@ -425,7 +446,7 @@
     <div class="pcard">
       <div class="secHead">
         <div>
-          <h3 class="secHead__h">Add Jewellery For Product</h3>
+          <h3 class="secHead__h">Add Jewellery for the Quantity of the Product</h3>
           <p class="secHead__p">
             Choose jewellery source, enter qty + selling price. Unit price comes from gem package.
           </p>
@@ -444,7 +465,8 @@
           <div class="miniTable__th">Unit Weight</div>
           <div class="miniTable__th">Total Weight</div>
           <div class="miniTable__th">Selling Price *</div>
-          <div class="miniTable__th">Original Price</div>
+          <div class="miniTable__th">Unit Price</div>
+          <div class="miniTable__th">Original Total</div>
           <div class="miniTable__th miniTable__th--actions">
             <button class="btnAdd" type="button" @click.stop="addJewelryRow">+ Add</button>
           </div>
@@ -475,20 +497,22 @@
 
                 <div class="dd__list">
                   <button
-  v-for="p in filteredGemPackages(row.query)"
-  :key="p.id"
-  class="dd__item"
-  type="button"
-  :disabled="Number(p.remainingQty ?? p.quantity ?? 0) <= 0"
-  @click.stop="Number(p.remainingQty ?? p.quantity ?? 0) > 0 && selectJewelryPackage(idx, p)"
->
+                    v-for="p in filteredGemPackages(row.query)"
+                    :key="p.id"
+                    class="dd__item"
+                    type="button"
+                    :disabled="Number(p.remainingQty ?? p.quantity ?? 0) <= 0"
+                    @click.stop="
+                      Number(p.remainingQty ?? p.quantity ?? 0) > 0 && selectJewelryPackage(idx, p)
+                    "
+                  >
                     <div class="dd__main">{{ p.name }}</div>
                     <div class="dd__sub">
-  {{ p.gemTypeName || '-' }} • Available Qty:
-  {{ Number(p.remainingQty ?? p.quantity ?? 0) }} •
-  Unit Wt: {{ Number(p.gemsSize ?? 0).toFixed(4) }} • Unit Price:
-  {{ unitPriceFromPackage(p).toLocaleString() }}
-</div>
+                      {{ p.gemTypeName || '-' }} • Available Qty:
+                      {{ Number(p.remainingQty ?? p.quantity ?? 0) }} • Unit Wt:
+                      {{ Number(p.gemsSize ?? 0).toFixed(4) }} • Unit Price:
+                      {{ unitPriceFromPackage(p).toLocaleString() }}
+                    </div>
                   </button>
 
                   <div v-if="filteredGemPackages(row.query).length === 0" class="dd__empty">
@@ -508,14 +532,16 @@
               placeholder="e.g. 3"
               @input="validateJewelryRows"
             />
+
             <div
-  v-if="row.gemsPackageId"
-  class="remainLine"
-  :class="{ 'remainLine--bad': !!row.qtyError }"
->
-Remaining: {{ remainingAfterThisJewelryRow(idx) }}
-</div>
-<div v-if="row.qtyError" class="tinyErr">{{ row.qtyError }}</div>
+              v-if="row.gemsPackageId"
+              class="remainLine"
+              :class="{ 'remainLine--bad': !!row.qtyError }"
+            >
+              Remaining: {{ remainingAfterThisJewelryRow(idx) }}
+            </div>
+
+            <div v-if="row.qtyError" class="tinyErr">{{ row.qtyError }}</div>
           </div>
 
           <div class="miniTable__td">
@@ -541,8 +567,18 @@ Remaining: {{ remainingAfterThisJewelryRow(idx) }}
             <div v-if="row.sellError" class="tinyErr">{{ row.sellError }}</div>
           </div>
 
+          <!-- Original Unit -->
           <div class="miniTable__td">
-            <div class="readPill readPill--muted">{{ (row.unitPrice ?? 0).toLocaleString() }}</div>
+            <div class="readPill readPill--muted">
+              {{ Number(row.unitPrice ?? 0).toLocaleString() }}
+            </div>
+          </div>
+
+          <!-- ✅ Original Total -->
+          <div class="miniTable__td">
+            <div class="readPill readPill--muted">
+              {{ originalLineTotal(row).toLocaleString() }}
+            </div>
           </div>
 
           <div class="miniTable__td miniTable__td--actions">
@@ -566,6 +602,35 @@ Remaining: {{ remainingAfterThisJewelryRow(idx) }}
           <div class="totals__label">Total Selling Price</div>
           <div class="totals__value">{{ totalSellingPrice.toLocaleString() }}</div>
         </div>
+
+        <div class="totals__box">
+          <div class="totals__label">Total Original Price</div>
+          <div class="totals__value">{{ totalOriginalPrice.toLocaleString() }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="pfield">
+      <label class="plabel">Final Price (MMK) *</label>
+
+      <input
+        v-model.number="product.finalPrice"
+        class="pinput"
+        type="number"
+        min="0"
+        step="1"
+        placeholder="e.g. 4782"
+      />
+
+      <div class="tinyHint">
+        Ref: <strong>{{ formatMoney(finalRefPriceAllIn) }}</strong>
+
+        <template v-if="hasFinalPrice">
+          • Diff: <strong>{{ formatMoney(finalPriceDiff) }}</strong>
+        </template>
+      </div>
+
+      <div v-if="hasFinalPrice && isFinalLowerThanRef" class="tinyErr">
+        Your final price is lower than the original price.
       </div>
     </div>
 
@@ -576,6 +641,37 @@ Remaining: {{ remainingAfterThisJewelryRow(idx) }}
         <button class="btnGhost" type="button" @click="goBack">Cancel</button>
         <button class="btnPrimary" type="button" @click="onSaveAll">Save</button>
       </div>
+    </div>
+  </div>
+  <div class="refBox">
+    <div class="refBox__title">Reference Price Summary</div>
+
+    <div class="refBox__grid">
+      <div class="refItem">
+        <div class="refItem__label">Ref Final/Unit</div>
+        <div class="refItem__value">{{ formatMoney(finalUnitPriceRef) }}</div>
+        <div class="refItem__sub">
+          (Gold {{ formatMoney(goldCostRef) }} + Making {{ formatMoney(makingCostRef) }} → Dep
+          {{ depLabel }})
+        </div>
+      </div>
+
+      <div class="refItem">
+        <div class="refItem__label">Total (Weight × Current Price)</div>
+        <div class="refItem__value">{{ formatMoney(totalGoldLineAmount) }}</div>
+        <div class="refItem__sub">Sum of all Gold rows line totals</div>
+      </div>
+
+      <div class="refItem">
+        <div class="refItem__label">Total Original Price</div>
+        <div class="refItem__value">{{ formatMoney(totalOriginalPrice) }}</div>
+        <div class="refItem__sub">Sum of (Package Unit Price × Qty)</div>
+      </div>
+    </div>
+
+    <div class="refBox__footer">
+      <span class="refBox__hint">Final Ref Price (All-in)</span>
+      <span class="refBox__final">{{ formatMoney(finalRefPriceAllIn) }}</span>
     </div>
   </div>
 </template>
@@ -589,95 +685,49 @@ Remaining: {{ remainingAfterThisJewelryRow(idx) }}
   import type { CraftDto } from '../dtos/CraftDto'
   import type { JewelryTypeDto } from '../dtos/JewelryTypeDto'
   import { useProductsStore } from '../stores/useProductsStore'
+  import type { GoldPriceHistoryDto } from '../dtos/GoldPriceHistoryDto'
 
-  const fillProduct = (p: any) => {
-    product.id = Number(p.id ?? 0)
-    product.name = p.name ?? ''
-    product.code = p.code ?? ''
-    product.stockStatus = p.stockStatus ?? ''
-    product.desc = p.desc ?? ''
-    product.qty = Number(p.qty ?? 0)
-    product.collection = p.collection ?? ''
-    product.shortDesc = p.shortDesc ?? ''
-    product.color = p.color ?? ''
-    product.weight = Number(p.weight ?? 0)
-    product.metarialLoss = Number(p.metarialLoss ?? 0)
-    product.makingCost = Number(p.makingCost ?? 0)
-    product.colorCount = Number(p.colorCount ?? 0)
-    product.depreciation = Number(p.depreciation ?? 0)
-    product.productTypeId = p.productTypeId != null ? Number(p.productTypeId) : null
-  }
+  const goldPriceHistory = ref<GoldPriceHistoryDto[]>([])
 
-
-    type PreviewImg = { key: string; file: File; previewUrl: string }
-    const selectedPreviews = ref<PreviewImg[]>([])
-      const totalCount = computed(() => productImages.value.length + selectedPreviews.value.length)
-
-
-      function onImgFilesSelected(e: Event) {
-  const input = e.target as HTMLInputElement
-  const files = input.files ? Array.from(input.files) : []
-  if (!files.length) return
-
-  const available = MAX_PHOTOS - totalCount.value
-  const picked = files.slice(0, Math.max(0, available))
-
-  for (const f of picked) {
-    imgFiles.value.push(f) // ✅ important for upload
-
-    selectedPreviews.value.push({
-      key: crypto.randomUUID(),
-      file: f,
-      previewUrl: URL.createObjectURL(f),
-    })
-  }
-
-  input.value = ''
-}
-  const MAX_PHOTOS = 9
-  const fileInput = ref<HTMLInputElement | null>(null)
-
-  const productImages = ref<any[]>([])
-    const imgFiles = ref<File[]>([])
-    function removePreview(key: string) {
-  const idx = selectedPreviews.value.findIndex((x) => x.key === key)
-  if (idx === -1) return
-
-  const item = selectedPreviews.value[idx]
-  URL.revokeObjectURL(item.previewUrl)
-
-  const fileIdx = imgFiles.value.findIndex((f) => f === item.file)
-  if (fileIdx !== -1) imgFiles.value.splice(fileIdx, 1)
-
-  selectedPreviews.value.splice(idx, 1)
-}
-async function deleteDbImage(imageId: number) {
-  if (!isEdit.value) return
-  const pid = Number(route.params.id)
-
-  await productsStore.deleteProductImage(imageId, pid)
-  productImages.value = productImages.value.filter((x) => x.id !== imageId)
-}
-
-  const router = useRouter()
-  const route = useRoute()
-  const isEdit = computed(() => !!route.params.id)
-
-  const productsStore = useProductsStore()
-  const emptySlots = computed(() => {
-    const left = MAX_PHOTOS - totalCount.value
-    return left > 0 ? Array.from({ length: left }, (_, i) => i + 1) : []
+  const activeSellPriceByPurity = computed(() => {
+    const map = new Map<string, { sellPrice: number; recordDate: string }>()
+    for (const x of goldPriceHistory.value) {
+      if (String(x.status) !== 'ACTIVE') continue
+      map.set(String(x.purity), {
+        sellPrice: Number((x as any).sellPrice ?? 0),
+        recordDate: String((x as any).recordDate ?? ''),
+      })
+    }
+    return map
   })
 
-  function triggerFilePicker() {
-    fileInput.value?.click()
+  const getActiveSellPrice = (purity: string) => {
+    return activeSellPriceByPurity.value.get(String(purity)) ?? null
   }
-  async function deleteProductImage(imageId: number) {
-    if (!isEdit.value) return
-    const pid = Number(route.params.id)
-    await productsStore.deleteProductImage(imageId, pid)
-    productImages.value = (productImages.value ?? []).filter((x) => x.id !== imageId)
-  }
+  type PreviewImg = { key: string; file: File; previewUrl: string }
+  const finalRefPriceAllIn = computed(() => {
+    const a = Number(finalUnitPriceRef.value ?? 0)
+    const b = Number(totalGoldLineAmount.value ?? 0)
+    const c = Number(totalOriginalPrice.value ?? 0)
+    return a + b + c
+  })
+  const hasFinalPrice = computed(() => {
+    const v = product.finalPrice
+    return v != null && Number(v) > 0
+  })
+  const finalPriceDiff = computed(() => {
+    if (!hasFinalPrice.value) return 0
+    const final = Number(product.finalPrice)
+    const ref = Number(finalRefPriceAllIn.value ?? 0)
+    return final - ref
+  })
+
+  const isFinalLowerThanRef = computed(() => {
+    if (!hasFinalPrice.value) return false
+    const final = Number(product.finalPrice)
+    const ref = Number(finalRefPriceAllIn.value ?? 0)
+    return ref > 0 && final < ref
+  })
 
   type GoldRow = {
     key: string
@@ -714,6 +764,15 @@ async function deleteDbImage(imageId: number) {
     sellError: string
   }
 
+  /* =========================
+   Router / Store / State
+========================= */
+  const router = useRouter()
+  const route = useRoute()
+  const isEdit = computed(() => !!route.params.id)
+
+  const productsStore = useProductsStore()
+
   const product = reactive({
     id: 0,
     name: '',
@@ -730,6 +789,7 @@ async function deleteDbImage(imageId: number) {
     colorCount: 0,
     depreciation: 0,
     productTypeId: null as number | null,
+    finalPrice: 0,
 
     goldRows: [
       {
@@ -744,7 +804,6 @@ async function deleteDbImage(imageId: number) {
         currentPrice: 0,
         weightError: '',
         priceError: '',
-
         craftDdOpen: false,
         craftQuery: '',
         craftId: null,
@@ -771,22 +830,103 @@ async function deleteDbImage(imageId: number) {
     ] as JewelryRow[],
   })
 
-  // DB lists
+  const fillProduct = (p: any) => {
+    product.id = Number(p.id ?? 0)
+    product.name = p.name ?? ''
+    product.code = p.code ?? ''
+    product.stockStatus = p.stockStatus ?? ''
+    product.desc = p.desc ?? ''
+    product.qty = Number(p.qty ?? 0)
+    product.collection = p.collection ?? ''
+    product.shortDesc = p.shortDesc ?? ''
+    product.color = p.color ?? ''
+    product.weight = Number(p.weight ?? 0)
+    product.metarialLoss = Number(p.metarialLoss ?? 0)
+    product.makingCost = Number(p.makingCost ?? 0)
+    product.colorCount = Number(p.colorCount ?? 0)
+    product.depreciation = Number(p.depreciation ?? 0)
+    product.finalPrice = Number(p.finalPrice ?? p.final_price ?? 0)
+    product.productTypeId = p.productTypeId != null ? Number(p.productTypeId) : null
+  }
+
+  /* =========================
+   Images
+========================= */
+  const MAX_PHOTOS = 9
+  const fileInput = ref<HTMLInputElement | null>(null)
+  const productImages = ref<any[]>([])
+  const imgFiles = ref<File[]>([])
+  const selectedPreviews = ref<PreviewImg[]>([])
+
+  const totalCount = computed(() => productImages.value.length + selectedPreviews.value.length)
+  const emptySlots = computed(() => {
+    const left = MAX_PHOTOS - totalCount.value
+    return left > 0 ? Array.from({ length: left }, (_, i) => i + 1) : []
+  })
+
+  function triggerFilePicker() {
+    fileInput.value?.click()
+  }
+
+  function onImgFilesSelected(e: Event) {
+    const input = e.target as HTMLInputElement
+    const files = input.files ? Array.from(input.files) : []
+    if (!files.length) return
+
+    const available = MAX_PHOTOS - totalCount.value
+    const picked = files.slice(0, Math.max(0, available))
+
+    for (const f of picked) {
+      imgFiles.value.push(f)
+      selectedPreviews.value.push({
+        key: crypto.randomUUID(),
+        file: f,
+        previewUrl: URL.createObjectURL(f),
+      })
+    }
+    input.value = ''
+  }
+
+  function removePreview(key: string) {
+    const idx = selectedPreviews.value.findIndex((x) => x.key === key)
+    if (idx === -1) return
+    const item = selectedPreviews.value[idx]
+    URL.revokeObjectURL(item.previewUrl)
+
+    const fileIdx = imgFiles.value.findIndex((f) => f === item.file)
+    if (fileIdx !== -1) imgFiles.value.splice(fileIdx, 1)
+
+    selectedPreviews.value.splice(idx, 1)
+  }
+
+  async function deleteDbImage(imageId: number) {
+    if (!isEdit.value) return
+    const pid = Number(route.params.id)
+    await productsStore.deleteProductImage(imageId, pid)
+    productImages.value = productImages.value.filter((x) => x.id !== imageId)
+  }
+
+  /* =========================
+   Dropdown data
+========================= */
   const goldSources = ref<GoldSourceDto[]>([])
   const gemsPackages = ref<GemsPackageDto[]>([])
   const crafts = ref<CraftDto[]>([])
   const jewelryTypes = ref<JewelryTypeDto[]>([])
 
-  // ✅ ProductType dropdown state
   const typeDdOpen = ref(false)
   const typeQuery = ref('')
 
   onMounted(async () => {
-    // load dropdown lists first
     try {
       goldSources.value = (await http<GoldSourceDto[]>('/gold-source')) ?? []
     } catch {
       goldSources.value = []
+    }
+    try {
+      goldPriceHistory.value = (await http<GoldPriceHistoryDto[]>('/gold-price-history')) ?? []
+    } catch {
+      goldPriceHistory.value = []
     }
     try {
       gemsPackages.value = (await http<GemsPackageDto[]>('/gems-packages')) ?? []
@@ -804,18 +944,16 @@ async function deleteDbImage(imageId: number) {
       jewelryTypes.value = []
     }
 
-    // ✅ if edit, load product detail
     if (isEdit.value) {
       const productId = Number(route.params.id)
       if (!productId) return alert('Invalid product id in url.')
 
       try {
-        const p = await http<any>(`/products/${productId}`)
+        const res = await http<any>(`/products/${productId}`)
+        const p = res?.data ?? res // ✅ unwrap if needed
         if (!p) return alert('Product not found.')
 
         fillProduct(p)
-
-        // ✅ set images here (NOT inside map)
         productImages.value = p.productImages ?? []
 
         if (Array.isArray(p.productGolds)) {
@@ -833,6 +971,7 @@ async function deleteDbImage(imageId: number) {
             priceError: '',
             craftDdOpen: false,
             craftQuery: '',
+
             craftId: Number(g.craftId ?? g.craft?.id ?? 0) || null,
             craftLabel: g.craftShopName ?? g.craft?.shopName ?? '',
             craftError: '',
@@ -848,7 +987,7 @@ async function deleteDbImage(imageId: number) {
             sourceLabel: j.gemsPackageName ?? j.gemsPackage?.name ?? '',
             availableQty: 0,
             unitWeight: Number(j.unitWeight ?? j.gemsSize ?? 0),
-            unitPrice: Number(j.unitPrice ?? 0),
+            unitPrice: Number(j.unitPrice ?? unitPriceFromPackage(j.gemsPackage ?? {}) ?? 0),
             qty: Number(j.qty ?? 0),
             sellingPrice: Number(j.sellingPrice ?? 0),
             qtyError: '',
@@ -858,28 +997,54 @@ async function deleteDbImage(imageId: number) {
       } catch (e: any) {
         alert(e?.message ?? 'Failed to load product detail.')
       }
+      // ✅ ADD THIS (right after mapping rows in edit mode)
+      validateGoldRows()
+      validateJewelryRows()
+
+      // ✅ Rebuild unitPrice for edit-mode rows (so Original Total + RefBox works)
+      product.jewelryRows.forEach((r) => {
+        if (!r.gemsPackageId) return
+        const pkg: any = gemsPackages.value.find((x: any) => x.id === r.gemsPackageId)
+        if (pkg) r.unitPrice = Number(unitPriceFromPackage(pkg) || 0)
+      })
     }
   })
 
-  // -------- helpers --------
-  const unitPriceFromPackage = (p: any) => {
-    const direct = Number(p.unitPrice ?? p.unit_price ?? p.pricePerUnit ?? p.unit_price_mmk ?? NaN)
-    if (!Number.isNaN(direct)) return direct
+  /* =========================
+   Utils
+========================= */
+  function formatMoney(v?: number | null) {
+    const n = Number(v ?? 0)
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n) + ' MMK'
+  }
 
-    const total = Number(p.originalPrice ?? p.original_price ?? 0)
-    const qty = Number(p.quantity ?? 0)
-    if (qty > 0) return Math.round(total / qty)
+  const parsePurityToNumber = (v: any): number => {
+    const m = String(v ?? '').match(/(\d+(\.\d+)?)/)
+    return m ? Number(m[1]) : 0
+  }
+
+  const unitPriceFromPackage = (p: any): number => {
+    // ✅ backend correct field
+    const direct = Number(p?.unitPrice)
+    if (Number.isFinite(direct) && direct > 0) return direct
+
+    // ✅ sometimes native query returns snake_case
+    const snake = Number(p?.unit_price)
+    if (Number.isFinite(snake) && snake > 0) return snake
+
+    // ✅ fallback: derive from totalPrice/quantity if unitPrice not provided
+    const total = Number(
+      p?.totalPrice ?? p?.total_price ?? p?.originalPrice ?? p?.original_price ?? 0
+    )
+    const qty = Number(p?.quantity ?? 0)
+    if (qty > 0 && Number.isFinite(total)) return total / qty
 
     return 0
   }
 
-  // ✅ IMPORTANT: backend expects Float -> send number (18/24)
-  const parsePurityToNumber = (v: any): number => {
-    const m = String(v ?? '').match(/(\d+(\.\d+)?)/) // "18 K" -> 18
-    return m ? Number(m[1]) : 0
-  }
-
-  // ----- ProductType dropdown helpers -----
+  /* =========================
+   Product Type dropdown
+========================= */
   const filteredJewelryTypes = (q: string) => {
     const term = (q || '').trim().toLowerCase()
     if (!term) return jewelryTypes.value
@@ -900,8 +1065,6 @@ async function deleteDbImage(imageId: number) {
 
   const toggleTypeDd = () => {
     typeDdOpen.value = !typeDdOpen.value
-
-    // close other dropdowns
     product.goldRows.forEach((r) => (r.ddOpen = false))
     product.goldRows.forEach((r) => (r.craftDdOpen = false))
     product.jewelryRows.forEach((r) => (r.ddOpen = false))
@@ -912,43 +1075,47 @@ async function deleteDbImage(imageId: number) {
     typeDdOpen.value = false
     typeQuery.value = ''
   }
-  //-----package ---
+
+  /* =========================
+   Jewellery: remaining logic
+========================= */
   const allowanceQtyForRow = (rowIndex: number): number => {
-  const row = product.jewelryRows[rowIndex]
-  if (!row.gemsPackageId) return 0
+    const row = product.jewelryRows[rowIndex]
+    if (!row.gemsPackageId) return 0
 
-  const pkg = gemsPackages.value.find(
-    (x: any) => x.id === row.gemsPackageId
-  ) as any
+    const pkg = gemsPackages.value.find((x: any) => x.id === row.gemsPackageId) as any
+    const total = Number(pkg?.remainingQty ?? pkg?.quantity ?? 0)
 
-  const total = Number(pkg?.remainingQty ?? pkg?.quantity ?? 0)
+    const usedJewels = product.jewelryRows.reduce((sum, r, i) => {
+      if (i === rowIndex) return sum
+      if (r.gemsPackageId !== row.gemsPackageId) return sum
+      return sum + (Number(r.qty) || 0)
+    }, 0)
 
-  const usedJewels = product.jewelryRows.reduce((sum, r, i) => {
-    if (i === rowIndex) return sum
-    if (r.gemsPackageId !== row.gemsPackageId) return sum
-    return sum + (Number(r.qty) || 0)
-  }, 0)
+    return Math.max(0, total - usedJewels)
+  }
 
-  return Math.max(0, total - usedJewels)
-}
-const remainingAfterThisJewelryRow = (rowIndex: number): number => {
-  const row = product.jewelryRows[rowIndex]
-  if (!row.gemsPackageId) return 0
+  const remainingAfterThisJewelryRow = (rowIndex: number): number => {
+    const row = product.jewelryRows[rowIndex]
+    if (!row.gemsPackageId) return 0
+    const allow = allowanceQtyForRow(rowIndex)
+    const q = Number(row.qty) || 0
+    return Math.max(0, allow - q)
+  }
 
-  const allow = allowanceQtyForRow(rowIndex)
-  const q = Number(row.qty) || 0
-
-  return Math.max(0, allow - q)
-}
-
-
-  // ----- GOLD -----
+  /* =========================
+   GOLD
+========================= */
   const goldError = ref<string | null>(null)
-  // A) allowance for this row (exclude THIS row) -> used for validation
+
+  const packageTotalWeight = (goldSourceId: number): number => {
+    const pkg = goldSources.value.find((x) => x.id === goldSourceId) as any
+    return Number(pkg?.remainingWeight ?? pkg?.weight ?? 0)
+  }
+
   const allowanceWeightForRow = (rowIndex: number): number => {
     const row = product.goldRows[rowIndex]
     if (!row.goldSourceId) return 0
-
     const total = packageTotalWeight(row.goldSourceId)
 
     const usedByOthers = product.goldRows.reduce((sum, r, i) => {
@@ -960,23 +1127,36 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     return Math.max(0, total - usedByOthers)
   }
 
-  // B) remaining AFTER this row takes weight (include THIS row) -> used for UI display
   const remainingAfterThisRow = (rowIndex: number): number => {
     const row = product.goldRows[rowIndex]
     if (!row.goldSourceId) return 0
-
     const allow = allowanceWeightForRow(rowIndex)
     const w = Number(row.weightUsed) || 0
-
     return Math.max(0, allow - w)
   }
 
   const totalGoldWeight = computed(() =>
     product.goldRows.reduce((sum, r) => sum + (Number(r.weightUsed) || 0), 0)
   )
-  const totalGoldPrice = computed(() =>
-    product.goldRows.reduce((sum, r) => sum + (Number(r.currentPrice) || 0), 0)
+
+  /** ✅ per row line total */
+  const goldRowLineTotal = (row: GoldRow) => {
+    const w = Number(row.weightUsed ?? 0)
+    const p = Number(row.currentPrice ?? 0)
+    return w * p
+  }
+
+  /** ✅ total of weight×price */
+  const totalGoldLineAmount = computed(() =>
+    product.goldRows.reduce((sum, r) => sum + goldRowLineTotal(r), 0)
   )
+
+  /** optional avg price */
+  const avgGoldPrice = computed(() => {
+    const w = totalGoldWeight.value
+    if (w <= 0) return 0
+    return Math.round(totalGoldLineAmount.value / w)
+  })
 
   const goldPurityLabel = computed(() => {
     const purities = product.goldRows.map((r) => (r.purity || '').trim()).filter(Boolean)
@@ -1043,14 +1223,19 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     row.goldSourceId = g.id
     row.sourceLabel = g.name || ''
     row.purity = (g as any).goldPurity || ''
-
-    // IMPORTANT: don't use original weight here anymore
+    const active = getActiveSellPrice(row.purity)
+    if (active) {
+      row.currentPrice = Number(active.sellPrice ?? 0)
+      row.priceError = ''
+    } else {
+      row.currentPrice = 0 // no active price found
+    }
     row.availableWeight = remaining
-
     row.ddOpen = false
     row.query = ''
     validateGoldRows()
   }
+
   const selectCraft = (idx: number, c: CraftDto) => {
     const row = product.goldRows[idx]
     row.craftId = c.id
@@ -1073,7 +1258,6 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
       currentPrice: 0,
       weightError: '',
       priceError: '',
-
       craftDdOpen: false,
       craftQuery: '',
       craftId: null,
@@ -1088,53 +1272,6 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     product.goldRows.splice(idx, 1)
     validateGoldRows()
   }
-  const remainingWeightForRow = (rowIndex: number): number => {
-    const row = product.goldRows[rowIndex]
-    if (!row.goldSourceId) return 0
-
-    const pkg = goldSources.value.find((x) => x.id === row.goldSourceId) as any
-
-    // ✅ base = remaining from DB (already reduced by previous products)
-    const baseRemaining = Number(pkg?.remainingWeight ?? pkg?.weight ?? 0)
-
-    // ✅ subtract what other rows in THIS form are already using
-    const usedByOtherRows = product.goldRows.reduce((sum, r, i) => {
-      if (i === rowIndex) return sum
-      if (r.goldSourceId !== row.goldSourceId) return sum
-      return sum + (Number(r.weightUsed) || 0)
-    }, 0)
-
-    const remaining = baseRemaining - usedByOtherRows
-    return remaining < 0 ? 0 : remaining
-  }
-
-  // 1) total weight of a gold package from API list
-  const packageTotalWeight = (goldSourceId: number): number => {
-    const pkg = goldSources.value.find((x) => x.id === goldSourceId) as any
-    return Number(pkg?.remainingWeight ?? pkg?.weight ?? 0)
-  }
-
-  // 2) total used weight from ALL rows for a package (includes every row)
-  const usedWeightForPackage = (goldSourceId: number): number => {
-    return product.goldRows.reduce((sum, r) => {
-      if (r.goldSourceId !== goldSourceId) return sum
-      return sum + (Number(r.weightUsed) || 0)
-    }, 0)
-  }
-
-  // 3) remaining for package AFTER all rows used (this is the real package remaining)
-  const remainingWeightForPackage = (goldSourceId: number): number => {
-    const pkg = goldSources.value.find((x) => x.id === goldSourceId) as any
-    const baseRemaining = Number(pkg?.remainingWeight ?? pkg?.weight ?? 0)
-
-    const usedInThisForm = product.goldRows.reduce((sum, r) => {
-      if (r.goldSourceId !== goldSourceId) return sum
-      return sum + (Number(r.weightUsed) || 0)
-    }, 0)
-
-    const remaining = baseRemaining - usedInThisForm
-    return remaining < 0 ? 0 : remaining
-  }
 
   const validateGoldRows = () => {
     goldError.value = null
@@ -1145,7 +1282,6 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
       r.priceError = ''
       r.craftError = ''
 
-      // required dropdowns
       if (!r.goldSourceId) hasAnyError = true
 
       if (!r.craftId) {
@@ -1153,39 +1289,36 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
         hasAnyError = true
       }
 
-      // validate only if gold source selected
       if (r.goldSourceId) {
         const w = Number(r.weightUsed) || 0
         const price = Number(r.currentPrice) || 0
 
-        // weight required
         if (w <= 0) {
           r.weightError = 'Weight is required.'
           hasAnyError = true
         } else {
-          // ✅ use allowance instead of remainingWeightForRow
           const allow = allowanceWeightForRow(idx)
-
           if (w > allow) {
             r.weightError = `Weight left is not enough (Remaining ${allow.toFixed(2)}).`
             hasAnyError = true
           }
         }
 
-        // price required
         if (price <= 0) {
-          r.priceError = 'Current price is required.'
+          r.priceError = r.purity
+            ? `No ACTIVE sell price found for ${r.purity}.`
+            : 'Please choose Gold Source to set purity.'
           hasAnyError = true
         }
       }
     })
 
-    if (hasAnyError) {
-      goldError.value = 'Please fill the Gold Information !!.'
-    }
+    if (hasAnyError) goldError.value = 'Please fill the Gold Information !!.'
   }
 
-  // ----- JEWELLERY -----
+  /* =========================
+   JEWELLERY
+========================= */
   const jewelryError = ref<string | null>(null)
 
   const filteredGemPackages = (q: string) => {
@@ -1208,16 +1341,21 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
 
   const selectJewelryPackage = (idx: number, p: GemsPackageDto) => {
     const row = product.jewelryRows[idx]
-    row.gemsPackageId = (p as any).id
-    row.sourceLabel = (p as any).name || ''
-    row.availableQty = Number((p as any).remainingQty ?? (p as any).quantity ?? 0)
-    row.unitWeight = Number((p as any).gemsSize ?? 0)
-    row.unitPrice = unitPriceFromPackage(p as any)
+    const pkg: any = p
+
+    row.gemsPackageId = Number(pkg.id ?? 0) || null
+    row.sourceLabel = pkg.name || ''
+    row.availableQty = Number(pkg.remainingQty ?? pkg.quantity ?? 0)
+    row.unitWeight = Number(pkg.gemsSize ?? 0)
+
+    // ✅ FIX: set unit price into row (this makes Original Unit + Total work)
+    row.unitPrice = Number(unitPriceFromPackage(pkg) || 0)
+
     row.ddOpen = false
     row.query = ''
+
     validateJewelryRows()
   }
-
   const addJewelryRow = () => {
     product.jewelryRows.push({
       key: crypto.randomUUID(),
@@ -1243,62 +1381,116 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
   }
 
   const validateJewelryRows = () => {
-  jewelryError.value = null
-  let hasAnyError = false
+    jewelryError.value = null
+    let hasAnyError = false
 
-  product.jewelryRows.forEach((r, idx) => {
-    r.qtyError = ''
-    r.sellError = ''
+    product.jewelryRows.forEach((r, idx) => {
+      r.qtyError = ''
+      r.sellError = ''
 
-    // dropdown required
-    if (!r.gemsPackageId) {
-      hasAnyError = true
-      return
-    }
+      if (!r.gemsPackageId) {
+        hasAnyError = true
+        return
+      }
 
-    const qty = Number(r.qty) || 0
-    const selling = Number(r.sellingPrice) || 0
+      // ✅ ensure unitPrice is not lost (ex: after reload / API late)
+      const pkg: any = gemsPackages.value.find((x: any) => x.id === r.gemsPackageId)
+      if (pkg) r.unitPrice = Number(unitPriceFromPackage(pkg) || r.unitPrice || 0)
 
-    // remaining allowance for THIS row
-    const allow = allowanceQtyForRow(idx)
+      const qty = Number(r.qty) || 0
+      const selling = Number(r.sellingPrice) || 0
+      const allow = allowanceQtyForRow(idx)
 
-    // qty required
-    if (qty <= 0) {
-      r.qtyError = 'Qty is required.'
-      hasAnyError = true
-    }
-    // qty exceeds remaining
-    else if (qty > allow) {
-      r.qtyError = `Exceeds remaining qty (${allow}).`
-      hasAnyError = true
-    }
+      if (qty <= 0) {
+        r.qtyError = 'Qty is required.'
+        hasAnyError = true
+      } else if (qty > allow) {
+        r.qtyError = `Exceeds remaining qty (${allow}).`
+        hasAnyError = true
+      }
 
-    // selling price required
-    if (selling <= 0) {
-      r.sellError = 'Selling price is required.'
-      hasAnyError = true
-    }
-  })
+      if (selling <= 0) {
+        r.sellError = 'Selling price is required.'
+        hasAnyError = true
+      }
+    })
 
-  if (hasAnyError) {
-    jewelryError.value = 'Please fill the Jewellery Information !!.'
+    if (hasAnyError) jewelryError.value = 'Please fill the Jewellery Information !!.'
   }
-}
 
   const totalJewelryQty = computed(() =>
     product.jewelryRows.reduce((sum, r) => sum + (Number(r.qty) || 0), 0)
   )
+
   const totalJewelryWeight = computed(() =>
     product.jewelryRows.reduce(
       (sum, r) => sum + (Number(r.qty) || 0) * (Number(r.unitWeight) || 0),
       0
     )
   )
+
   const totalSellingPrice = computed(() =>
     product.jewelryRows.reduce((sum, r) => sum + (Number(r.sellingPrice) || 0), 0)
   )
 
-  // ----- UI -----
+  /** ✅ original total per row */
+  const originalLineTotal = (row: JewelryRow) => {
+    const unit = Number(row.unitPrice ?? 0)
+    const qty = Number(row.qty ?? 0)
+    return unit * qty
+  }
+
+  /** ✅ sum original totals */
+  const totalOriginalPrice = computed(() =>
+    product.jewelryRows.reduce((sum, r) => sum + originalLineTotal(r), 0)
+  )
+
+  /* =========================
+   REF PRICE under Making Cost
+   Uses gold (from gold rows) + making cost + depreciation
+========================= */
+  const netGoldWeight = computed(() => {
+    const w = Number(product.weight ?? 0)
+    const loss = Number(product.metarialLoss ?? 0)
+    const net = w - loss
+    return net > 0 ? net : 0
+  })
+
+  /** choose purity from gold rows:
+   * - if only one purity -> use it
+   * - if mixed -> use 0 (so gold cost ref becomes 0) OR still use first row purity
+   * Here: we use first non-empty purity
+   */
+  const chosenPurityNumber = computed(() => {
+    const p = product.goldRows.map((r) => r.purity).find((x) => String(x || '').trim())
+    return parsePurityToNumber(p)
+  })
+
+  /** price per gram from gold rows current price:
+   * Because you don’t have gold price history here, we use avg price entered.
+   * This is exactly "ref from your inputs".
+   */
+  const goldPricePerGramRef = computed(() => avgGoldPrice.value)
+
+  const goldCostRef = computed(() => netGoldWeight.value * goldPricePerGramRef.value)
+  const makingCostRef = computed(() => Number(product.makingCost ?? 0))
+
+  const depRate = computed(() => {
+    const dep = Number(product.depreciation ?? 0)
+    return dep <= 1 ? dep : dep / 100
+  })
+
+  const depLabel = computed(() => `${Math.round(depRate.value * 100)}%`)
+
+  const finalUnitPriceRef = computed(() => {
+    const base = goldCostRef.value + makingCostRef.value
+    const v = base * (1 - depRate.value)
+    return v < 0 ? 0 : v
+  })
+
+  /* =========================
+   UI helpers
+========================= */
   const closeAllDd = () => {
     product.goldRows.forEach((r) => (r.ddOpen = false))
     product.goldRows.forEach((r) => (r.craftDdOpen = false))
@@ -1308,6 +1500,9 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
 
   const goBack = () => router.push('/admin/products')
 
+  /* =========================
+   SAVE
+========================= */
   const onSaveAll = async () => {
     if (!String(product.name || '').trim()) return alert('Product name is required.')
     if (!product.productTypeId || Number(product.productTypeId) <= 0)
@@ -1340,6 +1535,7 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
       colorCount: Number(product.colorCount ?? 0),
       depreciation: Number(product.depreciation ?? 0),
       productTypeId: Number(product.productTypeId),
+      finalPrice: Number(product.finalPrice ?? 0),
 
       productGolds: product.goldRows.map((r) => ({
         goldSourceId: r.goldSourceId!,
@@ -1369,13 +1565,14 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
       const savedId = Number(saved?.id)
       if (!savedId) throw new Error('Product saved but missing id.')
 
-      // upload selected files -> S3 -> add to product
       for (const file of imgFiles.value) {
         const url = await productsStore.uploadToS3(file)
         await productsStore.addProductImage(savedId, { imageUrl: url })
       }
 
       imgFiles.value = []
+      selectedPreviews.value.forEach((p) => URL.revokeObjectURL(p.previewUrl))
+      selectedPreviews.value = []
 
       const latest = await productsStore.getProductById(savedId)
       productImages.value = latest.productImages ?? []
@@ -1386,152 +1583,107 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
       alert(e?.message ?? 'Failed to save product.')
     }
   }
-</script>
+</script> 
+
 <style scoped>
-  /* =========================================================
-   ✅ GOLD TABLE FIX (Put this at the TOP)
-   Reason: your generic .miniTable__head overrides the gold grid.
-   We use higher-specificity selectors: .miniTable__head.miniTable__head--gold
-   ========================================================= */
-
-  /* ✅ force GOLD header + rows to be 5 columns (Gold | Craft | Weight | Price | Actions) */
-  /* ===== Product Images Grid (Tinder-like) ===== */
-
+  /* ===== Product Images Grid ===== */
   .media-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 160px);  /* fixed smaller size */
-  gap: 14px;
-  max-width: 520px; 
-}
-
-.media-card,
-.media-slot {
-  width: 160px;
-  height: 200px;   /* smaller fixed height */
-  border-radius: 14px;
-}
-
-
-.media-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* X button (top-right) */
-.media-x {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-
-  border: 0;
-  cursor: pointer;
-
-  display: grid;
-  place-items: center;
-
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  font-size: 18px;
-  line-height: 1;
-
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-.media-card {
-  position: relative;      /* IMPORTANT for .media-x absolute positioning */
-  overflow: hidden;
-  border-radius: 14px;
-  background: #0f1117;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* optional: same for slot card */
-.media-slot {
-  position: relative;
-}
-
-.media-x:hover {
-  background: rgba(0, 0, 0, 0.75);
-}
-
-.media-x:active {
-  transform: scale(0.96);
-}
-
-/* --- Empty slot (plus box) --- */
-.media-slot {
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  border-radius: 14px;
-
-  background: #121318;
-  border: 2px dashed rgba(255, 255, 255, 0.18);
-
-  display: grid;
-  place-items: center;
-
-  cursor: pointer;
-  transition: 0.15s ease;
-}
-
-.media-slot:hover {
-  border-color: rgba(255, 255, 255, 0.28);
-  background: #151723;
-  transform: translateY(-1px);
-}
-
-.media-slot:active {
-  transform: translateY(0px) scale(0.99);
-}
-
-.media-slot:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* plus sign */
-.media-plus {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-
-  display: grid;
-  place-items: center;
-
-  font-size: 34px;
-  font-weight: 600;
-
-  color: rgba(255, 255, 255, 0.65);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-/* hidden input (if you don't already have a global .hidden) */
-.hidden {
-  display: none;
-}
-
-/* Responsive: 2 columns on small screens */
-@media (max-width: 520px) {
-  .media-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: grid;
+    grid-template-columns: repeat(3, 160px);
+    gap: 14px;
+    max-width: 520px;
   }
-}
+  .media-card,
+  .media-slot {
+    width: 160px;
+    height: 200px;
+    border-radius: 14px;
+  }
+  .media-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #0f1117;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .media-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .media-x {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    border: 0;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .media-x:hover {
+    background: rgba(0, 0, 0, 0.75);
+  }
+  .media-x:active {
+    transform: scale(0.96);
+  }
+  .media-slot {
+    position: relative;
+    background: #121318;
+    border: 2px dashed rgba(255, 255, 255, 0.18);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+  .media-slot:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+    background: #151723;
+    transform: translateY(-1px);
+  }
+  .media-slot:active {
+    transform: translateY(0px) scale(0.99);
+  }
+  .media-slot:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .media-plus {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 34px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  @media (max-width: 520px) {
+    .media-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* ===== Fix GOLD grid to include Line Total column ===== */
   .miniTable__head.miniTable__head--gold,
   .miniTable__row.miniTable__row--gold {
     display: grid;
-    grid-template-columns: 1.2fr 1fr 0.9fr 0.9fr 170px;
+    grid-template-columns: 1.2fr 1fr 0.9fr 0.9fr 0.9fr 170px; /* ✅ added Line Total column */
     gap: 0;
-    align-items: center; /* vertically center like Jewellery table */
+    align-items: center;
   }
-
-  /* ✅ move +Add and Delete to the right corner */
   .miniTable__head.miniTable__head--gold .miniTable__th--actions,
   .miniTable__row.miniTable__row--gold .miniTable__td--actions {
     display: flex;
@@ -1541,25 +1693,7 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     padding-left: 0;
   }
 
-  /* ✅ make buttons consistent + avoid wrapping */
-  .btnAdd,
-  .btnDel {
-    white-space: nowrap;
-    min-width: 92px;
-  }
-
-  /* ✅ keep dropdown above everything */
-  .combo {
-    position: relative;
-  }
-  .dd {
-    z-index: 9999;
-  }
-
-  /* =========================================================
-   ✅ KEEP ALL YOUR EXISTING CSS BELOW (no breaking changes)
-   ========================================================= */
-
+  /* ===== Your existing styles (kept) ===== */
   .pwrap {
     background: #f3f4f6;
     min-height: 100vh;
@@ -1578,7 +1712,6 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     font-weight: 900;
     color: #2563eb;
   }
-
   .ptitle {
     margin: 12px 2px 14px;
   }
@@ -1593,7 +1726,6 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     font-size: 13px;
     color: #6b7280;
   }
-
   .pcard {
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -1601,7 +1733,6 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     padding: 16px;
     margin-top: 12px;
   }
-
   .pgrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1614,13 +1745,11 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
   .pfield--full {
     grid-column: 1/-1;
   }
-
   .plabel {
     font-size: 13px;
     font-weight: 900;
     color: #374151;
   }
-
   .pinput,
   .ptextarea {
     width: 100%;
@@ -1641,6 +1770,11 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
   }
   .ptextarea {
     resize: vertical;
+  }
+  .tinyHint {
+    font-size: 12px;
+    font-weight: 800;
+    color: #475569;
   }
 
   .pselectWrap {
@@ -1768,7 +1902,7 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
   }
   .miniTable__head--wide,
   .miniTable__row--wide {
-    grid-template-columns: 1.4fr 0.6fr 0.7fr 0.7fr 0.9fr 0.9fr 120px;
+    grid-template-columns: 1.4fr 0.6fr 0.7fr 0.7fr 0.9fr 0.9fr 0.9fr 120px; /* ✅ added Original Total */
   }
 
   .miniTable__head {
@@ -1798,7 +1932,6 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     border-bottom: none;
   }
 
-  /* buttons */
   .btnAdd {
     border: none;
     background: #2563eb;
@@ -1867,6 +2000,9 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     color: #374151;
   }
 
+  .combo {
+    position: relative;
+  }
   .combo__btn {
     width: 100%;
     border: 1px solid #d1d5db;
@@ -1902,6 +2038,7 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     background: #fff;
     box-shadow: 0 18px 45px rgba(17, 24, 39, 0.12);
     overflow: hidden;
+    z-index: 9999;
   }
   .dd--up {
     bottom: calc(100% + 8px);
@@ -2019,14 +2156,85 @@ const remainingAfterThisJewelryRow = (rowIndex: number): number => {
     .miniTable__row--wide {
       grid-template-columns: 1fr;
     }
-
-    /* ✅ keep actions on the right even on mobile */
     .miniTable__th--actions,
     .miniTable__td--actions {
       justify-content: flex-end;
     }
-
     .totals {
+      grid-template-columns: 1fr;
+    }
+  }
+  /* ✅ Add this in your <style scoped> */
+
+  .refBox {
+    margin-top: 14px;
+    background: #0f172a;
+    color: #fff;
+    border-radius: 18px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 18px 45px rgba(2, 6, 23, 0.18);
+  }
+  .refBox__title {
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    opacity: 0.95;
+    margin-bottom: 12px;
+  }
+  .refBox__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .refItem {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 12px;
+  }
+  .refItem__label {
+    font-size: 12px;
+    font-weight: 900;
+    opacity: 0.85;
+  }
+  .refItem__value {
+    margin-top: 6px;
+    font-size: 18px;
+    font-weight: 900;
+  }
+  .refItem__sub {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.75;
+    line-height: 1.3;
+  }
+  .refBox__footer {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.18);
+  }
+  .refBox__hint {
+    font-size: 12px;
+    font-weight: 900;
+    opacity: 0.85;
+  }
+  .refBox__final {
+    font-size: 20px;
+    font-weight: 900;
+    background: rgba(245, 158, 11, 0.18);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    padding: 8px 12px;
+    border-radius: 999px;
+  }
+
+  /* responsive */
+  @media (max-width: 980px) {
+    .refBox__grid {
       grid-template-columns: 1fr;
     }
   }

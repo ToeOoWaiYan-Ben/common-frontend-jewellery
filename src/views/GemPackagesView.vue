@@ -588,11 +588,19 @@
     clearErrors()
   }
 
-  function openEdit(row: GemsPackageDto) {
+  async function openEdit(row: GemsPackageDto) {
     showForm.value = true
     editId.value = row.id
-    Object.assign(form, { ...row })
-    sellerQuery.value = row.sellerId ? `${row.sellerId} - ${row.sellerName ?? ''}` : ''
+
+    const full = await store.getById(row.id)
+
+    Object.assign(form, blank())
+    Object.assign(form, {
+      ...full,
+      certificateImages: full.certificateImages ?? [],
+    })
+
+    sellerQuery.value = full.sellerId ? `${full.sellerId} - ${full.sellerName ?? ''}` : ''
     certFiles.value = []
     snapshot.value = JSON.stringify(form)
     clearErrors()
@@ -658,18 +666,28 @@
 
   async function save() {
     clearErrors()
+
+    // ✅ always compute gemsWeight before saving
     form.gemsWeight = packageWeight.value
 
-    if (!form.name.trim()) {
+    // ✅ null-safe validation
+    const name = (form.name ?? '').trim()
+    if (!name) {
       fieldErrors.name = 'Name is required'
       return
     }
+    form.name = name
 
     try {
       let saved: GemsPackageDto
 
       if (isEdit.value) {
-        saved = await store.update(editId.value!, { ...form })
+        // ✅ prevent update with null id
+        if (!editId.value) {
+          formError.value = 'Missing editId. Please close and edit again.'
+          return
+        }
+        saved = await store.update(editId.value, { ...form })
       } else {
         saved = await store.create({ ...form })
         editId.value = saved.id
@@ -680,20 +698,22 @@
         const url = await store.uploadToS3(file)
         await store.addCertificate(saved.id, {
           imageUrl: url,
-          title: certTitle.value.trim() || null,
+          title: (certTitle.value ?? '').trim() || null,
         })
       }
 
       certFiles.value = []
       certTitle.value = ''
 
-      // reload latest so form shows certificateImages
+      // ✅ reload latest so form shows certificateImages
       const latest = await store.getById(saved.id)
-      Object.assign(form, { ...latest })
-      snapshot.value = JSON.stringify(form)
+      Object.assign(form, blank())
+      Object.assign(form, { ...latest, certificateImages: latest.certificateImages ?? [] })
 
+      snapshot.value = JSON.stringify(form)
       await store.loadAll()
     } catch (e: any) {
+      console.error('SAVE ERROR:', e)
       if (applyBackendErrors(e)) return
       formError.value = e?.message ?? 'Failed to save.'
     }

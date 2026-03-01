@@ -44,7 +44,7 @@
     }
   })
   function getPrice(p: ProductDto) {
-    return p.productJewellerys?.[0]?.sellingPrice ?? 0
+    return Number(p.finalPrice ?? 0)
   }
 
   const selectedType = computed(() => {
@@ -144,10 +144,12 @@
   }
 
   function formatPrice(v: number) {
-  return new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 0,
-  }).format(v) + ' MMK'
-}
+    return (
+      new Intl.NumberFormat('en-US', {
+        maximumFractionDigits: 0,
+      }).format(v) + ' MMK'
+    )
+  }
   function openDetail(p: Product) {
     router.push({
       name: 'user-product-detail',
@@ -160,15 +162,30 @@
     // optional for UI
   }
   function getThumb(p: ProductDto) {
-  return p.productImages?.[0]?.imageUrl || 'https://via.placeholder.com/400x400?text=Product'
-}
-function getDesc(p: ProductDto) {
-  return (p.shortDesc && p.shortDesc.trim()) ? p.shortDesc : (p.desc || '')
-}
-function getTotalPrice(p: ProductDto) {
-  // sum of sellingPrice from all jewellery rows
-  return (p.productJewellerys ?? []).reduce((sum, r) => sum + (Number(r.sellingPrice) || 0), 0)
-}
+    return p.productImages?.[0]?.imageUrl || 'https://via.placeholder.com/400x400?text=Product'
+  }
+  function getDesc(p: ProductDto) {
+    return p.shortDesc && p.shortDesc.trim() ? p.shortDesc : p.desc || ''
+  }
+  function getTotalPrice(p: ProductDto) {
+    return (p.productJewellerys ?? []).reduce(
+      (sum: number, r: any) => sum + (Number(r?.sellingPrice) || 0),
+      0
+    )
+  }
+
+  function getFinalPrice(p: ProductDto) {
+    const raw = (p as any).finalPrice ?? (p as any).final_price ?? null
+
+    if (raw != null && Number(raw) > 0) {
+      return Number(raw)
+    }
+
+    return (p.productJewellerys ?? []).reduce(
+      (sum: number, r: any) => sum + (Number(r?.sellingPrice) || 0),
+      0
+    )
+  }
 
   /* ---------- Filtering + Sorting ---------- */
   const filteredProducts = computed(() => {
@@ -189,11 +206,11 @@ function getTotalPrice(p: ProductDto) {
     }
 
     // price
-    if (priceMin.value != null) list = list.filter((p) => getTotalPrice(p) >= priceMin.value!)
-if (priceMax.value != null) list = list.filter((p) => getTotalPrice(p) <= priceMax.value!)
+    if (priceMin.value != null) list = list.filter((p) => getFinalPrice(p) >= priceMin.value!)
+    if (priceMax.value != null) list = list.filter((p) => getFinalPrice(p) <= priceMax.value!)
 
-if (sortBy.value === 'priceLow') list.sort((a, b) => getTotalPrice(a) - getTotalPrice(b))
-if (sortBy.value === 'priceHigh') list.sort((a, b) => getTotalPrice(b) - getTotalPrice(a))
+    if (sortBy.value === 'priceLow') list.sort((a, b) => getFinalPrice(a) - getFinalPrice(b))
+    if (sortBy.value === 'priceHigh') list.sort((a, b) => getFinalPrice(b) - getFinalPrice(a))
     // (new/relevance demo: keep original order)
     return list
   })
@@ -278,19 +295,19 @@ if (sortBy.value === 'priceHigh') list.sort((a, b) => getTotalPrice(b) - getTota
             </button>
 
             <div class="sw-img" role="button" tabindex="0" @click="openDetail(p)">
-  <img :src="getThumb(p)" :alt="p.name" />
-</div>
+              <img :src="getThumb(p)" :alt="p.name" />
+            </div>
 
-<div class="sw-info">
-  <h3 class="sw-title" @click="openDetail(p)">{{ p.name }}</h3>
+            <div class="sw-info">
+              <h3 class="sw-title" @click="openDetail(p)">{{ p.name }}</h3>
 
-  <p class="sw-sub">
-    {{ getDesc(p) }}
-  </p>
+              <p class="sw-sub">
+                {{ getDesc(p) }}
+              </p>
 
-  <div class="sw-price">
-    {{ formatPrice(getTotalPrice(p)) }}
-  </div>
+              <div class="sw-price">
+                {{ formatPrice(getPrice(p)) }}
+              </div>
             </div>
           </article>
         </div>
@@ -522,15 +539,15 @@ if (sortBy.value === 'priceHigh') list.sort((a, b) => getTotalPrice(b) - getTota
 </template>
 
 <style scoped src="@/styles/user/catalog.css">
-.sw-sub{
-  margin: 6px 0 10px;
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.35;
+  .sw-sub {
+    margin: 6px 0 10px;
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.35;
 
-  display: -webkit-box;
-  -webkit-line-clamp: 2;       /* show 2 lines only */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* show 2 lines only */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 </style>
