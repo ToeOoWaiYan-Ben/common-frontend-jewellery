@@ -1583,7 +1583,7 @@
       alert(e?.message ?? 'Failed to save product.')
     }
   }
-</script> 
+</script>
 
 <style scoped>
   /* ===== Product Images Grid ===== */

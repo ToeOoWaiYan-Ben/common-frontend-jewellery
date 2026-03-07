@@ -55,8 +55,6 @@
           />
         </div>
 
-        
-
         <!-- Start Date -->
         <div class="category-form__row">
           <label class="category-form__label" for="startDate">Start Date *</label>
@@ -154,10 +152,10 @@
       <td>{{ item.name }}</td>
       <td>{{ formatPercent(item.discountRate) }}</td>
       <td>
-  <span :class="['status-badge', item.status === 'ACTIVE' ? 'active' : 'inactive']">
-    {{ item.status }}
-  </span>
-</td>
+        <span :class="['status-badge', item.status === 'ACTIVE' ? 'active' : 'inactive']">
+          {{ item.status }}
+        </span>
+      </td>
       <td>{{ item.startDate }}</td>
       <td>{{ item.endDate }}</td>
       <td>{{ item.description ?? '-' }}</td>
@@ -243,15 +241,15 @@
   const isSubmitting = ref(false)
   const formError = ref<string | null>(null)
 
-    const blank = () => ({
-  name: '',
-  discountRate: 0,
-  description: null,
-  startDate: '',
-  endDate: '',
-})
+  const blank = () => ({
+    name: '',
+    discountRate: 0,
+    description: null,
+    startDate: '',
+    endDate: '',
+  })
 
-const form = reactive(blank())
+  const form = reactive(blank())
 
   const resetForm = () => {
     Object.assign(form, blank())
@@ -286,7 +284,6 @@ const form = reactive(blank())
       description: p.description ?? null,
       startDate: p.startDate ?? '',
       endDate: p.endDate ?? '',
-     
     })
 
     formError.value = null
@@ -371,19 +368,20 @@ const form = reactive(blank())
 <style scoped src="@/styles/admin/admin-table.css"></style>
 <style scoped src="@/styles/admin/admin-form.css"></style>
 <style>
-.status-badge {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-}
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
 
-.status-badge.active {
-  background: #dcfce7;
-  color: #166534;
-}
+  .status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+  }
 
-.status-badge.inactive {
-  background: #fee2e2;
-  color: #991b1b;
-}</style>
+  .status-badge.inactive {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+</style>

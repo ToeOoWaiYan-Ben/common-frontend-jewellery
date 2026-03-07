@@ -1,4 +1,10 @@
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'BACKORDERED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+export type OrderStatus =
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'BACKORDERED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED'
 export type OrderItemType = 'PRODUCT' | 'CUSTOM'
 
 export interface OrderGoldDto {

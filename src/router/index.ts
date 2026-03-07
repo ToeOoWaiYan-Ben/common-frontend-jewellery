@@ -10,7 +10,8 @@ import { useAuthStore } from '../stores/useAuthStore'
 /* -------- Admin Views -------- */
 import HomeView from '../views/HomeView.vue'
 import UsersView from '../views/UsersView.vue'
-import OrdersView from '../views/OrderCreateView.vue'
+import OrdersView from '../views/OrdersView.vue'
+import OrderCreateView from '../views/OrderCreateView.vue'
 import ProductListView from '../views/ProductListView.vue'
 import ProductRegisterView from '../views/ProductRegisterView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
@@ -30,7 +31,6 @@ import PromotionsView from '../views/PromotionsView.vue'
 import PurchaseView from '../views/PurchaseView.vue'
 import PurchaseListView from '../views/PurchaseListView.vue'
 import VendorView from '../views/VendorView.vue'
-
 
 import ImageUploadView from '../views/AdminImagesView.vue'
 /* -------- User Storefront -------- */
@@ -91,13 +91,11 @@ const routes: RouteRecordRaw[] = [
         component: ProductRegisterView,
         props: true,
       },
+      { path: 'orders', name: 'orders', component: OrdersView },
+      { path: 'orders/create', name: 'order-create', component: OrderCreateView },
 
       { path: 'purchase', name: 'purchase', component: PurchaseView },
-      {
-        path: '/purchase-list',
-        name: 'purchase-list',
-        component: PurchaseListView,
-      },
+      { path: 'purchase/list', name: 'purchase-list', component: PurchaseListView },
 
       { path: 'categories', name: 'categories', component: CategoriesView },
       { path: 'crafts', name: 'crafts', component: CraftsView },

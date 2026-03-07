@@ -178,56 +178,49 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useRouter } from 'vue-router'
 
   import { useProductsStore } from '@/stores/useProductsStore'
-  import { useGoldPriceHistoryStore } from '@/stores/useGoldPriceHistoryStore'
   import { useCustomersStore } from '@/stores/useCustomersStore'
   import { useInvoicesStore } from '@/stores/useInvoicesStore'
 
-  import type { GoldPurity } from '@/dtos/GoldPriceHistoryDto'
   import type { CustomerDto } from '@/dtos/CustomerDto'
   import type { PurchaseSaveRequestDto } from '@/dtos/InvoiceDto'
-  import { finalPrice } from '@/utils/productPricing'
 
   const router = useRouter()
 
-  // stores
+  // STORES
   const productsStore = useProductsStore()
-  const { items: products } = storeToRefs(productsStore)
-
-  const goldPriceStore = useGoldPriceHistoryStore()
-  const { items: goldPrices } = storeToRefs(goldPriceStore)
-
   const customersStore = useCustomersStore()
-  const { items: customers } = storeToRefs(customersStore)
-
   const invoicesStore = useInvoicesStore()
 
-  // UI state
+  const { items: products } = storeToRefs(productsStore)
+  const { items: customers } = storeToRefs(customersStore)
+
+  // UI STATE
   const submitting = ref(false)
   const submitError = ref<string | null>(null)
 
   const discount = ref(0)
 
-  // product dropdown
-  const productSearch = ref('')
-  const showProductDropdown = ref(false)
   const selectedProducts = ref<any[]>([])
-  const productBox = ref<HTMLElement | null>(null)
-
-  // customer dropdown
-  const customerSearch = ref('')
-  const showCustomerDropdown = ref(false)
   const selectedCustomer = ref<CustomerDto | null>(null)
+
+  // SEARCH
+  const productSearch = ref('')
+  const customerSearch = ref('')
+
+  const showProductDropdown = ref(false)
+  const showCustomerDropdown = ref(false)
+
+  const productBox = ref<HTMLElement | null>(null)
   const customerBox = ref<HTMLElement | null>(null)
 
   onMounted(async () => {
-    if (!products.value.length) await productsStore.loadProducts()
-    if (!goldPrices.value.length) await goldPriceStore.loadAll()
-    if (!customers.value.length) await customersStore.loadCustomers()
+    await Promise.all([productsStore.loadProducts(), customersStore.loadCustomers()])
+
     document.addEventListener('click', handleClickOutside)
   })
 
@@ -241,29 +234,18 @@
     if (customerBox.value && !customerBox.value.contains(t)) showCustomerDropdown.value = false
   }
 
-  // gold price map
-  const sellPriceByPurity = computed<Record<GoldPurity, number>>(() => {
-    const map: Record<GoldPurity, number> = { K24: 0, K22: 0, K18: 0, K14: 0 }
-    for (const r of goldPrices.value) {
-      if (r.status === 'ACTIVE') map[r.purity] = Number(r.sellPrice ?? 0)
-    }
-    return map
-  })
+  // ----------------------
+  // CUSTOMER
+  // ----------------------
 
-  // customers
   const filteredCustomers = computed(() => {
-    const term = customerSearch.value.trim().toLowerCase()
+    const term = customerSearch.value.toLowerCase()
     if (!term) return customers.value
-    return customers.value.filter((c: any) => {
-      return (
-        String(c.name ?? '')
-          .toLowerCase()
-          .includes(term) ||
-        String(c.phone ?? '')
-          .toLowerCase()
-          .includes(term)
-      )
-    })
+
+    return customers.value.filter(
+      (c: any) =>
+        (c.name ?? '').toLowerCase().includes(term) || (c.phone ?? '').toLowerCase().includes(term)
+    )
   })
 
   const selectCustomer = (c: CustomerDto) => {
@@ -275,29 +257,31 @@
   const clearCustomer = () => {
     selectedCustomer.value = null
     customerSearch.value = ''
-    showCustomerDropdown.value = false
   }
 
-  // products
+  // ----------------------
+  // PRODUCTS
+  // ----------------------
+
   const filteredProducts = computed(() => {
-    const term = productSearch.value.trim().toLowerCase()
+    const term = productSearch.value.toLowerCase()
     if (!term) return products.value
-    return products.value.filter((p: any) => {
-      return (
-        String(p.name ?? '')
-          .toLowerCase()
-          .includes(term) ||
-        String(p.code ?? '')
-          .toLowerCase()
-          .includes(term)
-      )
-    })
+
+    return products.value.filter(
+      (p: any) =>
+        (p.name ?? '').toLowerCase().includes(term) || (p.code ?? '').toLowerCase().includes(term)
+    )
   })
 
   const selectProduct = (product: any) => {
     const exists = selectedProducts.value.find((p) => p.id === product.id)
     if (exists) return
-    selectedProducts.value.push({ ...product, purchase_qty: 1 })
+
+    selectedProducts.value.push({
+      ...product,
+      purchase_qty: 1,
+    })
+
     productSearch.value = ''
     showProductDropdown.value = false
   }
@@ -306,15 +290,16 @@
     selectedProducts.value.splice(index, 1)
   }
 
-  // pricing
-  const unitPrice = (item: any) => Number(item.finalPrice ?? 0)
+  // ----------------------
+  // PRICING
+  // ----------------------
 
   const calculateItemTotal = (item: any) => {
     const qty = Number(item.purchase_qty ?? 1)
-    return unitPrice(item) * qty
+    const price = Number(item.finalPrice ?? 0)
+    return qty * price
   }
 
-  // totals
   const subtotal = computed(() =>
     selectedProducts.value.reduce((sum, item) => sum + calculateItemTotal(item), 0)
   )
@@ -324,19 +309,30 @@
     const percent = Number(discount.value ?? 0)
 
     const discountAmount = sub * (percent / 100)
-
     const total = sub - discountAmount
 
     return total < 0 ? 0 : total
   })
 
-  // validation
+  // ----------------------
+  // VALIDATION (FIXED)
+  // ----------------------
+
   const canCompletePurchase = computed(() => {
-    return selectedCustomer.value != null && selectedProducts.value.length > 0
+    if (submitting.value) return false
+    if (!selectedCustomer.value) return false
+    if (!selectedProducts.value.length) return false
+
+    return selectedProducts.value.every((p) => Number(p.purchase_qty) > 0)
   })
 
-  // submit
+  // ----------------------
+  // SUBMIT (FIXED)
+  // ----------------------
+
   const onCompletePurchase = async () => {
+    console.log('CLICKED')
+
     if (!canCompletePurchase.value) return
 
     submitting.value = true
@@ -346,8 +342,8 @@
       const payload: PurchaseSaveRequestDto = {
         customerId: Number(selectedCustomer.value!.id),
         status: 'CONFIRMED',
-        discountAmount: subtotal.value * (Number(discount.value ?? 0) / 100),
-        discountPercentage: null,
+        discountAmount: null,
+        discountPercentage: Number(discount.value ?? 0),
         items: selectedProducts.value.map((p) => ({
           productId: Number(p.id),
           qty: Number(p.purchase_qty ?? 1),
@@ -357,13 +353,12 @@
 
       await invoicesStore.createInvoice(payload)
 
-      // ✅ reset UI (optional but nice)
+      // reset
       selectedProducts.value = []
-      clearCustomer()
+      selectedCustomer.value = null
       discount.value = 0
 
-      // ✅ go list
-      router.push('/purchase-list')
+      router.push('/admin/purchase/list')
     } catch (e: any) {
       submitError.value = e?.message ?? 'Failed to complete purchase.'
     } finally {
@@ -371,15 +366,19 @@
     }
   }
 
-  const goToList = () => router.push('/purchase-list')
+  const goToList = () => router.push('/admin/purchase/list')
 
-  // helpers
+  // ----------------------
+  // HELPERS
+  // ----------------------
+
   function formatMoney(v?: number | null) {
     const n = Number(v ?? 0)
     return (
-      new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(
-        n
-      ) + ' MMK'
+      new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(n) + ' MMK'
     )
   }
 </script>
