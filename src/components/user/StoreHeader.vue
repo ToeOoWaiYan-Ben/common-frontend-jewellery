@@ -1,26 +1,11 @@
 <template>
   <header class="mh-header">
     <!-- Top black bar -->
-    <div class="mh-topbar">
-      <div class="mh-topbar__left">
-        <span class="mh-topbar__item">Stores</span>
-      </div>
 
-      <div class="mh-topbar__center">
-        <span class="mh-topbar__item">Free standard shipping over 3,670 ฿</span>
-      </div>
-
-      <div class="mh-topbar__right">
-        <button class="mh-topbar__btn" type="button">Club</button>
-        <button class="mh-topbar__btn" type="button">Login</button>
-        <button class="mh-icon-btn" type="button" aria-label="Search">🔍</button>
-        <button class="mh-icon-btn" type="button" aria-label="Bag">👜</button>
-      </div>
-    </div>
-
+    
     <!-- Brand -->
     <div class="mh-brand">
-      <div class="mh-brand__logo">MYIT THAR OO</div>
+      <div class="mh-brand__logo">MYIT TAR OO</div>
     </div>
 
     <!-- Nav -->
@@ -65,18 +50,13 @@
 
             <!-- promo stays the same -->
             <div class="mh-mega__promo">
-              <div>
-                <div class="mh-mega__promoTitle">Sale</div>
-                <div class="mh-mega__promoSub">Up to 40% off select styles*</div>
-              </div>
-              <div class="mh-mega__promoImg"></div>
+              
             </div>
           </template>
         </div>
       </div>
 
       <button class="mh-nav__icon" type="button" aria-label="Search">🔍</button>
-      <button class="mh-nav__icon" type="button" aria-label="Bag">👜</button>
     </nav>
   </header>
 </template>
@@ -88,6 +68,7 @@
   const router = useRouter()
   const open = ref(false)
   const dropdownRef = ref<HTMLElement | null>(null)
+    
 
   const typesStore = useUserJewelryTypesStore()
 

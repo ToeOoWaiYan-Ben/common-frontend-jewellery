@@ -31,7 +31,7 @@ const selectedType = computed(() => {
 
 const heroTitle = computed(() => selectedType.value?.name ?? 'Jewelry Collection')
 const heroDesc = computed(() => selectedType.value?.description ?? 'The perfect choice for an elegant outfit.')
-const heroImageUrl = computed(() => selectedType.value?.imageUrl ?? '/default-hero.jpg')
+const heroImageUrl = computed(() => selectedType.value?.imageUrl ?? '/default-hero1.jpg')
 
 /* ---------------- Drawer ---------------- */
 const drawerOpen = ref(false)
@@ -221,7 +221,7 @@ async function loadProducts() {
   if (selectedTypeId.value != null) {
     await productsStore.loadByTypeId(selectedTypeId.value)
   } else {
-    productsStore.items = []
+    await productsStore.loadProducts()
   }
 }
 
@@ -279,7 +279,7 @@ watch(selectedTypeId, loadProducts)
 
         <div v-else class="grid sw-grid">
           <article v-for="p in pagedProducts" :key="(p as any).id" class="sw-card">
-            <button class="sw-heart" type="button" aria-label="Add to wishlist">♡</button>
+            
 
             <div class="sw-img" role="button" tabindex="0" @click="openDetail(p)">
               <img :src="getThumb(p)" :alt="(p as any).name" />
@@ -370,27 +370,8 @@ watch(selectedTypeId, loadProducts)
 
         <div class="sw-sep2"></div>
 
-        <!-- Color -->
-        <button class="sw-accHead" type="button" @click="acc.color = !acc.color">
-          <span>Color</span>
-          <span class="sw-accChevron" :class="{ open: acc.color }">⌄</span>
-        </button>
-
-        <div v-if="acc.color" class="sw-accBody">
-          <button
-            v-for="c in colors"
-            :key="c.name"
-            class="sw-colorRow"
-            type="button"
-            @click="toggleColor(c.name)"
-          >
-            <span class="sw-colorBox" :style="{ background: c.hex }"></span>
-            <span class="sw-colorName">{{ c.name }}</span>
-            <span class="sw-colorTick">{{ selectedColors.includes(c.name) ? '✓' : '' }}</span>
-          </button>
-        </div>
-
-        <div class="sw-sep2"></div>
+        
+        
 
         <!-- Collection -->
         <button class="sw-accHead" type="button" @click="acc.collection = !acc.collection">
@@ -488,20 +469,92 @@ watch(selectedTypeId, loadProducts)
       </div>
     </aside>
   </div>
+  <footer class="mf-footer">
+    <div class="mf-footer__content">
+
+      <h2 class="mf-footer__title">MYITTAR OO</h2>
+
+      <div class="mf-footer__subtitle">
+        Diamonds and Fine Jewellery
+      </div>
+
+      <p class="mf-footer__text">
+        Address: No.23, 29th Street (Lower Block), Pabedan Township, Yangon.
+      </p>
+
+      <p class="mf-footer__text">
+        Ph: 09785166189, 095166189
+      </p>
+
+      <div class="mf-footer__social">
+        <a
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Facebook
+        </a>
+      </div>
+
+    </div>
+
+    <div class="mf-footer__bottom">
+      © 2026 MYITTAR OO Diamonds and Fine Jewellery
+    </div>
+  </footer>
 </template>
 
 <style scoped src="@/styles/user/catalog.css"></style>
 
 <style scoped>
-.sw-sub {
-  margin: 6px 0 10px;
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.35;
+.mf-footer {
+  margin-top: 80px;
+  padding: 60px 20px 20px;
+  background: #fafafa;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+}
 
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.mf-footer__content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mf-footer__title {
+  font-size: 32px;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.mf-footer__subtitle {
+  font-size: 16px;
+  color: #8c8c8c;
+  letter-spacing: 0.12em;
+  margin-bottom: 20px;
+}
+
+.mf-footer__text {
+  font-size: 15px;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.mf-footer__social {
+  margin-top: 18px;
+}
+
+.mf-footer__social a {
+  text-decoration: none;
+  color: #b8924f;
+  font-weight: 500;
+}
+
+.mf-footer__bottom {
+  margin-top: 35px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #777;
 }
 </style>

@@ -269,7 +269,7 @@
         <div class="miniTable__head miniTable__head--gold">
           <div class="miniTable__th">Gold Source *</div>
           <div class="miniTable__th">Craft *</div>
-          <div class="miniTable__th">Weight Used (kyat/g) *</div>
+          <div class="miniTable__th">Weight Used (kyat) *</div>
           <div class="miniTable__th">Current Price (MMK) *</div>
           <div class="miniTable__th">Line Total</div>
           <div class="miniTable__th miniTable__th--actions">

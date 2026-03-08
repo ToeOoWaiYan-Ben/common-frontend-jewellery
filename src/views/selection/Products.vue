@@ -29,10 +29,7 @@
         <p>Manage crafts</p>
       </RouterLink>
 
-      <RouterLink to="/admin/product-tags" class="card">
-        <h3>Product Tags</h3>
-        <p>Manage product tags</p>
-      </RouterLink>
+     
     </div>
   </div>
 </template>
