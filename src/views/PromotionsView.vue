@@ -181,6 +181,7 @@
   import TablePage from '../components/TablePage.vue'
   import { usePromotionsStore } from '../stores/usePromotionsStore'
   import type { PromotionDto } from '../dtos/PromotionDto'
+  
 
   const promotionsStore = usePromotionsStore()
   const { items: promotions, loading, error } = storeToRefs(promotionsStore)

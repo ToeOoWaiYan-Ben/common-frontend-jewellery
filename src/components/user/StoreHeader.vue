@@ -56,7 +56,7 @@
         </div>
       </div>
 
-      <button class="mh-nav__icon" type="button" aria-label="Search">🔍</button>
+      
     </nav>
   </header>
 </template>

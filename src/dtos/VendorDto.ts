@@ -1,15 +1,16 @@
-export interface VendorDto {
-  id: number
+import type { VendorItemDto } from './VendorItemDto'
 
-  buybackBasePrice: number | null
-  deductionRate: number | null
-  deductionAmount: number | null
+export interface VendorDto {
+  id?: number
+
+  invoiceId: number
+  customerId: number
+  invoiceNo?: string | null
 
   desc: string
+  buybackDate: string | null // YYYY-MM-DD
 
-  buybackPrice: number | null
-  buybackDate: string | null // "YYYY-MM-DD"
+  totalBuybackPrice: number | null
 
-  customerId: number
-  goldPriceId: number
+  items: VendorItemDto[]
 }
