@@ -7,7 +7,6 @@
         <p class="users-meta">Create and manage gem types (one-to-many with packages).</p>
       </div>
 
-      <RouterLink to="/" class="users-search__back-link"> ← Back </RouterLink>
     </div>
 
     <!-- Form card -->
