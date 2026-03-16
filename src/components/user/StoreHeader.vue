@@ -18,7 +18,7 @@
           :aria-expanded="open"
           @click.stop="open = !open"
         >
-          Home
+          Jewelry Types
         </button>
 
         <div v-if="open" class="mh-mega" @click.stop>
