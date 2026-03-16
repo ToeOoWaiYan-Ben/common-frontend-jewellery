@@ -18,10 +18,11 @@
         <h3>Gem Types</h3>
         <p>Manage gem types</p>
       </RouterLink>
+      
 
       <RouterLink to="/admin/jewelry-types" class="card">
-        <h3>Materials</h3>
-        <p>Manage materials</p>
+        <h3>Jewelry Types</h3>
+        <p>Manage jewelry types</p>
       </RouterLink>
 
       <RouterLink to="/admin/crafts" class="card">
