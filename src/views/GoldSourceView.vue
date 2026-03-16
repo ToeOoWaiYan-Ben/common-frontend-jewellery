@@ -39,12 +39,12 @@
             <label class="gs-label" for="goldPurity">Gold Purity *</label>
 
             <select id="goldPurity" v-model="formGoldPurity" class="gs-input" required>
-              <option value="K24">24K</option>
-              <option value="K22">22K</option>
-              <option value="K18">18K</option>
-              <option value="K22">16K</option>
-              <option value="K14">14K</option>
-              <option value="K22">13K</option>
+              <option value="K24">K24</option>
+              <option value="K22">K22</option>
+              <option value="K18">K18</option>
+              <option value="K22">K16</option>
+              <option value="K14">K14</option>
+              <option value="K12">K12</option>
             </select>
           </div>
           <div class="gs-field">
