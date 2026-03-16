@@ -2,7 +2,6 @@
   <header class="mh-header">
     <!-- Top black bar -->
 
-    
     <!-- Brand -->
     <div class="mh-brand">
       <div class="mh-brand__logo">MYIT TAR OO</div>
@@ -49,14 +48,10 @@
             </div>
 
             <!-- promo stays the same -->
-            <div class="mh-mega__promo">
-              
-            </div>
+            <div class="mh-mega__promo"></div>
           </template>
         </div>
       </div>
-
-      
     </nav>
   </header>
 </template>
@@ -68,7 +63,6 @@
   const router = useRouter()
   const open = ref(false)
   const dropdownRef = ref<HTMLElement | null>(null)
-    
 
   const typesStore = useUserJewelryTypesStore()
 

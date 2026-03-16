@@ -86,14 +86,14 @@ export const useVendorsStore = defineStore('vendors', {
     async createVendor(payload: Omit<VendorDto, 'id'>) {
       this.loading = true
       this.error = null
-    
+
       try {
         const created = await http<VendorDto>('/vendors', {
           method: 'POST',
           body: JSON.stringify(payload),
         })
-    
-        await this.loadVendors()   // ✅ reload fresh data from backend
+
+        await this.loadVendors() // ✅ reload fresh data from backend
         return created
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while creating vendor.'
@@ -106,14 +106,14 @@ export const useVendorsStore = defineStore('vendors', {
     async updateVendor(id: number, payload: Omit<VendorDto, 'id'>) {
       this.loading = true
       this.error = null
-    
+
       try {
         const updated = await http<VendorDto>(`/vendors/${id}`, {
           method: 'PUT',
           body: JSON.stringify(payload),
         })
-    
-        await this.loadVendors()   // ✅ reload fresh data
+
+        await this.loadVendors() // ✅ reload fresh data
         return updated
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while updating vendor.'
@@ -126,13 +126,13 @@ export const useVendorsStore = defineStore('vendors', {
     async deleteVendor(id: number) {
       this.loading = true
       this.error = null
-    
+
       try {
         await http<void>(`/vendors/${id}`, {
           method: 'DELETE',
         })
-    
-        await this.loadVendors()   // ✅ reload fresh data
+
+        await this.loadVendors() // ✅ reload fresh data
       } catch (e: any) {
         this.error = e?.message ?? 'Something went wrong while deleting vendor.'
         throw e

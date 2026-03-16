@@ -187,13 +187,9 @@
 
           <div class="pd-priceRow">
             <div class="pd-price">{{ formatPrice(getPrice(product)) }}</div>
-            
           </div>
 
-          <div class="pd-actions">
-            
-            
-          </div>
+          <div class="pd-actions"></div>
           <div class="pd-tabs">
             <button
               class="pd-tab"

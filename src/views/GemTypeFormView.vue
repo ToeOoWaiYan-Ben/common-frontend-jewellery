@@ -6,7 +6,6 @@
         <h2 class="page-title">Gem Type Form</h2>
         <p class="users-meta">Create and manage gem types (one-to-many with packages).</p>
       </div>
-
     </div>
 
     <!-- Form card -->

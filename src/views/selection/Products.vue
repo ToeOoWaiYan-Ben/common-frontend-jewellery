@@ -18,7 +18,6 @@
         <h3>Gem Types</h3>
         <p>Manage gem types</p>
       </RouterLink>
-      
 
       <RouterLink to="/admin/jewelry-types" class="card">
         <h3>Jewelry Types</h3>
@@ -29,8 +28,6 @@
         <h3>Crafts</h3>
         <p>Manage crafts</p>
       </RouterLink>
-
-     
     </div>
   </div>
 </template>
