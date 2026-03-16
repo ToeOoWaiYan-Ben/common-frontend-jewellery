@@ -243,8 +243,8 @@ watch(selectedTypeId, loadProducts)
 
       <div class="sw-hero__content">
         <div class="sw-crumbs">
-          <span>Home</span>
-          <span class="sw-sep">/</span>
+          <router-link to="/user/catalog" class="breadcrumb-link">Home</router-link>
+<span class="sw-sep">/</span>
           <span>Jewelry</span>
           <span class="sw-sep">/</span>
           <span class="sw-crumb--active">{{ heroTitle }}</span>
