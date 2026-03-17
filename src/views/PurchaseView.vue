@@ -429,41 +429,41 @@
   // ----------------------
 
   const onCompletePurchase = async () => {
-    if (!canCompletePurchase.value) return
+  if (!canCompletePurchase.value) return
 
-    submitting.value = true
-    submitError.value = null
+  submitting.value = true
+  submitError.value = null
 
-    try {
-      const payload: PurchaseSaveRequestDto = {
-        customerId: Number(selectedCustomer.value!.id),
-        status: 'CONFIRMED',
-        promotionId: selectedPromotion.value ? Number(selectedPromotion.value.id) : null,
-        discountAmount: null,
-        discountPercentage: Number(discount.value ?? 0),
-        items: selectedProducts.value.map((p) => ({
-          productId: Number(p.id),
-          qty: Number(p.purchase_qty ?? 1),
-          sellingPrice: Number(getPromotionAdjustedPrice(p)),
-        })),
-      }
-
-      await invoicesStore.createInvoice(payload)
-
-      selectedProducts.value = []
-      selectedCustomer.value = null
-      selectedPromotionId.value = null
-      customerSearch.value = ''
-      productSearch.value = ''
-      discount.value = 0
-
-      router.push('/admin/purchase/list')
-    } catch (e: any) {
-      submitError.value = e?.message ?? 'Failed to complete purchase.'
-    } finally {
-      submitting.value = false
+  try {
+    const payload: PurchaseSaveRequestDto = {
+      customerId: Number(selectedCustomer.value!.id),
+      status: 'CONFIRMED',
+      promotionId: selectedPromotion.value ? Number(selectedPromotion.value.id) : null,
+      discountAmount: null,
+      discountPercentage: Number(discount.value ?? 0),
+      items: selectedProducts.value.map((p) => ({
+        productId: Number(p.id),
+        qty: Number(p.purchase_qty ?? 1),
+        sellingPrice: Number(getPromotionAdjustedPrice(p)),
+      })),
     }
+
+    await invoicesStore.createInvoice(payload)
+
+    selectedProducts.value = []
+    selectedCustomer.value = null
+    selectedPromotionId.value = null
+    customerSearch.value = ''
+    productSearch.value = ''
+    discount.value = 0
+
+    router.push('/admin/invoices')
+  } catch (e: any) {
+    submitError.value = e?.message ?? 'Failed to complete purchase.'
+  } finally {
+    submitting.value = false
   }
+}
 
   const goToList = () => router.push('/admin/purchase/list')
 
