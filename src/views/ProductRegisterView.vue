@@ -108,7 +108,6 @@
           />
 
           <!-- ✅ REF PRICE DISPLAY -->
-          
         </div>
 
         <div class="pfield">
@@ -644,7 +643,6 @@
       <div class="refItem">
         <div class="refItem__label">Making Cost</div>
         <div class="refItem__value">{{ formatMoney(makingCostRef) }}</div>
-        
       </div>
 
       <div class="refItem">
@@ -1259,9 +1257,9 @@
   }
 
   const removeGoldRow = (idx: number) => {
-  product.goldRows.splice(idx, 1)
-  validateGoldRows()
-}
+    product.goldRows.splice(idx, 1)
+    validateGoldRows()
+  }
 
   const validateGoldRows = () => {
     goldError.value = null
@@ -1365,9 +1363,9 @@
   }
 
   const removeJewelryRow = (idx: number) => {
-  product.jewelryRows.splice(idx, 1)
-  validateJewelryRows()
-}
+    product.jewelryRows.splice(idx, 1)
+    validateJewelryRows()
+  }
 
   const validateJewelryRows = () => {
     jewelryError.value = null

@@ -4,12 +4,12 @@
       <ul class="side-nav__list">
         <li class="side-nav__item">
           <RouterLink
-  to="/admin"
-  class="side-nav__link"
-  exact-active-class="side-nav__link--active"
->
-  Dashboard
-</RouterLink>
+            to="/admin"
+            class="side-nav__link"
+            exact-active-class="side-nav__link--active"
+          >
+            Dashboard
+          </RouterLink>
         </li>
 
         <li class="side-nav__item">

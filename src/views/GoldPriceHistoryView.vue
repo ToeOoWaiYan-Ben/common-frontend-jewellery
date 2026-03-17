@@ -156,7 +156,14 @@
       <td>{{ item.purity }}</td>
       <td>{{ formatMMK(item.buyPrice) }}</td>
       <td>{{ formatMMK(item.sellPrice) }}</td>
-      <td>{{ item.status }}</td>
+      <td>
+        <span
+          class="status-badge"
+          :class="item.status === 'ACTIVE' ? 'status-badge--active' : 'status-badge--inactive'"
+        >
+          {{ item.status }}
+        </span>
+      </td>
       <td>
         <div style="display: flex; gap: 0.25rem">
           <button class="btn-secondary" type="button" @click="onClickEdit(item)">Edit</button>
@@ -347,6 +354,42 @@
     )
   }
 </script>
+<style scoped>
+.status-select {
+  font-weight: 700;
+}
 
+.status-select--active {
+  color: #15803d;
+  border-color: #86efac;
+  background-color: #f0fdf4;
+}
+
+.status-select--inactive {
+  color: #b91c1c;
+  border-color: #fca5a5;
+  background-color: #fef2f2;
+}
+
+.status-badge {
+  display: inline-block;
+  min-width: 90px;
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.status-badge--active {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.status-badge--inactive {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+</style>
 <style scoped src="@/styles/admin/admin-table.css"></style>
 <style scoped src="@/styles/admin/admin-form.css"></style>
