@@ -11,6 +11,7 @@
   const router = useRouter()
 
   /* ---------------- Stores ---------------- */
+  
   const productsStore = useProductsStore()
   const typesStore = useUserJewelryTypesStore()
 

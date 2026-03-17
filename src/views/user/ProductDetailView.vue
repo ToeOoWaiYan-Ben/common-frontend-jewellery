@@ -6,6 +6,8 @@
   import type { ProductImageDto } from '@/dtos/ProductImageDto'
 
   import type { ProductDto } from '@/types/ProductDto'
+  import { useProductsStore } from '@/stores/useProductsStore'
+  const productsStore = useProductsStore()
   /* -------- API state -------- */
   const loading = ref(false)
   const error = ref('')
@@ -54,19 +56,19 @@
   const category = computed(() => (route.query.category as string) || 'Jewelry')
   const productId = computed(() => Number(route.params.id))
   async function fetchProduct() {
-    loading.value = true
-    error.value = ''
-    product.value = null
+  loading.value = true
+  error.value = ''
+  product.value = null
 
-    try {
-      const { data } = await axios.get(`https://jewellery-backend-50fcb77db821.herokuapp.com/${productId.value}`)
-      product.value = data
-    } catch (e: any) {
-      error.value = e?.response?.data?.message ?? e?.message ?? 'Failed to load product.'
-    } finally {
-      loading.value = false
-    }
+  try {
+    const data = await productsStore.getProductById(productId.value)
+    product.value = data
+  } catch (e: any) {
+    error.value = e?.message ?? 'Failed to load product.'
+  } finally {
+    loading.value = false
   }
+}
   onMounted(fetchProduct)
   watch(productId, fetchProduct)
   const galleryTop3 = computed(() => {
