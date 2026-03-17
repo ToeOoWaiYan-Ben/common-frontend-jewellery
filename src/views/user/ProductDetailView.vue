@@ -59,7 +59,7 @@
     product.value = null
 
     try {
-      const { data } = await axios.get(`http://localhost:8080/api/products/${productId.value}`)
+      const { data } = await axios.get(`https://jewellery-backend-50fcb77db821.herokuapp.com/${productId.value}`)
       product.value = data
     } catch (e: any) {
       error.value = e?.response?.data?.message ?? e?.message ?? 'Failed to load product.'
