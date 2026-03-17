@@ -108,13 +108,7 @@
           />
 
           <!-- ✅ REF PRICE DISPLAY -->
-          <div class="tinyHint">
-            Ref Final/Unit: <strong>{{ formatMoney(finalUnitPriceRef) }}</strong>
-            <span style="opacity: 0.8">
-              (Gold {{ formatMoney(goldCostRef) }} + Making {{ formatMoney(makingCostRef) }} → Dep
-              {{ depLabel }})
-            </span>
-          </div>
+          
         </div>
 
         <div class="pfield">
@@ -648,12 +642,9 @@
 
     <div class="refBox__grid">
       <div class="refItem">
-        <div class="refItem__label">Ref Final/Unit</div>
-        <div class="refItem__value">{{ formatMoney(finalUnitPriceRef) }}</div>
-        <div class="refItem__sub">
-          (Gold {{ formatMoney(goldCostRef) }} + Making {{ formatMoney(makingCostRef) }} → Dep
-          {{ depLabel }})
-        </div>
+        <div class="refItem__label">Making Cost</div>
+        <div class="refItem__value">{{ formatMoney(makingCostRef) }}</div>
+        
       </div>
 
       <div class="refItem">
@@ -706,7 +697,7 @@
   }
   type PreviewImg = { key: string; file: File; previewUrl: string }
   const finalRefPriceAllIn = computed(() => {
-    const a = Number(finalUnitPriceRef.value ?? 0)
+    const a = Number(makingCostRef.value ?? 0)
     const b = Number(totalGoldLineAmount.value ?? 0)
     const c = Number(totalOriginalPrice.value ?? 0)
     return a + b + c
