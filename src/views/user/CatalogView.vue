@@ -521,12 +521,12 @@
 
       <div class="mf-footer__social">
         <a
-  href="https://web.facebook.com/myittaroo1996?mibextid=wwXIfr&rdid=es9Muc0qFthaPjMN&share_url=https%3A%2F%2Fweb.facebook.com%2Fshare%2F1C1eJmdpKt%2F%3Fmibextid%3DwwXIfr%26_rdc%3D1%26_rdr%3D1"
-  target="_blank"
-  rel="noopener noreferrer"
->
-  Facebook
-</a>
+          href="https://web.facebook.com/myittaroo1996?mibextid=wwXIfr&rdid=es9Muc0qFthaPjMN&share_url=https%3A%2F%2Fweb.facebook.com%2Fshare%2F1C1eJmdpKt%2F%3Fmibextid%3DwwXIfr%26_rdc%3D1%26_rdr%3D1"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Facebook
+        </a>
       </div>
     </div>
 
