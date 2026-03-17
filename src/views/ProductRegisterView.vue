@@ -439,7 +439,7 @@
     <div class="pcard">
       <div class="secHead">
         <div>
-          <h3 class="secHead__h">Add Jewellery for the Quantity of the Product</h3>
+          <h3 class="secHead__h">Add Gems for the Quantity of the Product</h3>
           <p class="secHead__p">
             Choose jewellery source, enter qty + selling price. Unit price comes from gem package.
           </p>
@@ -453,8 +453,8 @@
 
       <div class="miniTable">
         <div class="miniTable__head miniTable__head--wide">
-          <div class="miniTable__th">Jewellery Source *</div>
-          <div class="miniTable__th">Qty *</div>
+          <div class="miniTable__th">Gem Source </div>
+          <div class="miniTable__th">Qty </div>
           <div class="miniTable__th">Unit Weight</div>
           <div class="miniTable__th">Total Weight</div>
           <div class="miniTable__th">Selling Price *</div>
@@ -473,7 +473,7 @@
           <div class="miniTable__td">
             <div class="combo" @click.stop>
               <button class="combo__btn" type="button" @click.stop="toggleJewelryDd(idx)">
-                <span class="combo__text">{{ row.sourceLabel || 'Select jewellery package' }}</span>
+                <span class="combo__text">{{ row.sourceLabel || 'Select gem package' }}</span>
                 <span class="combo__icon">▾</span>
               </button>
 
