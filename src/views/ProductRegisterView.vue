@@ -1259,10 +1259,9 @@
   }
 
   const removeGoldRow = (idx: number) => {
-    if (product.goldRows.length === 1) return
-    product.goldRows.splice(idx, 1)
-    validateGoldRows()
-  }
+  product.goldRows.splice(idx, 1)
+  validateGoldRows()
+}
 
   const validateGoldRows = () => {
     goldError.value = null
@@ -1366,10 +1365,9 @@
   }
 
   const removeJewelryRow = (idx: number) => {
-    if (product.jewelryRows.length === 1) return
-    product.jewelryRows.splice(idx, 1)
-    validateJewelryRows()
-  }
+  product.jewelryRows.splice(idx, 1)
+  validateJewelryRows()
+}
 
   const validateJewelryRows = () => {
     jewelryError.value = null
