@@ -56,19 +56,19 @@
   const category = computed(() => (route.query.category as string) || 'Jewelry')
   const productId = computed(() => Number(route.params.id))
   async function fetchProduct() {
-  loading.value = true
-  error.value = ''
-  product.value = null
+    loading.value = true
+    error.value = ''
+    product.value = null
 
-  try {
-    const data = await productsStore.getProductById(productId.value)
-    product.value = data
-  } catch (e: any) {
-    error.value = e?.message ?? 'Failed to load product.'
-  } finally {
-    loading.value = false
+    try {
+      const data = await productsStore.getProductById(productId.value)
+      product.value = data
+    } catch (e: any) {
+      error.value = e?.message ?? 'Failed to load product.'
+    } finally {
+      loading.value = false
+    }
   }
-}
   onMounted(fetchProduct)
   watch(productId, fetchProduct)
   const galleryTop3 = computed(() => {

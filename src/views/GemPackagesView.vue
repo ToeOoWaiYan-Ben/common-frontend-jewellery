@@ -79,7 +79,13 @@
             </p>
           </div>
 
-          <button class="gp-btn" type="button" @click="closeForm" :disabled="store.loading">
+          <button
+            class="gp-btn"
+            type="button"
+            @click="closeForm"
+            :disabled="store.loading"
+            style="background-color: #3b82f6; color: white"
+          >
             ✕ Close
           </button>
         </div>

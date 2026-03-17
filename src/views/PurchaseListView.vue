@@ -9,7 +9,7 @@
     :isLoading="isLoading"
     :errorMessage="errorMessage"
     :showForm="false"
-    :primaryButtonLabel="'Refresh'"
+    :primaryButtonLabel="'Create'"
     idKey="id"
     :editingId="null"
     @click-new="onClickRefresh"
@@ -140,6 +140,8 @@
   import { useProductsStore } from '@/stores/useProductsStore'
 
   import type { InvoiceResponseDto } from '@/dtos/InvoiceDto'
+  import { useRouter } from 'vue-router'
+  const router = useRouter()
 
   const invoicesStore = useInvoicesStore()
   const { items: invoices, loading, error } = storeToRefs(invoicesStore)
@@ -225,8 +227,8 @@
     currentPage.value = page
   }
 
-  const onClickRefresh = async () => {
-    await invoicesStore.loadAll()
+  const onClickRefresh = () => {
+    router.push({ name: 'purchase' })
   }
 
   const onClickView = (inv: InvoiceResponseDto) => {

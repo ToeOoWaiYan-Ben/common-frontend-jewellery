@@ -9,7 +9,7 @@
     :isLoading="isLoading"
     :errorMessage="errorMessage"
     :showForm="showForm"
-    primaryButtonLabel="Create New Customer"
+    :primaryButtonLabel="showForm ? 'Close Form' : 'Create New Customer'"
     idKey="id"
     @click-new="onClickNew"
     @change-page="goToPage"

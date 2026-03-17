@@ -4,7 +4,7 @@
     <p class="settings-sub">Choose what to manage</p>
 
     <div class="grid">
-      <RouterLink to="/admin/purchase" class="card">
+      <RouterLink to="/admin/purchase/list" class="card">
         <h3>Purchases</h3>
         <p>Manage purchases</p>
       </RouterLink>
