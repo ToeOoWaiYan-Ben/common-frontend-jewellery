@@ -457,7 +457,7 @@
     productSearch.value = ''
     discount.value = 0
 
-    router.push('/admin/invoices')
+    router.push('/admin/purchase/list')
   } catch (e: any) {
     submitError.value = e?.message ?? 'Failed to complete purchase.'
   } finally {
