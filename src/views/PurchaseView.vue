@@ -189,7 +189,7 @@
           
 
           <p v-if="!canCompletePurchase" style="margin-top: 10px; color: #ef4444; font-size: 13px">
-            Please select a customer and add at least 1 product.
+          
           </p>
 
           <p v-if="submitError" style="margin-top: 10px; color: #ef4444; font-size: 13px">
