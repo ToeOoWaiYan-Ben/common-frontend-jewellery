@@ -186,7 +186,7 @@
             {{ submitting ? 'Saving…' : 'Complete Purchase' }}
           </button>
 
-          <button class="btn" type="button">Print Invoice</button>
+          
 
           <p v-if="!canCompletePurchase" style="margin-top: 10px; color: #ef4444; font-size: 13px">
             Please select a customer and add at least 1 product.
