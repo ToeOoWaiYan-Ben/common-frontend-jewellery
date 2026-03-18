@@ -510,7 +510,7 @@
   </div>
   <footer class="mf-footer">
     <div class="mf-footer__content">
-      <h2 class="mf-footer__title">MYITTAR OO</h2>
+      <h2 class="mf-footer__title">MYIT TAR OO</h2>
 
       <div class="mf-footer__subtitle">Diamonds and Fine Jewellery</div>
 
@@ -531,7 +531,7 @@
       </div>
     </div>
 
-    <div class="mf-footer__bottom">© 2026 MYITTAR OO Diamonds and Fine Jewellery</div>
+    <div class="mf-footer__bottom">© 2026 MYIT TAR OO Diamonds and Fine Jewellery</div>
   </footer>
 </template>
 

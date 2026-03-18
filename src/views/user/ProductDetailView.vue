@@ -147,10 +147,7 @@
         <div class="pd-container">
           <button class="pd-crumbLink" type="button" @click="backToCatalog">Home</button>
           <span class="pd-crumbSep">/</span>
-          <button class="pd-crumbLink" type="button" @click="backToCatalog">Jewelry</button>
-          <span class="pd-crumbSep">/</span>
-          <span class="pd-crumbCurrent">{{ category }}</span>
-          <span class="pd-crumbSep">/</span>
+        
           <span class="pd-crumbNow">{{ product.name }}</span>
         </div>
       </div>
