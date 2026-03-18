@@ -106,7 +106,7 @@
             <th>Product</th>
             <th>Code</th>
             <th style="text-align: right">Qty</th>
-            <th style="text-align: right">Unit</th>
+            <th style="text-align: right">Price</th>
             <th style="text-align: right">Total</th>
           </tr>
         </thead>
