@@ -603,29 +603,34 @@
       </div>
     </div>
     <div class="pfield">
-      <label class="plabel">Final Price (MMK) *</label>
+  <label class="plabel">Final Price (MMK) *</label>
 
-      <input
-        v-model.number="product.finalPrice"
-        class="pinput"
-        type="number"
-        min="0"
-        step="1"
-        placeholder="e.g. 4782"
-      />
+  <div v-if="finalPriceError" class="tinyErr">
+    {{ finalPriceError }}
+  </div>
 
-      <div class="tinyHint">
-        Ref: <strong>{{ formatMoney(finalRefPriceAllIn) }}</strong>
+  <input
+    v-model.number="product.finalPrice"
+    class="pinput"
+    type="number"
+    min="0"
+    step="1"
+    placeholder="e.g. 4782"
+    @input="finalPriceError = ''"
+  />
 
-        <template v-if="hasFinalPrice">
-          • Diff: <strong>{{ formatMoney(finalPriceDiff) }}</strong>
-        </template>
-      </div>
+  <div class="tinyHint">
+    Ref: <strong>{{ formatMoney(finalRefPriceAllIn) }}</strong>
 
-      <div v-if="hasFinalPrice && isFinalLowerThanRef" class="tinyErr">
-        Your final price is lower than the original price.
-      </div>
-    </div>
+    <template v-if="hasFinalPrice">
+      • Diff: <strong>{{ formatMoney(finalPriceDiff) }}</strong>
+    </template>
+  </div>
+
+  <div v-if="hasFinalPrice && isFinalLowerThanRef" class="tinyErr">
+    Your final price is lower than the original price.
+  </div>
+</div>
 
     <!-- SAVE -->
     <div class="saveBar">
@@ -710,6 +715,8 @@
     const ref = Number(finalRefPriceAllIn.value ?? 0)
     return final - ref
   })
+  const finalPriceError = ref('')
+  
 
   const isFinalLowerThanRef = computed(() => {
     if (!hasFinalPrice.value) return false
@@ -1490,22 +1497,41 @@
   /* =========================
    SAVE
 ========================= */
+const validateFinalPrice = () => {
+  finalPriceError.value = ''
+
+  const final = Number(product.finalPrice ?? 0)
+
+  if (!product.finalPrice || final <= 0) {
+    finalPriceError.value = 'Final price is required.'
+    return false
+  }
+
+  return true
+}
   const onSaveAll = async () => {
     if (!String(product.name || '').trim()) return alert('Product name is required.')
-    if (!product.productTypeId || Number(product.productTypeId) <= 0)
-      return alert('Product Type is required.')
-    if (product.depreciation == null || Number(product.depreciation) <= 0)
-      return alert('Depreciation is required.')
 
-    validateGoldRows()
-    validateJewelryRows()
+  if (!product.productTypeId || Number(product.productTypeId) <= 0)
+    return alert('Product Type is required.')
 
-    const goldMissing = product.goldRows.some((r) => !r.goldSourceId || !r.craftId)
-    const jewMissing = product.jewelryRows.some((r) => !r.gemsPackageId)
+  if (product.depreciation == null || Number(product.depreciation) <= 0)
+    return alert('Depreciation is required.')
 
-    if (goldMissing) return (goldError.value = 'Please choose Gold Source + Craft for every row.')
-    if (jewMissing) return (jewelryError.value = 'Please choose Jewellery package for every row.')
-    if (goldError.value || jewelryError.value) return
+  // ✅ ADD THIS HERE
+  if (!validateFinalPrice()) return
+
+  validateGoldRows()
+  validateJewelryRows()
+
+  const goldMissing = product.goldRows.some((r) => !r.goldSourceId || !r.craftId)
+  const jewMissing = product.jewelryRows.some((r) => !r.gemsPackageId)
+
+  if (goldMissing) return (goldError.value = 'Please choose Gold Source + Craft for every row.')
+  if (jewMissing) return (jewelryError.value = 'Please choose Jewellery package for every row.')
+  if (goldError.value || jewelryError.value) return
+   
+
 
     const payload = {
       name: product.name,
