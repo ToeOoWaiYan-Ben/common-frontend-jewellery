@@ -123,8 +123,6 @@
             placeholder="Search by type name or category…"
           />
         </div>
-
-        
       </div>
     </template>
 

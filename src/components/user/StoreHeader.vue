@@ -4,8 +4,10 @@
 
     <!-- Brand -->
     <div class="mh-brand">
-      <div class="mh-brand__logo">MYIT TAR OO</div>
-    </div>
+  <router-link to="/user/catalog" class="mh-brand__logo">
+    MYIT TAR OO
+  </router-link>
+</div>
 
     <!-- Nav -->
     <nav class="mh-nav">
@@ -113,5 +115,10 @@
     document.removeEventListener('click', onDocClick)
   })
 </script>
-
+<style>
+.mh-brand__logo {
+  text-decoration: none;
+  color: inherit;   /* keeps your original text color */
+}
+</style>
 <style scoped src="@/styles/user/store-header.css"></style>

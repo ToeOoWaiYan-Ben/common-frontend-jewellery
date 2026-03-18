@@ -186,11 +186,10 @@
             {{ submitting ? 'Saving…' : 'Complete Purchase' }}
           </button>
 
-          
-
-          <p v-if="!canCompletePurchase" style="margin-top: 10px; color: #ef4444; font-size: 13px">
-          
-          </p>
+          <p
+            v-if="!canCompletePurchase"
+            style="margin-top: 10px; color: #ef4444; font-size: 13px"
+          ></p>
 
           <p v-if="submitError" style="margin-top: 10px; color: #ef4444; font-size: 13px">
             {{ submitError }}

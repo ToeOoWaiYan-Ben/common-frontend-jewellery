@@ -453,8 +453,8 @@
 
       <div class="miniTable">
         <div class="miniTable__head miniTable__head--wide">
-          <div class="miniTable__th">Gem Source </div>
-          <div class="miniTable__th">Qty </div>
+          <div class="miniTable__th">Gem Source</div>
+          <div class="miniTable__th">Qty</div>
           <div class="miniTable__th">Unit Weight</div>
           <div class="miniTable__th">Total Weight</div>
           <div class="miniTable__th">Selling Price *</div>

@@ -28,10 +28,8 @@
 
     // ✅ show gem info (optional)
     const firstJew = p.productJewellerys?.[0]
-    if (firstJew?.unitWeight != null) items.push(`Unit weight: ${firstJew.unitWeight}`)
-    if (firstJew?.originalPrice != null)
-      items.push(`Original price: ${formatPrice(Number(firstJew.originalPrice))}`)
-
+    
+   
     // ✅ show gold info (optional)
     const firstGold = p.productGolds?.[0]
     if (firstGold?.goldPurity) items.push(`Gold purity: ${firstGold.goldPurity}`)
@@ -147,7 +145,7 @@
         <div class="pd-container">
           <button class="pd-crumbLink" type="button" @click="backToCatalog">Home</button>
           <span class="pd-crumbSep">/</span>
-        
+
           <span class="pd-crumbNow">{{ product.name }}</span>
         </div>
       </div>
