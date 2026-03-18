@@ -460,14 +460,7 @@
 
       <div class="sw-drawer__body">
         <div class="sw-sortList">
-          <button
-            class="sw-radio"
-            :class="{ 'is-active': sortBy === 'relevance' }"
-            type="button"
-            @click="sortBy = 'relevance'"
-          >
-            Relevance <span class="sw-check">{{ sortBy === 'relevance' ? '✓' : '' }}</span>
-          </button>
+          
 
           <button
             class="sw-radio"

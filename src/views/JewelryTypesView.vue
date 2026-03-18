@@ -124,17 +124,7 @@
           />
         </div>
 
-        <div style="display: flex; gap: 10px; align-items: center">
-          <label style="font-weight: 600">Filter Category:</label>
-          <select v-model="filterCategoryId" class="category-form__input" style="max-width: 280px">
-            <option :value="null">All categories</option>
-            <option v-for="c in categories" :key="c.id" :value="c.id">
-              {{ c.name }}
-            </option>
-          </select>
-
-          <button class="btn-secondary" type="button" @click="reloadTypes">Apply</button>
-        </div>
+        
       </div>
     </template>
 
