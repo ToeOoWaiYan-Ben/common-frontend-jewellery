@@ -53,8 +53,15 @@
         </div>
 
         <div class="card kpi-card">
-          <span class="kpi-label">Purchases in Period</span>
-          <b class="kpi-value">{{ data.purchasesToday }}</b>
+          <span class="kpi-label">Period Cost</span>
+          <b class="kpi-value">{{ money(data.totalCost) }}</b>
+        </div>
+
+        <div class="card kpi-card">
+          <span class="kpi-label">Period Profit</span>
+          <b class="kpi-value" :class="Number(data.totalProfit) >= 0 ? 'profit-up' : 'profit-down'">
+            {{ money(data.totalProfit) }}
+          </b>
         </div>
 
         <div class="card kpi-card">
@@ -140,6 +147,8 @@
     monthSales: 0,
     purchasesToday: 0,
     lowStockCount: 0,
+    totalCost: 0,
+    totalProfit: 0,
     salesTrend: [],
     topProducts: [],
     lowStock: [],

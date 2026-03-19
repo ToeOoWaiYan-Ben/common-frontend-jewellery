@@ -28,8 +28,7 @@
 
     // ✅ show gem info (optional)
     const firstJew = p.productJewellerys?.[0]
-    
-   
+
     // ✅ show gold info (optional)
     const firstGold = p.productGolds?.[0]
     if (firstGold?.goldPurity) items.push(`Gold purity: ${firstGold.goldPurity}`)

@@ -460,8 +460,6 @@
 
       <div class="sw-drawer__body">
         <div class="sw-sortList">
-          
-
           <button
             class="sw-radio"
             :class="{ 'is-active': sortBy === 'new' }"

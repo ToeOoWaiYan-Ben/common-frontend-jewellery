@@ -105,7 +105,6 @@
   import { http } from '../services/http'
   import type { JewelryTypeDto } from '../dtos/JewelryTypeDto'
 
-
   const router = useRouter()
   const productsStore = useProductsStore()
   const { items: products, loading, error } = storeToRefs(productsStore)

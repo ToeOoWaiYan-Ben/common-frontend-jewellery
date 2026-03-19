@@ -603,34 +603,61 @@
       </div>
     </div>
     <div class="pfield">
-  <label class="plabel">Final Price (MMK) *</label>
+      <div class="refBox">
+        <div class="refBox__title">Reference Price Summary</div>
 
-  <div v-if="finalPriceError" class="tinyErr">
-    {{ finalPriceError }}
-  </div>
+        <div class="refBox__grid">
+          <div class="refItem">
+            <div class="refItem__label">Making Cost</div>
+            <div class="refItem__value">{{ formatMoney(makingCostRef) }}</div>
+          </div>
 
-  <input
-    v-model.number="product.finalPrice"
-    class="pinput"
-    type="number"
-    min="0"
-    step="1"
-    placeholder="e.g. 4782"
-    @input="finalPriceError = ''"
-  />
+          <div class="refItem">
+            <div class="refItem__label">Total (Weight × Current Price)</div>
+            <div class="refItem__value">{{ formatMoney(totalGoldLineAmount) }}</div>
+            <div class="refItem__sub">Sum of all Gold rows line totals</div>
+          </div>
 
-  <div class="tinyHint">
-    Ref: <strong>{{ formatMoney(finalRefPriceAllIn) }}</strong>
+          <div class="refItem">
+            <div class="refItem__label">Total Original Price</div>
+            <div class="refItem__value">{{ formatMoney(totalOriginalPrice) }}</div>
+            <div class="refItem__sub">Sum of (Package Unit Price × Qty)</div>
+          </div>
+        </div>
 
-    <template v-if="hasFinalPrice">
-      • Diff: <strong>{{ formatMoney(finalPriceDiff) }}</strong>
-    </template>
-  </div>
+        <div class="refBox__footer">
+          <span class="refBox__hint">Final Ref Price (All-in)</span>
+          <span class="refBox__final">{{ formatMoney(finalRefPriceAllIn) }}</span>
+        </div>
+      </div>
+      <label class="plabel">Final Price (MMK) *</label>
 
-  <div v-if="hasFinalPrice && isFinalLowerThanRef" class="tinyErr">
-    Your final price is lower than the original price.
-  </div>
-</div>
+      <div v-if="finalPriceError" class="tinyErr">
+        {{ finalPriceError }}
+      </div>
+
+      <input
+        v-model.number="product.finalPrice"
+        class="pinput"
+        type="number"
+        min="0"
+        step="1"
+        placeholder="e.g. 4782"
+        @input="finalPriceError = ''"
+      />
+
+      <div class="tinyHint">
+        Ref: <strong>{{ formatMoney(finalRefPriceAllIn) }}</strong>
+
+        <template v-if="hasFinalPrice">
+          • Diff: <strong>{{ formatMoney(finalPriceDiff) }}</strong>
+        </template>
+      </div>
+
+      <div v-if="hasFinalPrice && isFinalLowerThanRef" class="tinyErr">
+        Your final price is lower than the original price.
+      </div>
+    </div>
 
     <!-- SAVE -->
     <div class="saveBar">
@@ -639,33 +666,6 @@
         <button class="btnGhost" type="button" @click="goBack">Cancel</button>
         <button class="btnPrimary" type="button" @click="onSaveAll">Save</button>
       </div>
-    </div>
-  </div>
-  <div class="refBox">
-    <div class="refBox__title">Reference Price Summary</div>
-
-    <div class="refBox__grid">
-      <div class="refItem">
-        <div class="refItem__label">Making Cost</div>
-        <div class="refItem__value">{{ formatMoney(makingCostRef) }}</div>
-      </div>
-
-      <div class="refItem">
-        <div class="refItem__label">Total (Weight × Current Price)</div>
-        <div class="refItem__value">{{ formatMoney(totalGoldLineAmount) }}</div>
-        <div class="refItem__sub">Sum of all Gold rows line totals</div>
-      </div>
-
-      <div class="refItem">
-        <div class="refItem__label">Total Original Price</div>
-        <div class="refItem__value">{{ formatMoney(totalOriginalPrice) }}</div>
-        <div class="refItem__sub">Sum of (Package Unit Price × Qty)</div>
-      </div>
-    </div>
-
-    <div class="refBox__footer">
-      <span class="refBox__hint">Final Ref Price (All-in)</span>
-      <span class="refBox__final">{{ formatMoney(finalRefPriceAllIn) }}</span>
     </div>
   </div>
 </template>
@@ -716,7 +716,6 @@
     return final - ref
   })
   const finalPriceError = ref('')
-  
 
   const isFinalLowerThanRef = computed(() => {
     if (!hasFinalPrice.value) return false
@@ -786,6 +785,7 @@
     depreciation: 0,
     productTypeId: null as number | null,
     finalPrice: 0,
+    referencePrice: 0,
 
     goldRows: [
       {
@@ -842,6 +842,7 @@
     product.colorCount = Number(p.colorCount ?? 0)
     product.depreciation = Number(p.depreciation ?? 0)
     product.finalPrice = Number(p.finalPrice ?? p.final_price ?? 0)
+    product.referencePrice = Number(p.referencePrice ?? 0)
     product.productTypeId = p.productTypeId != null ? Number(p.productTypeId) : null
   }
 
@@ -1497,41 +1498,39 @@
   /* =========================
    SAVE
 ========================= */
-const validateFinalPrice = () => {
-  finalPriceError.value = ''
+  const validateFinalPrice = () => {
+    finalPriceError.value = ''
 
-  const final = Number(product.finalPrice ?? 0)
+    const final = Number(product.finalPrice ?? 0)
 
-  if (!product.finalPrice || final <= 0) {
-    finalPriceError.value = 'Final price is required.'
-    return false
+    if (!product.finalPrice || final <= 0) {
+      finalPriceError.value = 'Final price is required.'
+      return false
+    }
+
+    return true
   }
-
-  return true
-}
   const onSaveAll = async () => {
     if (!String(product.name || '').trim()) return alert('Product name is required.')
 
-  if (!product.productTypeId || Number(product.productTypeId) <= 0)
-    return alert('Product Type is required.')
+    if (!product.productTypeId || Number(product.productTypeId) <= 0)
+      return alert('Product Type is required.')
 
-  if (product.depreciation == null || Number(product.depreciation) <= 0)
-    return alert('Depreciation is required.')
+    if (product.depreciation == null || Number(product.depreciation) <= 0)
+      return alert('Depreciation is required.')
 
-  // ✅ ADD THIS HERE
-  if (!validateFinalPrice()) return
+    // ✅ ADD THIS HERE
+    if (!validateFinalPrice()) return
 
-  validateGoldRows()
-  validateJewelryRows()
+    validateGoldRows()
+    validateJewelryRows()
 
-  const goldMissing = product.goldRows.some((r) => !r.goldSourceId || !r.craftId)
-  const jewMissing = product.jewelryRows.some((r) => !r.gemsPackageId)
+    const goldMissing = product.goldRows.some((r) => !r.goldSourceId || !r.craftId)
+    const jewMissing = product.jewelryRows.some((r) => !r.gemsPackageId)
 
-  if (goldMissing) return (goldError.value = 'Please choose Gold Source + Craft for every row.')
-  if (jewMissing) return (jewelryError.value = 'Please choose Jewellery package for every row.')
-  if (goldError.value || jewelryError.value) return
-   
-
+    if (goldMissing) return (goldError.value = 'Please choose Gold Source + Craft for every row.')
+    if (jewMissing) return (jewelryError.value = 'Please choose Jewellery package for every row.')
+    if (goldError.value || jewelryError.value) return
 
     const payload = {
       name: product.name,
@@ -1549,6 +1548,7 @@ const validateFinalPrice = () => {
       depreciation: Number(product.depreciation ?? 0),
       productTypeId: Number(product.productTypeId),
       finalPrice: Number(product.finalPrice ?? 0),
+      referencePrice: Number(finalRefPriceAllIn.value ?? 0),
 
       productGolds: product.goldRows.map((r) => ({
         goldSourceId: r.goldSourceId!,

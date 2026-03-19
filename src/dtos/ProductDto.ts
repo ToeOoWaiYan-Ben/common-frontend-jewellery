@@ -36,6 +36,7 @@ export interface ProductDto {
   depreciation: number
   productTypeId: number
   finalPrice: number
+  referencePrice?: number | null
 
   // ✅ matches backend fields
   productGolds: ProductGoldItemDto[]

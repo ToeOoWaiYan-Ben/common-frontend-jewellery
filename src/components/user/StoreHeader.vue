@@ -4,10 +4,8 @@
 
     <!-- Brand -->
     <div class="mh-brand">
-  <router-link to="/user/catalog" class="mh-brand__logo">
-    MYIT TAR OO
-  </router-link>
-</div>
+      <router-link to="/user/catalog" class="mh-brand__logo"> MYIT TAR OO </router-link>
+    </div>
 
     <!-- Nav -->
     <nav class="mh-nav">
@@ -116,9 +114,9 @@
   })
 </script>
 <style>
-.mh-brand__logo {
-  text-decoration: none;
-  color: inherit;   /* keeps your original text color */
-}
+  .mh-brand__logo {
+    text-decoration: none;
+    color: inherit; /* keeps your original text color */
+  }
 </style>
 <style scoped src="@/styles/user/store-header.css"></style>
