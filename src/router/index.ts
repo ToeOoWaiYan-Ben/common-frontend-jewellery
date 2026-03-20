@@ -43,13 +43,15 @@ import Suppliers from '../views/selection/Suppliers.vue'
 import Pricing from '../views/selection/Pricing.vue'
 import UsersSelection from '../views/selection/Users.vue'
 
+
 const routes: RouteRecordRaw[] = [
   /* ---------- Default ---------- */
   { path: '/', redirect: '/user/catalog' },
 
-  /* ---------- Auth ---------- */
-  { path: '/login', name: 'login', component: LoginView },
-
+/* ---------- Auth ---------- */
+{ path: '/login', name: 'login', component: LoginView },
+{ path: '/reset-password', component: () => import('../views/ResetPasswordView.vue') },
+  
   /* ---------- USER STOREFRONT ---------- */
   {
     path: '/user',

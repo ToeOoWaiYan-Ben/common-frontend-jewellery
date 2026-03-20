@@ -24,6 +24,10 @@
         required
       />
 
+      <p class="forgot-password">
+  <a href="#" @click.prevent="goToForgot">Forgot password?</a>
+</p>
+
       <!-- Error -->
       <p v-if="error" class="login-error">{{ error }}</p>
 
@@ -39,6 +43,30 @@
   import { reactive, computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '../stores/useAuthStore'
+  import { http } from '../services/http'
+
+async function goToForgot() {
+if (!form.email.endsWith('@gmail.com')) {
+  alert("Only Gmail is allowed")
+  return
+}
+
+  try {
+    await http('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        email: form.email
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    alert("Reset link sent to your email!")
+  } catch (e) {
+    alert("Error sending email")
+  }
+}
 
   const router = useRouter()
   const auth = useAuthStore()
@@ -136,4 +164,19 @@
     margin: 4px 0 0;
     text-align: center;
   }
+
+  .forgot-password {
+  text-align: right;
+  margin-top: -6px;
+}
+
+.forgot-password a {
+  font-size: 13px;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
 </style>
