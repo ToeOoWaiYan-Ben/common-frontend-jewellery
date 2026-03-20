@@ -8,18 +8,7 @@
 
     <!-- User -->
     <div class="app-header__user">
-      <div class="app-header__user-meta">
-        <span class="app-header__user-name">
-          {{ displayName }}
-        </span>
-        <span class="app-header__user-role">
-          {{ displayRole }}
-        </span>
-      </div>
-
-      <div class="app-header__avatar">
-        {{ avatarLetter }}
-      </div>
+      
 
       <button class="app-header__logout" @click="handleLogout">
         Logout
